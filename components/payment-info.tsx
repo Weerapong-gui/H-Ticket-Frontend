@@ -1,5 +1,6 @@
 import { eventConfig } from "@/lib/event-config";
 import { money, TICKET_PRICE } from "@/lib/booking";
+import { AccountCopyField } from "@/components/account-copy-field";
 
 /** ข้อมูลโอนเงิน มาจาก lib/event-config.ts (backend ไม่ได้ส่งข้อมูลนี้มา) */
 export function PaymentInfo() {
@@ -26,16 +27,11 @@ export function PaymentInfo() {
               <dd>{p.accountName}</dd>
             </div>
           )}
-          {p.accountNumber && (
-            <div>
-              <dt>เลขบัญชี / พร้อมเพย์</dt>
-              <dd className="reference">{p.accountNumber}</dd>
-            </div>
-          )}
         </dl>
       ) : (
         <p>ผู้จัดงานยังไม่ประกาศบัญชีรับโอน</p>
       )}
+      {p.accountNumber && <AccountCopyField accountNumber={p.accountNumber} />}
       {p.promptPayQr && (
         // eslint-disable-next-line @next/next/no-img-element -- static QR from config
         <img

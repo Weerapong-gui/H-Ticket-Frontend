@@ -2657,3 +2657,45 @@ footer {
   padding: 14px 16px;
   margin: 0 0 18px;
 }
+.account-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  background: #140d0d;
+}
+.account-copy-number {
+  font-family: var(--display);
+  font-size: clamp(1.15rem, 5vw, 1.9rem);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow-x: auto;
+  min-width: 0;
+}
+.account-copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: var(--red);
+  color: #f6e7dc;
+  font: 600 12px var(--sans);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.account-copy-button:hover {
+  background: var(--bright);
+}
+.account-copy-button:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+.account-copy-button.copied {
+  background: #1f5130;
+}
