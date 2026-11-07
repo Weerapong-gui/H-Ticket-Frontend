@@ -92,7 +92,7 @@ export function Footer() {
         </p>
       </div>
       <div className="footer-bottom">
-        <span>© The Haunted House · Demo booking experience</span>
+        <span>© The Haunted House · Pre-sale tickets</span>
         <div>
           <Link href="/#attraction">The house</Link>
           <Link href="/#faq">FAQ</Link>

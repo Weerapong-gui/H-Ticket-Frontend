@@ -214,7 +214,7 @@ export default function Home() {
           </Link>
         </Reveal>
         <p className="ticket-note">
-          เดโมเท่านั้น · เลือกได้ 1–10 ใบ · ไม่มีการเรียกเก็บเงิน
+          จองล่วงหน้า · 1 รหัสนักศึกษา = 1 ใบ · โอนแล้วแนบสลิป รับเลขบัตรทันที
         </p>
       </section>
       <section className="section faq-section" id="faq">

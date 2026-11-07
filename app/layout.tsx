@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
-import { DemoBookingProvider } from "@/components/demo-booking-provider";
+import { SalesProvider } from "@/components/booking-provider";
 import { Header, Footer } from "@/components/chrome";
 
 export const metadata: Metadata = {
   title: "The Haunted House | Enter if you dare",
   description:
-    "An immersive horror experience. Explore the house and create your demo booking.",
+    "An immersive horror experience. Pre-sale tickets for the haunted house.",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
-        <DemoBookingProvider>
+        <SalesProvider>
           <Header />
           <div id="main-content">
             <Suspense
@@ -33,7 +33,7 @@ export default function RootLayout({
             </Suspense>
           </div>
           <Footer />
-        </DemoBookingProvider>
+        </SalesProvider>
       </body>
     </html>
   );
