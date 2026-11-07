@@ -6,10 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:booking": "node scripts/verify-booking.cjs",
+    "format": "prettier --write app components lib scripts README.md",
+    "test:api": "node scripts/verify-api.cjs",
+    "test:demo": "node scripts/verify-demo.cjs"
   },
   "dependencies": {
+    "lucide-react": "^1.70.0",
+    "motion": "^14.10.1",
     "next": "16.4.5",
+    "qrcode": "^1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
@@ -20,7 +28,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@types/qrcode": "^1.5.6"
   }
 }
