@@ -21,7 +21,7 @@ export default function Login() {
   return (
     <main className="booking-main">
       <div className="login-panel">
-        <p className="eyebrow">STAFF ONLY</p>
+        <p className="eyebrow">ทีมงาน</p>
         <h1>เข้าสู่ระบบแอดมิน</h1>
         <p>สำหรับทีมงานขายและแจกบัตร</p>
         <form

@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel:wght@400;500;600;700;800&family=DM+Sans:wght@400;450;500;600;700&display=swap");
 @import "tailwindcss";
 :root {
   --background: #080808;
@@ -7,9 +6,9 @@
   --bright: #d62828;
   --muted: #99918d;
   --border: #392020;
-  --serif: "Cormorant Garamond", Georgia, serif;
-  --display: "Cinzel", Georgia, serif;
-  --sans: "DM Sans", Arial, sans-serif;
+  --serif: var(--f-cormorant), var(--f-serif-thai), Georgia, serif;
+  --display: var(--f-cinzel), var(--f-serif-thai), Georgia, serif;
+  --sans: var(--f-dm-sans), var(--f-sans-thai), Arial, sans-serif;
 }
 @theme inline {
   --color-background: var(--background);
@@ -83,11 +82,10 @@ h1,
 h2,
 h3 {
   font-weight: 500;
-  line-height: 1.08;
+  line-height: 1.35;
 }
 h2 {
-  font: 500 clamp(36px, 4vw, 56px)/1.08 var(--serif);
-  letter-spacing: -1px;
+  font: 500 clamp(34px, 3.6vw, 50px)/1.35 var(--serif);
 }
 h2 em,
 h1 em {
@@ -145,10 +143,9 @@ p {
   background: var(--red);
   color: #f6e7dc;
   padding: 15px 25px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 1.7px;
-  text-transform: uppercase;
+  letter-spacing: 0.5px;
   border: 1px solid #ac2930;
   transition:
     background 0.25s,
@@ -163,7 +160,7 @@ p {
 .header-cta {
   min-height: 42px;
   padding: 10px 19px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .menu-toggle {
   display: none;
@@ -204,9 +201,9 @@ p {
   padding-top: 95px;
 }
 .eyebrow {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 2.8px;
+  letter-spacing: 1px;
   color: #b16c65;
   text-transform: uppercase;
   display: flex;
@@ -244,8 +241,8 @@ p {
   margin-left: 20px;
 }
 .hero-subtitle {
-  font-size: 10px;
-  letter-spacing: 4.4px;
+  font-size: 18px;
+  letter-spacing: 3px;
   color: #c8b9aa;
 }
 .hero-description {
@@ -262,11 +259,11 @@ p {
   display: inline-flex;
   gap: 15px;
   align-items: center;
-  font-size: 11px;
+  font-size: 14px;
   color: #b9ada3;
 }
 .hero-note {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1px;
   color: #a2968d;
   margin-top: 30px;
@@ -280,22 +277,6 @@ p {
   background: #b33b36;
   border-radius: 50%;
   box-shadow: 0 0 9px #9b111e;
-}
-.hero-bottom {
-  position: absolute;
-  bottom: 28px;
-  left: 5.5%;
-  right: 5.5%;
-  display: flex;
-  justify-content: space-between;
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #7d746f;
-}
-.hero-bottom a {
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 .fog {
   position: absolute;
@@ -331,7 +312,7 @@ p {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.3px;
   color: #b7aaa0;
 }
@@ -341,7 +322,7 @@ p {
   color: #8b3837;
 }
 .info-strip small {
-  font-size: 8px;
+  font-size: 12px;
   color: #746a63;
 }
 .section {
@@ -372,35 +353,6 @@ p {
   border: 1px solid #e8ded225;
   pointer-events: none;
 }
-.image-caption {
-  position: absolute;
-  bottom: 23px;
-  left: 25px;
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: #c2b3a2;
-}
-.image-seal {
-  position: absolute;
-  right: -27px;
-  top: 32px;
-  border: 1px solid #70524a;
-  background: #15100d;
-  width: 92px;
-  height: 92px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transform: rotate(8deg);
-  font-size: 9px;
-  letter-spacing: 1px;
-}
-.image-seal b {
-  font-family: var(--serif);
-  font-size: 17px;
-  font-weight: 400;
-}
 .story-copy h2 {
   margin: 23px 0 25px;
 }
@@ -416,21 +368,6 @@ p {
 }
 .experiences {
   padding-top: 30px;
-}
-.section-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 30px;
-  margin-bottom: 36px;
-}
-.section-heading h2 {
-  margin-top: 18px;
-  font-size: 44px;
-}
-.section-heading > p {
-  font-size: 11px;
-  line-height: 1.8;
 }
 .experience-grid {
   display: grid;
@@ -455,44 +392,9 @@ p {
   transform: scale(1.05);
   filter: brightness(0.85) saturate(0.65);
 }
-.experience-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(0deg, #080808 0%, #080808b0 27%, transparent 75%);
-}
-.experience-number {
-  position: absolute;
-  top: 19px;
-  left: 23px;
-  font: 20px var(--serif);
-  color: #c6b7a277;
-}
-.experience-copy {
-  position: absolute;
-  bottom: 26px;
-  left: 25px;
-  right: 22px;
-}
-.experience-copy .eyebrow {
-  font-size: 7px;
-  letter-spacing: 2px;
-}
 .experience h3 {
   font: 27px var(--serif);
   margin: 10px 0;
-}
-.experience-copy > p:not(.eyebrow) {
-  font-size: 10px;
-  max-width: 225px;
-}
-.experience-link {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 25px;
-  font-size: 9px;
-  color: #bca99b;
-  letter-spacing: 0.5px;
 }
 .quote {
   text-align: center;
@@ -505,7 +407,7 @@ p {
   width: 22px;
 }
 .quote p {
-  font: 36px/1.3 var(--serif);
+  font: 34px/1.5 var(--serif);
   color: #d7c9bc;
   margin: 20px 0;
 }
@@ -513,7 +415,7 @@ p {
   color: #9c8c80;
 }
 .quote > span {
-  font-size: 7px;
+  font-size: 12px;
   letter-spacing: 2.2px;
   color: #85756d;
 }
@@ -529,28 +431,6 @@ p {
 .center-heading > p:last-child {
   font-size: 12px;
 }
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-top: 55px;
-}
-.price-card {
-  position: relative;
-  border: 1px solid #352624;
-  background: #110e0d;
-  padding: 35px 29px;
-}
-.price-card > svg {
-  color: #92504a;
-}
-.price-card h3 {
-  font: 29px var(--serif);
-  margin: 15px 0 8px;
-}
-.price-card > p {
-  font-size: 10px;
-}
 .price {
   font: 49px var(--serif);
   margin: 20px 0;
@@ -561,87 +441,15 @@ p {
   font: 10px var(--sans);
   color: #8d7d73;
 }
-.price-card ul {
-  list-style: none;
-  padding: 0;
-  line-height: 2.7;
-  margin: 0 0 28px;
-  font-size: 10px;
-  color: #afa095;
-}
-.price-card li > span {
-  font-size: 9px;
-  color: #8b3c36;
-  margin-right: 7px;
-}
-.price-card .button {
-  width: 100%;
-  font-size: 9px;
-}
 .outline {
   background: transparent;
   border-color: #5e302e;
 }
-.featured {
-  border-color: #8b282d;
-  background: linear-gradient(#241013, #110e0d);
-}
-.popular {
-  position: absolute;
-  top: -13px;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  background: #8f1925;
-  padding: 5px 16px;
-  font-size: 7px;
-  letter-spacing: 1.5px;
-}
 .ticket-note {
   text-align: center;
-  font-size: 9px;
+  font-size: 12px;
   margin-top: 25px;
   color: #796d66;
-}
-.faq-section {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 70px;
-  padding-top: 30px;
-}
-.faq-section h2 {
-  margin: 21px 0;
-}
-.faq-section > div > p:last-child {
-  font-size: 12px;
-}
-.faq-item {
-  border-bottom: 1px solid #302321;
-}
-.faq-item h3 button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  width: 100%;
-  border: 0;
-  background: none;
-  text-align: left;
-  padding: 23px 0;
-  font-size: 12px;
-}
-.faq-item svg {
-  color: #a2645a;
-  flex-shrink: 0;
-}
-.faq-item motion,
-.faq-item [id] {
-  overflow: hidden;
-}
-.faq-item p {
-  padding: 0 30px 23px 0;
-  font-size: 11px;
-  line-height: 1.9;
 }
 .final-cta {
   text-align: center;
@@ -669,10 +477,10 @@ footer {
   padding-bottom: 45px;
 }
 .footer-top > p {
-  font-size: 11px;
+  font-size: 12px;
 }
 .footer-top > a:last-child {
-  font-size: 10px;
+  font-size: 12px;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -685,7 +493,7 @@ footer {
   justify-content: space-between;
   gap: 25px;
   color: #746962;
-  font-size: 8px;
+  font-size: 12px;
 }
 .footer-bottom > div {
   display: flex;
@@ -708,7 +516,7 @@ footer {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 10px;
+  font-size: 12px;
   color: #665c56;
 }
 .progress span {
@@ -717,7 +525,7 @@ footer {
   width: 27px;
   height: 27px;
   border: 1px solid #3c2b27;
-  font-size: 9px;
+  font-size: 12px;
 }
 .progress .active {
   color: #d5c7ba;
@@ -729,9 +537,8 @@ footer {
 .page-heading {
   margin-bottom: 40px;
 }
-.page-heading h1,
-.confirmation h1 {
-  font: 500 clamp(38px, 4.4vw, 59px)/1.15 var(--serif);
+.page-heading h1 {
+  font: 500 clamp(36px, 4vw, 52px)/1.35 var(--serif);
   margin: 14px 0;
 }
 .page-heading > p:last-child {
@@ -762,90 +569,9 @@ footer {
   border: 1px solid #49302b;
   padding: 5px 7px;
 }
-.booking-step > p,
-.quantity-step p {
-  font-size: 10px;
-  margin-bottom: 16px;
-}
-.ticket-options {
-  display: grid;
-  gap: 10px;
-}
-.ticket-option {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  background: #110e0d;
-  border: 1px solid #382724;
-  padding: 18px;
-  text-align: left;
-  width: 100%;
-}
-.ticket-option strong {
-  display: block;
+.booking-step > p {
   font-size: 12px;
-  font-weight: 500;
-}
-.ticket-option small {
-  display: block;
-  font-size: 9px;
-  color: #8c7f76;
-  margin-top: 4px;
-}
-.ticket-option > b {
-  margin-left: auto;
-  font: 23px var(--serif);
-  white-space: nowrap;
-  text-align: right;
-}
-.ticket-option > b small {
-  font: 8px var(--sans);
-}
-.selected {
-  border-color: #9b343b !important;
-  background: #291014 !important;
-  box-shadow: 0 0 20px #9b111e12;
-}
-.radio {
-  border: 1px solid #77534d;
-  width: 17px;
-  height: 17px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-}
-.selected .radio {
-  background: #9b111e;
-  border-color: #ae3e46;
-}
-.quantity-step {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.quantity-step h2 {
-  margin-bottom: 8px;
-}
-.quantity-step p {
-  margin: 0 0 0 44px;
-}
-.quantity {
-  display: flex;
-  align-items: center;
-  border: 1px solid #49302b;
-}
-.quantity button {
-  display: grid;
-  place-items: center;
-  width: 39px;
-  height: 40px;
-  border: 0;
-  background: #17100f;
-}
-.quantity output {
-  width: 43px;
-  text-align: center;
+  margin-bottom: 16px;
 }
 .summary {
   position: sticky;
@@ -858,7 +584,7 @@ footer {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 1.7px;
   color: #a47769;
   border-bottom: 1px solid #3a2722;
@@ -877,7 +603,7 @@ footer {
   justify-content: space-between;
   gap: 20px;
   margin-bottom: 18px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .summary dt {
   color: #938178;
@@ -898,26 +624,13 @@ footer {
 .total strong {
   font: 36px var(--serif);
 }
-.summary-note {
-  font-size: 9px;
-  margin-top: 5px;
-  margin-bottom: 25px;
-}
 .summary .button {
   width: 100%;
-  font-size: 9px;
+  font-size: 12px;
   gap: 15px;
 }
-.demo-note {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  font-size: 8px;
-  margin-top: 20px;
-}
 .selection-hint {
-  font-size: 9px;
+  font-size: 12px;
   margin-top: 12px;
   text-align: center;
 }
@@ -928,7 +641,7 @@ footer {
 .form-fields label {
   display: grid;
   gap: 8px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .form-fields label span {
   color: #84766e;
@@ -947,134 +660,10 @@ footer {
 .form-fields textarea::placeholder {
   color: #685b53;
 }
-.payment-options {
-  display: grid;
-  gap: 10px;
-  margin-top: 22px;
-}
-.payment-options label {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  border: 1px solid #402a25;
-  padding: 16px;
-  background: #120e0d;
-  font-size: 11px;
-  cursor: pointer;
-}
-.payment-options input {
-  accent-color: #ac2734;
-}
-.payment-options svg {
-  color: #9b7567;
-}
-.demo-banner {
-  padding: 15px;
-  background: #221310;
-  border-left: 2px solid #883a32;
-  font-size: 9px;
-  margin-top: 22px;
-  color: #b59482;
-}
 .error {
   color: #f18e8e;
-  font-size: 11px;
-  margin-bottom: 15px;
-}
-.empty-page {
-  min-height: 65vh;
-  padding: 100px 8%;
-  text-align: center;
-}
-.empty-page h1 {
-  font: 50px var(--serif);
-}
-.empty-page p {
-  margin: 20px;
-}
-.confirmation {
-  text-align: center;
-}
-.confirmation-icon {
-  width: 60px;
-  height: 60px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #8d3e37;
-  border-radius: 50%;
-  color: #b78468;
-  margin: 0 auto 25px;
-  background: #291411;
-}
-.confirmation > .eyebrow {
-  justify-content: center;
-}
-.confirmation > p:not(.eyebrow) {
   font-size: 12px;
-}
-.confirmation-ticket {
-  max-width: 790px;
-  margin: 40px auto;
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  border: 1px solid #55362a;
-  background: #16100d;
-  text-align: left;
-}
-.ticket-detail {
-  padding: 35px;
-}
-.ticket-detail h2 {
-  font-size: 37px;
-  margin: 17px 0 25px;
-}
-.ticket-detail dl > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  margin: 12px 0;
-  font-size: 10px;
-}
-.ticket-detail dt {
-  color: #927d6c;
-}
-.ticket-detail dd {
-  text-align: right;
-  max-width: 65%;
-  margin: 0;
-}
-.reference {
-  letter-spacing: 1px;
-  font-size: 9px;
-}
-.qr-panel {
-  border-left: 1px dashed #6a4833;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #20170f;
-  padding: 30px 20px;
-  text-align: center;
-}
-.qr-panel img {
-  max-width: 100%;
-  height: auto;
-}
-.qr-panel strong {
-  font-size: 18px;
-  letter-spacing: 4px;
-  color: #c3a481;
-  margin-top: 17px;
-}
-.qr-panel > span {
-  font-size: 8px;
-  letter-spacing: 1.8px;
-  color: #c6a584;
-}
-.qr-panel > p {
-  font-size: 9px;
-  margin-top: 13px;
+  margin-bottom: 15px;
 }
 @media (min-width: 1500px) {
   .hero-content {
@@ -1106,24 +695,11 @@ footer {
   .story-image {
     height: 410px;
   }
-  .section-heading h2 {
-    font-size: 36px;
-  }
   .experience {
     height: 365px;
   }
-  .experience-copy {
-    left: 18px;
-    right: 15px;
-  }
   .experience h3 {
     font-size: 23px;
-  }
-  .price-card {
-    padding: 28px 20px;
-  }
-  .faq-section {
-    gap: 35px;
   }
   .booking-grid {
     gap: 25px;
@@ -1161,7 +737,7 @@ footer {
     margin-right: 17px;
     padding: 8px 12px;
     min-height: 36px;
-    font-size: 8px;
+    font-size: 12px;
     gap: 8px;
   }
   .menu-toggle {
@@ -1214,11 +790,11 @@ footer {
     margin-left: 12px;
   }
   .eyebrow {
-    font-size: 8px;
+    font-size: 12px;
     letter-spacing: 2px;
   }
   .hero-subtitle {
-    font-size: 8px;
+    font-size: 15px;
     letter-spacing: 2.8px;
   }
   .hero-description {
@@ -1230,22 +806,10 @@ footer {
   }
   .hero .button {
     min-height: 48px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .hero .text-link {
-    font-size: 10px;
-  }
-  .hero-bottom {
-    left: 6%;
-    right: 6%;
-    font-size: 7px;
-    bottom: 24px;
-  }
-  .hero-bottom > span:last-child {
-    display: none;
-  }
-  .hero-bottom > span:first-child {
-    max-width: 110px;
+    font-size: 12px;
   }
   .info-strip {
     display: grid;
@@ -1254,7 +818,7 @@ footer {
     gap: 20px 12px;
   }
   .info-strip > span {
-    font-size: 8px;
+    font-size: 12px;
     gap: 8px;
   }
   .info-strip svg {
@@ -1271,9 +835,6 @@ footer {
     height: 360px;
     margin-right: 15px;
   }
-  .image-seal {
-    right: -15px;
-  }
   .story-copy h2 {
     font-size: 45px;
   }
@@ -1282,15 +843,6 @@ footer {
   }
   .experiences {
     padding-top: 15px;
-  }
-  .section-heading {
-    display: block;
-  }
-  .section-heading h2 {
-    font-size: 37px;
-  }
-  .section-heading > p {
-    margin-top: 20px;
   }
   .experience-grid {
     grid-template-columns: 1fr;
@@ -1301,16 +853,6 @@ footer {
   }
   .experience h3 {
     font-size: 32px;
-  }
-  .experience-copy > p:not(.eyebrow) {
-    font-size: 12px;
-  }
-  .experience-copy {
-    left: 25px;
-    bottom: 26px;
-  }
-  .experience-link {
-    font-size: 10px;
   }
   .quote {
     padding: 10px 20px 65px;
@@ -1324,38 +866,6 @@ footer {
   .center-heading h2 {
     font-size: 42px;
   }
-  .pricing-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    margin-top: 38px;
-  }
-  .price-card {
-    padding: 30px;
-  }
-  .price-card h3 {
-    font-size: 32px;
-  }
-  .price-card > p,
-  .price-card ul {
-    font-size: 12px;
-  }
-  .price-card .button {
-    font-size: 10px;
-  }
-  .faq-section {
-    display: block;
-    padding-top: 0;
-  }
-  .faq-list {
-    margin-top: 25px;
-  }
-  .faq-item h3 button {
-    font-size: 12px;
-    line-height: 1.5;
-  }
-  .faq-item p {
-    font-size: 12px;
-  }
   .final-cta {
     padding: 65px 6%;
   }
@@ -1368,7 +878,7 @@ footer {
     gap: 25px;
   }
   .footer-top > p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .footer-top > a:last-child {
     width: 100%;
@@ -1389,13 +899,13 @@ footer {
     justify-content: space-between;
   }
   .progress > div {
-    font-size: 8px;
+    font-size: 12px;
     gap: 5px;
   }
   .progress span {
     width: 22px;
     height: 22px;
-    font-size: 8px;
+    font-size: 12px;
   }
   .page-heading h1 {
     font-size: 43px;
@@ -1408,61 +918,8 @@ footer {
     position: static;
     padding: 25px;
   }
-  .ticket-option {
-    gap: 11px;
-    padding: 15px 12px;
-  }
-  .ticket-option small {
-    font-size: 8px;
-  }
-  .ticket-option strong {
-    font-size: 11px;
-  }
-  .ticket-option > b {
-    font-size: 22px;
-  }
   .booking-step h2 {
     font-size: 24px;
-  }
-  .quantity-step {
-    gap: 15px;
-  }
-  .quantity-step h2 {
-    font-size: 22px;
-    gap: 10px;
-  }
-  .quantity-step p {
-    font-size: 9px;
-    margin-left: 39px;
-  }
-  .quantity button {
-    width: 32px;
-  }
-  .quantity output {
-    width: 32px;
-  }
-  .confirmation h1 {
-    font-size: 43px;
-  }
-  .confirmation-ticket {
-    grid-template-columns: 1fr;
-  }
-  .ticket-detail {
-    padding: 26px;
-  }
-  .ticket-detail dl > div {
-    font-size: 11px;
-  }
-  .qr-panel {
-    border-left: 0;
-    border-top: 1px dashed #6a4833;
-    padding: 30px;
-  }
-  .confirmation .progress {
-    margin-bottom: 40px;
-  }
-  .empty-page h1 {
-    font-size: 40px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1489,13 +946,6 @@ footer {
   top: 12px;
 }
 @media (max-width: 700px) {
-  .quantity button {
-    min-height: 44px;
-    min-width: 36px;
-  }
-  .quantity output {
-    min-width: 32px;
-  }
   .menu-toggle {
     min-width: 44px;
     min-height: 44px;
@@ -1580,7 +1030,7 @@ footer {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10px;
+  font-size: 12px;
   color: #b4a49c;
   margin-top: 8px;
 }
@@ -1602,25 +1052,11 @@ footer {
 .early-bird-price > span {
   display: block;
   color: #9d8c83;
-  font-size: 9px;
+  font-size: 12px;
   margin-top: 5px;
 }
-.early-bird-row .quantity {
-  background: #0d0b0b;
-  flex-shrink: 0;
-}
-.early-bird-row .quantity button {
-  width: 34px;
-  min-height: 44px;
-  background: transparent;
-}
-.early-bird-row .quantity output {
-  width: 32px;
-  font-size: 12px;
-  color: #f0e3d7;
-}
 .ticket-quantity-note {
-  font-size: 9px;
+  font-size: 12px;
   color: #9d8c83;
   padding: 0 25px 20px;
   margin: 0;
@@ -1653,12 +1089,6 @@ footer {
   .early-bird-price strong {
     font-size: 23px;
   }
-  .early-bird-row .quantity {
-    justify-self: end;
-  }
-  .early-bird-row .quantity button {
-    min-width: 42px;
-  }
   .ticket-quantity-note {
     padding-left: 20px;
   }
@@ -1684,7 +1114,7 @@ footer {
   gap: 20px;
   padding: 10px 0;
   border-bottom: 1px solid #ffffff08;
-  font-size: 11px;
+  font-size: 12px;
 }
 .fixed-event-panel dl > div:last-child {
   border: 0;
@@ -1698,8 +1128,7 @@ footer {
   max-width: 65%;
   overflow-wrap: anywhere;
 }
-.summary dd,
-.ticket-detail dd {
+.summary dd {
   overflow-wrap: anywhere;
 }
 @media (max-width: 700px) {
@@ -1707,7 +1136,7 @@ footer {
     padding: 20px;
   }
   .fixed-event-panel dl > div {
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 /* API-connected buyer and staff surfaces */
@@ -1731,11 +1160,6 @@ footer {
   padding: 0;
   margin-top: 8px;
 }
-.single-admission {
-  font-size: 10px;
-  color: #b5a197;
-  white-space: nowrap;
-}
 .error-notice {
   border: 1px solid #82383b;
   background: #321417;
@@ -1751,87 +1175,6 @@ footer {
 .error-notice .text-link {
   margin-top: 10px;
 }
-.checkout-fields {
-  border: 0;
-  padding: 0;
-  margin: 0;
-  min-width: 0;
-}
-.checkout-fields:disabled {
-  opacity: 0.6;
-}
-.transfer-panel {
-  border: 1px solid #4b302a;
-  background: #17100e;
-  padding: 23px;
-}
-.transfer-panel > svg {
-  color: #be8375;
-}
-.transfer-panel > strong {
-  display: block;
-  font-size: 17px;
-  margin: 10px 0 15px;
-}
-.transfer-panel p,
-.payment-explainer {
-  font-size: 12px;
-  line-height: 1.9;
-}
-.transfer-panel dl > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  font-size: 12px;
-  margin: 10px 0;
-}
-.transfer-panel dt {
-  color: #b19c90;
-}
-.transfer-panel dd {
-  margin: 0;
-  text-align: right;
-  overflow-wrap: anywhere;
-}
-.transfer-panel img {
-  margin: 20px auto 0;
-  max-width: 100%;
-  height: auto;
-}
-.payment-explainer {
-  margin-top: 17px !important;
-}
-.slip-upload {
-  display: flex;
-  align-items: start;
-  gap: 15px;
-  border: 1px dashed #80504a;
-  padding: 22px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-.slip-upload > svg {
-  color: #bc8b78;
-  flex-shrink: 0;
-}
-.slip-upload > span {
-  font-size: 13px;
-  min-width: 0;
-}
-.slip-upload input {
-  display: block;
-  margin-top: 12px;
-  width: 100%;
-  font-size: 11px;
-}
-.slip-upload input::file-selector-button {
-  background: #4b1a20;
-  border: 1px solid #9c4c4d;
-  color: #f0dfd3;
-  padding: 9px 12px;
-  margin-right: 10px;
-  cursor: pointer;
-}
 .slip-preview {
   margin-top: 20px;
 }
@@ -1844,13 +1187,9 @@ footer {
   margin: auto;
 }
 .slip-preview p {
-  font-size: 10px;
+  font-size: 12px;
   overflow-wrap: anywhere;
   margin-top: 10px;
-}
-.lookup-link {
-  display: flex;
-  margin-top: 16px;
 }
 .ticket-lookup {
   max-width: 1050px;
@@ -1878,7 +1217,7 @@ footer {
   border-radius: 0;
 }
 .privacy-note {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.8;
   margin: 18px 0 28px;
 }
@@ -1935,7 +1274,7 @@ footer {
   justify-content: space-between;
   gap: 20px;
   margin: 12px 0;
-  font-size: 11px;
+  font-size: 12px;
 }
 .issued-event dt {
   color: #aa9487;
@@ -2031,7 +1370,7 @@ footer {
 }
 .stats-grid span {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: #ad9789;
 }
 .stats-grid strong {
@@ -2047,7 +1386,7 @@ footer {
   margin-top: 20px;
 }
 .action-buttons .button {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.8px;
 }
 .action-buttons .text-link {
@@ -2072,7 +1411,7 @@ footer {
 .admin-filters label {
   display: grid;
   gap: 8px;
-  font-size: 11px;
+  font-size: 12px;
   flex: 1;
 }
 .admin-filters label:nth-child(2) {
@@ -2106,14 +1445,14 @@ footer {
   line-height: 1.7;
 }
 .order-card p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
   margin-top: 5px;
   overflow-wrap: anywhere;
 }
 .order-status {
   margin-left: auto;
-  font-size: 11px;
+  font-size: 12px;
   color: #bba191;
   border: 1px solid #5d3d33;
   padding: 5px 12px;
@@ -2196,12 +1535,6 @@ footer {
   }
 }
 @media (max-width: 700px) {
-  .single-admission {
-    grid-column: 2;
-    grid-row: 2;
-    text-align: right;
-    font-size: 9px;
-  }
   .lookup-form {
     flex-direction: column;
     align-items: stretch;
@@ -2234,7 +1567,7 @@ footer {
     gap: 15px;
   }
   .admin-nav a {
-    font-size: 10px;
+    font-size: 12px;
   }
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -2261,7 +1594,7 @@ footer {
     font-size: 25px;
   }
   .admin-section-heading > button {
-    font-size: 10px;
+    font-size: 12px;
   }
   .order-card {
     padding: 20px;
@@ -2291,9 +1624,6 @@ footer {
   }
   .login-panel {
     padding: 25px;
-  }
-  .slip-upload {
-    padding: 17px;
   }
 }
 @media (max-width: 900px) {
@@ -2327,7 +1657,7 @@ footer {
     margin-left: auto;
     margin-right: 12px;
     min-height: 40px;
-    font-size: 9px;
+    font-size: 12px;
     gap: 10px;
     padding: 10px 15px;
   }
@@ -2341,20 +1671,17 @@ footer {
     height: calc(100svh - 76px);
   }
 }
-.student-form-heading,
-.student-review-heading {
+.student-form-heading {
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 27px;
 }
-.student-form-heading > svg,
-.student-review-heading > svg {
+.student-form-heading > svg {
   color: #b16c65;
   flex-shrink: 0;
 }
-.student-form-heading h2,
-.student-review-heading h2 {
+.student-form-heading h2 {
   font: 25px/1.6 var(--serif);
   margin: 0;
 }
@@ -2383,120 +1710,31 @@ footer {
 .field-error {
   display: block;
   color: #efaaa0 !important;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   margin-top: 7px;
 }
 .student-info .field-hint {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: #ad9d91;
   line-height: 1.8;
   margin-top: 7px;
 }
-.student-privacy {
-  display: flex;
-  gap: 12px;
-  border-left: 2px solid #723336;
-  padding: 14px 16px;
-  background: #1a1111;
-  margin: 23px 0;
-}
-.student-privacy > svg {
-  color: #bd8e7c;
-  flex-shrink: 0;
-  margin-top: 4px;
-}
-.student-privacy p {
-  font-size: 10px;
-  line-height: 1.9;
-}
-.student-review {
-  padding: 28px;
-  border: 1px solid #663b35;
-  background: #17100e;
-}
-.student-review dl {
-  margin: 0 0 25px;
-}
-.student-review dl > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 16px 0;
-  border-bottom: 1px solid #3b2923;
-  font-size: 12px;
-}
-.student-review dt {
-  color: #a99588;
-}
-.student-review dd {
-  margin: 0;
-  text-align: right;
-  overflow-wrap: anywhere;
-  max-width: 65%;
-}
-.student-review > p {
-  font-size: 10px;
-  margin-bottom: 18px;
-}
-.student-review > .text-link {
-  background: none;
-  border: 0;
-  padding: 0;
-}
-.confirmation-actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 25px;
-  flex-wrap: wrap;
-}
 .student-checkout .summary .button {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.7px;
 }
 @media (max-width: 700px) {
-  .student-info,
-  .student-review {
+  .student-info {
     padding: 23px 20px;
   }
   .student-form-heading h2 {
     font-size: 23px;
   }
-  .student-privacy p {
-    font-size: 10px;
-  }
-  .student-review dl > div {
-    font-size: 11px;
-  }
   .student-checkout .summary .button {
-    font-size: 10px;
+    font-size: 12px;
   }
-}
-.demo-scope-note {
-  display: flex;
-  gap: 12px;
-  padding: 16px 20px;
-  border-left: 2px solid #8c4447;
-  background: #1b1112;
-  margin-bottom: 28px;
-}
-.demo-scope-note svg {
-  flex-shrink: 0;
-  color: #bc8574;
-  margin-top: 3px;
-}
-.demo-scope-note p {
-  font-size: 11px;
-  line-height: 1.9;
-}
-.checkout-quantity {
-  margin-bottom: 28px;
-}
-.student-entries {
-  display: grid;
-  gap: 24px;
 }
 .student-entry {
   margin: 0;
@@ -2506,127 +1744,78 @@ footer {
   color: #ab8c7c;
   margin-left: 10px;
 }
-.student-review-person {
-  margin: 20px 0 26px;
-  padding-top: 20px;
-  border-top: 1px solid #51312c;
-}
-.student-review-person h3 {
-  font-size: 15px;
-  line-height: 1.7;
-  color: #d4b5a1;
-}
-.multi-booking-summary {
-  max-width: 850px;
-  text-align: left;
-  border: 1px solid #55362a;
-  background: #15100e;
-  padding: 25px 30px;
-  margin: 35px auto;
-}
-.multi-booking-summary dl {
-  margin: 0;
-}
-.multi-booking-summary dl > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 25px;
-  padding: 10px 0;
-  font-size: 12px;
-  border-bottom: 1px solid #ffffff07;
-}
-.multi-booking-summary dt {
-  color: #a68d7d;
-}
-.multi-booking-summary dd {
-  margin: 0;
-  text-align: right;
-  max-width: 65%;
-  overflow-wrap: anywhere;
-}
-.individual-tickets {
-  display: grid;
-  gap: 25px;
-  max-width: 850px;
-  margin: 30px auto;
-}
-.individual-ticket {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(220px, 1fr);
-  border: 1px solid #6c4636;
-  background: #17100d;
-  text-align: left;
-}
-.individual-ticket-info {
-  padding: 32px;
-  min-width: 0;
-}
-.individual-ticket-info h2 {
-  font-size: 32px;
-  line-height: 1.4;
-  margin: 18px 0 25px;
-  overflow-wrap: anywhere;
-}
-.individual-ticket-info dl > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  margin: 17px 0;
-  font-size: 11px;
-}
-.individual-ticket-info dt {
-  color: #ac9281;
-}
-.individual-ticket-info dd {
-  margin: 0;
-  text-align: right;
-  max-width: 65%;
-  overflow-wrap: anywhere;
-}
-.individual-ticket-info .reference {
-  font-size: 9px;
-}
-.confirmation-retention {
-  max-width: 800px;
-  margin: 24px auto 32px;
-  font-size: 11px;
-}
-.confirmation-actions button.text-link {
-  background: none;
-  border: 0;
-  padding: 10px;
-}
 @media (max-width: 700px) {
   .student-form-heading h2 > span {
     display: block;
     margin: 8px 0 0;
   }
-  .individual-ticket {
-    grid-template-columns: 1fr;
-  }
-  .individual-ticket-info {
-    padding: 24px;
-  }
-  .individual-ticket .qr-panel {
-    border-left: 0;
-    border-top: 1px dashed #6a4833;
-  }
-  .individual-ticket-info h2 {
-    font-size: 28px;
-  }
-  .multi-booking-summary {
-    padding: 20px;
-  }
-  .multi-booking-summary dl > div {
-    font-size: 11px;
-  }
-  .demo-scope-note {
-    padding: 15px;
-  }
-  .demo-scope-note p {
-    font-size: 10px;
-  }
-  .student-entries {
-    gap: 20px;
-  }
+}
+
+/* ---- real checkout ---- */
+.payment-info h2 {
+  margin: 4px 0 12px;
+}
+.promptpay-qr {
+  display: block;
+  width: min(240px, 100%);
+  margin: 16px 0;
+  background: #fff;
+  padding: 8px;
+}
+.slip-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 420px;
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  object-fit: contain;
+}
+.success-banner {
+  border: 1px solid #2f6b3a;
+  background: #13261a;
+  color: #bfe8c6;
+  padding: 14px 16px;
+  margin: 0 0 18px;
+}
+.account-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  background: #140d0d;
+}
+.account-copy-number {
+  font-family: var(--display);
+  font-size: clamp(1.15rem, 5vw, 1.9rem);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow-x: auto;
+  min-width: 0;
+}
+.account-copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: var(--red);
+  color: #f6e7dc;
+  font: 600 12px var(--sans);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.account-copy-button:hover {
+  background: var(--bright);
+}
+.account-copy-button:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+.account-copy-button.copied {
+  background: #1f5130;
 }

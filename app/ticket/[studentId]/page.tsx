@@ -7,9 +7,18 @@ export const metadata: Metadata = {
 };
 export default async function TicketPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ studentId: string }>;
+  searchParams: Promise<{ new?: string }>;
 }) {
   const { studentId } = await params;
-  return <TicketLookup key={studentId} studentId={studentId} />;
+  const { new: justIssued } = await searchParams;
+  return (
+    <TicketLookup
+      key={studentId}
+      studentId={decodeURIComponent(studentId)}
+      justIssued={justIssued === "1"}
+    />
+  );
 }

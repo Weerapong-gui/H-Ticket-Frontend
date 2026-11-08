@@ -7,7 +7,13 @@ import { api, ApiError, IssuedTicket } from "@/lib/api";
 import { validStudentId } from "@/lib/booking";
 import { ErrorNotice } from "./error-notice";
 import { EventFacts } from "./event-facts";
-export function TicketLookup({ studentId = "" }: { studentId?: string }) {
+export function TicketLookup({
+  studentId = "",
+  justIssued = false,
+}: {
+  studentId?: string;
+  justIssued?: boolean;
+}) {
   const router = useRouter();
   const [query, setQuery] = useState(studentId);
   const [ticket, setTicket] = useState<IssuedTicket | null>(null);
@@ -52,7 +58,7 @@ export function TicketLookup({ studentId = "" }: { studentId?: string }) {
   return (
     <main className="booking-main ticket-lookup">
       <div className="page-heading">
-        <p className="eyebrow">YOUR NUMBER / YOUR NIGHT</p>
+        <p className="eyebrow">ค้นบัตร</p>
         <h1>
           ค้นหา<em>บัตรของคุณ</em>
         </h1>
@@ -96,7 +102,13 @@ export function TicketLookup({ studentId = "" }: { studentId?: string }) {
       <ErrorNotice error={error} />
       {ticket && !loading && (
         <section className="issued-ticket" aria-label="บัตรจากระบบ">
-          <p className="eyebrow">THE HAUNTED HOUSE / PRE-SALE</p>
+          {justIssued && (
+            <p className="success-banner" role="status">
+              ออกบัตรสำเร็จ! บันทึกหน้านี้ไว้ (บุ๊กมาร์กหรือแคปหน้าจอ)
+              ใช้แลกบัตรจริงหน้างาน
+            </p>
+          )}
+          <p className="eyebrow">THE HAUNTED HOUSE · บัตรล่วงหน้า</p>
           <p>เลขบัตร / ลำดับคิว</p>
           <strong className="ticket-number">{ticket.ticket_label}</strong>
           <h2>{ticket.name}</h2>

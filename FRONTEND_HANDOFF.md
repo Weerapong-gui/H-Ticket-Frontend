@@ -1,6 +1,6 @@
 ﻿# Frontend integration handoff
 
-> Current buyer checkout has been changed to a student **demo** flow by the latest request. It allows 1–10 tickets and never calls `/api/orders`. The API adapters, real ticket lookup and admin routes described below are retained; purchase-route descriptions below describe the integration contract, not the currently active demo checkout. Personal booking data stays in React memory and is not sent to the backend.
+> Checkout ใช้ระบบจริงแล้ว: 1 รหัสนักศึกษา = 1 ใบ ส่ง `POST /api/orders` พร้อมสลิป แล้วพาไปหน้า `/ticket/{student_id}?new=1` (โหมดเดโม 1–10 ใบถูกเอาออก)
 
 เอกสารอ้างอิง: `docs/BACKEND_API.md` — ฝั่ง backend ดูแลโดยอีกทีม งานใน repository นี้เป็น frontend เท่านั้น
 
@@ -62,7 +62,3 @@ API tests ใช้ fetch mock ใน process ทดสอบเท่านั�
 7. ทดสอบปิดถาวรใน test environment เท่านั้น พร้อมคำยืนยัน `ปิดถาวร`
 
 การทดสอบร่วมเหล่านี้ยังไม่ได้อ้างว่าผ่านกับ service จริง
-
-## Multi-student uniqueness update
-
-The latest demo now has one student per selected ticket, per-batch duplicate checks, an in-memory used-ID registry and separate demo ticket IDs/QRs. It still does not submit real multi-ticket orders. See [PRODUCTION_UNIQUENESS.md](PRODUCTION_UNIQUENESS.md) for required backend/database constraints, atomic batch confirmation, lifecycle, privacy-safe eligibility and entry-token handling.
