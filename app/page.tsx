@@ -14,11 +14,7 @@ import {
 } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import { ScareLayer } from "@/components/scare/scare-layer";
-const gallery = [
-  { image: "hallway", alt: "ทางเดินมืดในบ้านเก่า มีแสงเทียน" },
-  { image: "room", alt: "ห้องเก่าในบ้านร้าง" },
-  { image: "ritual", alt: "ห้องที่จุดเทียนไว้รอบโต๊ะ" },
-];
+import { FlashCamera } from "@/components/scare/flash-camera";
 export default function Home() {
   return (
     <ScareLayer>
@@ -92,21 +88,8 @@ export default function Home() {
             <p>เดินเข้าไป หาทางออกให้เจอ แล้วอย่าหันกลับไปมอง</p>
           </Reveal>
         </section>
-        <section className="section experiences" id="experiences">
-          <div className="experience-grid">
-            {gallery.map((g) => (
-              <Reveal key={g.image}>
-                <div className="experience">
-                  <Image
-                    src={`/images/${g.image}.jpg`}
-                    alt={g.alt}
-                    fill
-                    sizes="(max-width: 700px) 100vw, 33vw"
-                  />
-                </div>
-              </Reveal>
-            ))}
-          </div>
+        <section className="section camera-section" id="camera">
+          <FlashCamera />
         </section>
         <section className="quote">
           <Flame />
