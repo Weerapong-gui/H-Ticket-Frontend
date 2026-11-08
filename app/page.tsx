@@ -13,26 +13,10 @@ import {
   Flame,
 } from "lucide-react";
 import { Reveal } from "@/components/reveal";
-import { Faq } from "@/components/faq";
-const experiences = [
-  {
-    name: "The Cursed Hallway",
-    tag: "01 / THE DESCENT",
-    text: "Every footstep echoes. Not all of them are yours.",
-    image: "hallway",
-  },
-  {
-    name: "The Forbidden Room",
-    tag: "02 / THE DISCOVERY",
-    text: "Some secrets were locked away for a reason.",
-    image: "room",
-  },
-  {
-    name: "The Final Ritual",
-    tag: "03 / THE RECKONING",
-    text: "The house has been waiting for one last guest.",
-    image: "ritual",
-  },
+const gallery = [
+  { image: "hallway", alt: "ทางเดินมืดในบ้านเก่า มีแสงเทียน" },
+  { image: "room", alt: "ห้องเก่าในบ้านร้าง" },
+  { image: "ritual", alt: "ห้องที่จุดเทียนไว้รอบโต๊ะ" },
 ];
 export default function Home() {
   return (
@@ -40,7 +24,7 @@ export default function Home() {
       <section className="hero">
         <Image
           src="/images/mansion.jpg"
-          alt="A decaying Victorian mansion beneath a blood-red moon"
+          alt="บ้านเก่าทรุดโทรมใต้พระจันทร์สีแดง"
           fill
           loading="eager"
           sizes="100vw"
@@ -50,25 +34,19 @@ export default function Home() {
         <div className="fog" />
         <div className="hero-content">
           <Reveal>
-            <p className="eyebrow">
-              <span /> THE DOORS ARE OPEN. WILL YOU ENTER?
-            </p>
             <h1>
               <span>THE</span>HAUNTED
               <br />
               HOUSE<span className="title-mark">✦</span>
             </h1>
-            <p className="hero-subtitle">AN IMMERSIVE HORROR EXPERIENCE</p>
-            <p className="hero-description">
-              Step inside a house where the past
-              <br className="desktop-break" /> refuses to stay buried.
-            </p>
+            <p className="hero-subtitle">บ้านผีสิง</p>
+            <p className="hero-description">เข้าไปแล้ว อย่าหันหลังกลับ</p>
             <div className="hero-actions">
               <Link href="/booking" className="button">
-                Book tickets <ArrowRight size={18} />
+                จองบัตร <ArrowRight size={18} />
               </Link>
               <Link href="#attraction" className="text-link">
-                Discover the house <ArrowDown size={15} />
+                เกี่ยวกับงาน <ArrowDown size={15} />
               </Link>
             </div>
             <div className="hero-note">
@@ -77,113 +55,53 @@ export default function Home() {
             </div>
           </Reveal>
         </div>
-        <div className="hero-bottom">
-          <span>THE HOUSE REMEMBERS EVERYTHING.</span>
-          <a href="#attraction">
-            SCROLL TO UNCOVER <ArrowDown size={14} />
-          </a>
-          <span>{eventConfig.type.toUpperCase()}</span>
-        </div>
       </section>
       <div className="info-strip">
         <span>
-          <MapPin /> Location: {eventConfig.location}
+          <MapPin /> สถานที่: {eventConfig.location}
         </span>
         <span>
-          <Clock3 /> Event time: {eventConfig.time}
+          <Clock3 /> เวลา: {eventConfig.time}
         </span>
         <span>
-          <CalendarDays /> Event date: {eventConfig.date}
+          <CalendarDays /> วันที่: {eventConfig.date}
         </span>
         <span>
-          <Ticket /> {money(TICKET_PRICE)} per soul
+          <Ticket /> {money(TICKET_PRICE)} ต่อคน
         </span>
       </div>
       <section className="section story" id="attraction">
         <Reveal className="story-image">
           <Image
             src="/images/mansion.jpg"
-            alt="The forgotten house and its shadowed windows"
+            alt="บ้านร้างกับหน้าต่างมืด ๆ"
             fill
             sizes="(max-width: 700px) 100vw, 45vw"
           />
-          <span className="image-caption">
-            EST. 1893 — ABANDONED, NEVER EMPTY.
-          </span>
-          <div className="image-seal">
-            THE PAST
-            <br />
-            <b>IS ALIVE</b>
-          </div>
         </Reveal>
         <Reveal className="story-copy">
-          <p className="eyebrow">01 / THE STORY BEHIND THE SILENCE</p>
+          <p className="eyebrow">เกี่ยวกับงาน</p>
           <h2>
-            A house with
-            <br />a <em>dark history.</em>
-          </h2>
-          <p>
-            They say the family left in the winter of 1893.
+            บ้านหลังนี้
             <br />
-            They say the house has been empty ever since.
-          </p>
-          <p>
-            But every night, the lights return. Footsteps travel through locked
-            rooms. And somewhere upstairs, a music box plays a song no one
-            remembers.
-          </p>
-          <p>
-            Cross the threshold into a fully immersive world of winding
-            corridors, buried secrets, and things that move when you look away.
-          </p>
-          <Link className="text-link" href="#experiences">
-            Some stories must be experienced <ArrowRight size={16} />
-          </Link>
+            <em>ไม่เคยว่าง</em>
+          </h2>
+          <p>ไฟดับ ประตูเปิดค้างไว้ และมีบางอย่างรอคุณอยู่ข้างใน</p>
+          <p>เดินเข้าไป หาทางออกให้เจอ แล้วอย่าหันกลับไปมอง</p>
         </Reveal>
       </section>
       <section className="section experiences" id="experiences">
-        <Reveal className="section-heading">
-          <div>
-            <p className="eyebrow">02 / THERE IS NO TURNING BACK</p>
-            <h2>
-              Three chapters.
-              <br />
-              <em>One unforgettable nightmare.</em>
-            </h2>
-          </div>
-          <p>
-            Follow the story deeper into the house.
-            <br />
-            Every room has something to hide.
-          </p>
-        </Reveal>
         <div className="experience-grid">
-          {experiences.map((e, i) => (
-            <Reveal key={e.name}>
-              <Link href="/booking" className={`experience experience-${i}`}>
+          {gallery.map((g) => (
+            <Reveal key={g.image}>
+              <div className="experience">
                 <Image
-                  src={`/images/${e.image}.jpg`}
-                  alt={
-                    e.name === "The Cursed Hallway"
-                      ? "An eerie candlelit gothic corridor"
-                      : e.name === "The Forbidden Room"
-                        ? "A mysterious old room in the abandoned mansion"
-                        : "A candlelit chamber prepared for a dark ritual"
-                  }
+                  src={`/images/${g.image}.jpg`}
+                  alt={g.alt}
                   fill
                   sizes="(max-width: 700px) 100vw, 33vw"
                 />
-                <div className="experience-overlay" />
-                <span className="experience-number">0{i + 1}</span>
-                <div className="experience-copy">
-                  <p className="eyebrow">{e.tag}</p>
-                  <h3>{e.name}</h3>
-                  <p>{e.text}</p>
-                  <span className="experience-link">
-                    Enter the experience <ArrowUp />
-                  </span>
-                </div>
-              </Link>
+              </div>
             </Reveal>
           ))}
         </div>
@@ -191,60 +109,36 @@ export default function Home() {
       <section className="quote">
         <Flame />
         <p>
-          “The walls don’t just have ears.
+          “ผนังบ้านนี้ไม่ได้มีแค่หู
           <br />
-          <em>They have memories.”</em>
+          <em>มันจำทุกอย่างได้”</em>
         </p>
-        <span>— FROM THE HOUSEKEEPER’S JOURNAL, 1893</span>
       </section>
       <section className="section tickets-section" id="tickets">
         <Reveal className="center-heading">
-          <p className="eyebrow">03 / YOUR INVITATION TO THE UNKNOWN</p>
+          <p className="eyebrow">บัตร</p>
           <h2>
-            There’s a place <em>for you.</em>
+            บัตร<em>ล่วงหน้า</em>
           </h2>
-          <p>
-            Your Early Bird invitation. The house will take care of the rest.
-          </p>
         </Reveal>
         <Reveal className="early-bird-home">
           <TicketAccordion />
           <Link href="/booking" className="button">
-            Book now <ArrowRight size={16} />
+            จองบัตร <ArrowRight size={16} />
           </Link>
         </Reveal>
         <p className="ticket-note">
-          จองล่วงหน้า · 1 รหัสนักศึกษา = 1 ใบ · โอนแล้วแนบสลิป รับเลขบัตรทันที
+          1 รหัสนักศึกษา = 1 ใบ · โอนแล้วแนบสลิป รับเลขบัตรทันที
         </p>
       </section>
-      <section className="section faq-section" id="faq">
-        <Reveal>
-          <p className="eyebrow">04 / BEFORE YOU CROSS THE THRESHOLD</p>
-          <h2>
-            A few things
-            <br />
-            <em>you should know.</em>
-          </h2>
-          <p>
-            The unknown is frightening.
-            <br />
-            Your visit doesn’t have to be.
-          </p>
-        </Reveal>
-        <Faq />
-      </section>
       <section className="final-cta">
-        <p className="eyebrow">SOME CURIOSITIES COME AT A PRICE.</p>
         <h2>
-          Will you <em>come inside?</em>
+          กล้า<em>เข้ามาไหม?</em>
         </h2>
         <Link href="/booking" className="button">
-          Book your experience <ArrowRight size={17} />
+          จองบัตร <ArrowRight size={17} />
         </Link>
       </section>
     </main>
   );
-}
-function ArrowUp() {
-  return <ArrowRight size={17} style={{ transform: "rotate(-45deg)" }} />;
 }

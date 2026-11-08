@@ -14,17 +14,17 @@ export default function BookingPage() {
     <main className="booking-main">
       <Progress step={1} />
       <div className="page-heading">
-        <p className="eyebrow">ONE-DAY EVENT / PRE-SALE</p>
+        <p className="eyebrow">บัตรล่วงหน้า</p>
         <h1>
-          Reserve your <em>nightmare.</em>
+          จอง<em>บัตร</em>
         </h1>
         <p>โอนเงิน แนบสลิป แล้วรับเลขบัตรทันที · 1 รหัสนักศึกษา = 1 ใบ</p>
       </div>
       <div className="booking-grid">
         <div className="booking-controls">
           <SalesNotice />
-          <section className="fixed-event-panel" aria-label="Event information">
-            <p className="eyebrow">THE NIGHT TO REMEMBER</p>
+          <section className="fixed-event-panel" aria-label="รายละเอียดงาน">
+            <p className="eyebrow">รายละเอียดงาน</p>
             <dl>
               <EventFacts />
             </dl>

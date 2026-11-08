@@ -5,19 +5,19 @@ export function EventFacts() {
   return (
     <>
       <div>
-        <dt>Event</dt>
+        <dt>งาน</dt>
         <dd>{eventConfig.name}</dd>
       </div>
       <div>
-        <dt>Event date</dt>
+        <dt>วันที่</dt>
         <dd>{eventConfig.date}</dd>
       </div>
       <div>
-        <dt>Event time</dt>
+        <dt>เวลา</dt>
         <dd>{eventConfig.time}</dd>
       </div>
       <div>
-        <dt>Location</dt>
+        <dt>สถานที่</dt>
         <dd>{eventConfig.location}</dd>
       </div>
     </>

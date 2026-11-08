@@ -11,7 +11,7 @@ export function PaymentInfo() {
       className="fixed-event-panel payment-info"
       aria-label="วิธีโอนเงิน"
     >
-      <p className="eyebrow">HOW TO PAY</p>
+      <p className="eyebrow">วิธีชำระเงิน</p>
       <h2>โอนเงิน {money(TICKET_PRICE)} แล้วแนบสลิป</h2>
       {ready ? (
         <dl>

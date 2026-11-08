@@ -8,9 +8,9 @@ export function Summary({ children }: { children?: React.ReactNode }) {
     <aside className="summary">
       <div className="summary-top">
         <Ticket size={22} />
-        <span>YOUR NIGHT AT THE HOUSE</span>
+        <span>THE HAUNTED HOUSE</span>
       </div>
-      <h2>Booking summary</h2>
+      <h2>สรุปการจอง</h2>
       <dl>
         <EventFacts />
         <div>

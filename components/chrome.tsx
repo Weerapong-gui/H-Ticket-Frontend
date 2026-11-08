@@ -47,13 +47,11 @@ export function Header() {
   return (
     <header className="header">
       <Brand />
-      <nav className={open ? "nav open" : "nav"} aria-label="Main navigation">
+      <nav className={open ? "nav open" : "nav"} aria-label="เมนูหลัก">
         {[
-          ["Home", "/"],
-          ["Attraction", "/#attraction"],
-          ["Experiences", "/#experiences"],
-          ["Tickets", "/#tickets"],
-          ["FAQ", "/#faq"],
+          ["หน้าแรก", "/"],
+          ["เกี่ยวกับงาน", "/#attraction"],
+          ["บัตร", "/#tickets"],
           ["ค้นบัตร", "/ticket"],
         ].map(([label, url]) => (
           <Link onClick={() => setOpen(false)} key={label} href={url}>
@@ -62,11 +60,11 @@ export function Header() {
         ))}
       </nav>
       <Link className="button header-cta" href="/booking">
-        Book tickets <ArrowUpRight size={15} />
+        จองบัตร <ArrowUpRight size={15} />
       </Link>
       <button
         className="menu-toggle"
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open ? "ปิดเมนู" : "เปิดเมนู"}
         aria-expanded={open}
         onClick={() => setOpen(!open)}
       >
@@ -80,11 +78,6 @@ export function Footer() {
     <footer>
       <div className="footer-top">
         <Brand />
-        <p>
-          Some doors should never be opened.
-          <br />
-          This one is waiting for you.
-        </p>
         <p className="contact-demo">
           ติดต่อผู้จัดงาน
           <br />
@@ -92,12 +85,11 @@ export function Footer() {
         </p>
       </div>
       <div className="footer-bottom">
-        <span>© The Haunted House · Pre-sale tickets</span>
+        <span>© The Haunted House · บัตรล่วงหน้า</span>
         <div>
-          <Link href="/#attraction">The house</Link>
-          <Link href="/#faq">FAQ</Link>
+          <Link href="/#attraction">เกี่ยวกับงาน</Link>
           <Link href="/ticket">ค้นบัตร</Link>
-          <Link href="/admin/login">Staff</Link>
+          <Link href="/admin/login">ทีมงาน</Link>
           <span
             role="img"
             aria-label="Instagram — ยังไม่ประกาศบัญชี"

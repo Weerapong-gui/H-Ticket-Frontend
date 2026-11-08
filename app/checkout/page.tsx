@@ -140,9 +140,9 @@ export default function Checkout() {
     <main className="booking-main">
       <Progress step={2} />
       <div className="page-heading">
-        <p className="eyebrow">ONE STUDENT ID = ONE TICKET</p>
+        <p className="eyebrow">1 รหัสนักศึกษา = 1 ใบ</p>
         <h1>
-          Who’s <em>coming inside?</em>
+          กรอกข้อมูล<em>และแนบสลิป</em>
         </h1>
         <p>กรอกข้อมูลของคุณและแนบสลิปโอนเงิน ระบบจะออกเลขบัตรให้ทันที</p>
       </div>

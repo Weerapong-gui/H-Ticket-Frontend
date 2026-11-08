@@ -58,7 +58,7 @@ export function TicketLookup({
   return (
     <main className="booking-main ticket-lookup">
       <div className="page-heading">
-        <p className="eyebrow">YOUR NUMBER / YOUR NIGHT</p>
+        <p className="eyebrow">ค้นบัตร</p>
         <h1>
           ค้นหา<em>บัตรของคุณ</em>
         </h1>
@@ -108,7 +108,7 @@ export function TicketLookup({
               ใช้แลกบัตรจริงหน้างาน
             </p>
           )}
-          <p className="eyebrow">THE HAUNTED HOUSE / PRE-SALE</p>
+          <p className="eyebrow">THE HAUNTED HOUSE · บัตรล่วงหน้า</p>
           <p>เลขบัตร / ลำดับคิว</p>
           <strong className="ticket-number">{ticket.ticket_label}</strong>
           <h2>{ticket.name}</h2>

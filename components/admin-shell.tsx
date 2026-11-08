@@ -22,7 +22,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     <main className="admin-main">
       <div className="admin-heading">
         <div>
-          <p className="eyebrow">THE HAUNTED HOUSE / STAFF ONLY</p>
+          <p className="eyebrow">THE HAUNTED HOUSE · ทีมงาน</p>
           <h1>
             จัดการบัตร <em>Pre-sale</em>
           </h1>
