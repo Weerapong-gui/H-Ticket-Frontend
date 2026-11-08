@@ -13,7 +13,8 @@ services:
       - "${FRONTEND_BIND:-127.0.0.1:13000}:3000"
     networks:
       backend:
-        aliases: [frontend]
+        # frontend.internal: หน้า Cloudflare ไม่รับ Service URL ที่ชื่อไม่มีจุด
+        aliases: [frontend, frontend.internal]
     restart: unless-stopped
 
 networks:

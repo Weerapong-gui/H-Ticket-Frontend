@@ -21,6 +21,23 @@ npm run dev
 - `/admin/login`, `/admin`, `/admin/orders`, `/admin/rejected` หน้าทีมงาน
 - `/admin/scan` สแกน QR บนหน้าบัตรเพื่อแจกบัตรวันงาน (กล้องใช้ได้เฉพาะเว็บที่เปิดผ่าน HTTPS — ทดสอบจากมือถือด้วย `npx next dev --experimental-https`)
 
+## Deploy (เครื่อง manjaro เดียวกับ backend)
+
+หน้าเว็บรันเป็น container `frontend` ใน Docker network ของ `H-Ticket-Backend` และออกอินเทอร์เน็ตผ่าน Cloudflare Tunnel ตัวเดียวกับ backend ที่ `https://ticket.sumfu.store`
+
+```sh
+ssh 100.109.2.36
+cd ~/Projects/H-Ticket-Frontend
+git pull
+docker compose up -d --build
+```
+
+- `NEXT_PUBLIC_API_URL` ถูกฝังตอน build (ค่าเริ่มต้น `https://ticket.sumfu.store`) เปลี่ยนแล้วต้อง build ใหม่
+- เส้นทางใน Cloudflare (tunnel `h-ticket` → Routes) เรียงจากบนลงล่าง:
+  1. `ticket.sumfu.store` path `^/(api/.*|healthz)$` → `http://backend:8080`
+  2. `ticket.sumfu.store` (ไม่มี path) → `http://frontend.internal:3000`
+- เช็กในเครื่อง: `curl http://127.0.0.1:13000/`
+
 ## ไฟล์ที่ต้องแก้บ่อย
 
 - `lib/event-config.ts` วัน เวลา สถานที่ ราคา และบัญชีรับโอน (ช่องไหนยังไม่ประกาศให้ใส่ "รอประกาศ" หรือปล่อยว่าง)
