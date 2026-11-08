@@ -19,6 +19,7 @@ npm run dev
 - `/checkout` กรอกข้อมูลและแนบสลิป แล้วไปที่ `/ticket/{รหัสนักศึกษา}?new=1`
 - `/ticket`, `/ticket/[studentId]` ค้นบัตรด้วยรหัสนักศึกษา
 - `/admin/login`, `/admin`, `/admin/orders`, `/admin/rejected` หน้าทีมงาน
+- `/admin/scan` สแกน QR บนหน้าบัตรเพื่อแจกบัตรวันงาน (กล้องใช้ได้เฉพาะเว็บที่เปิดผ่าน HTTPS — ทดสอบจากมือถือด้วย `npx next dev --experimental-https`)
 
 ## ไฟล์ที่ต้องแก้บ่อย
 
@@ -41,6 +42,7 @@ npm run dev
 npm run test:booking
 npm run test:api
 npm run test:scare
+npm run test:pickup
 npm run lint
 npm run typecheck
 npm run build

@@ -17,15 +17,16 @@
 
 ## เส้นทางที่พร้อมเชื่อมต่อ
 
-| Frontend                   | API                                                                                   |
-| -------------------------- | ------------------------------------------------------------------------------------- |
-| `/booking` และ `/checkout` | `GET /api/sales`                                                                      |
-| `/checkout`                | `POST /api/orders` multipart: `name`, `student_id`, `phone`, `slip`                   |
-| `/ticket/[studentId]`      | `GET /api/tickets/{student_id}`                                                       |
-| `/admin/login`             | `POST /api/admin/login`                                                               |
-| `/admin`                   | `GET /api/admin/stats`, `PUT /api/admin/sales`, `POST /api/admin/sales/close-forever` |
-| `/admin/orders`            | `GET /api/admin/orders`, authenticated slip, cancel และ pickup                        |
-| `/admin/rejected`          | `GET /api/admin/rejected`, authenticated rejected slip                                |
+| Frontend                   | API                                                                                               |
+| -------------------------- | ------------------------------------------------------------------------------------------------- |
+| `/booking` และ `/checkout` | `GET /api/sales`                                                                                  |
+| `/checkout`                | `POST /api/orders` multipart: `name`, `student_id`, `phone`, `slip`                               |
+| `/ticket/[studentId]`      | `GET /api/tickets/{student_id}`                                                                   |
+| `/admin/login`             | `POST /api/admin/login`                                                                           |
+| `/admin`                   | `GET /api/admin/stats`, `PUT /api/admin/sales`, `POST /api/admin/sales/close-forever`             |
+| `/admin/orders`            | `GET /api/admin/orders`, authenticated slip, cancel และ pickup                                    |
+| `/admin/scan`              | `GET /api/admin/orders?q=<รหัส>` (เลือกเฉพาะรหัสที่ตรงเป๊ะ), `POST /api/admin/orders/{id}/pickup` |
+| `/admin/rejected`          | `GET /api/admin/rejected`, authenticated rejected slip                                            |
 
 Frontend รองรับ error code ตามเอกสาร พร้อม `contact`, `ticket_label`, `retry_after_secs` และกลับหน้า login เมื่อ admin API ตอบ 401
 
