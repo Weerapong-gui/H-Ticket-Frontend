@@ -1,0 +1,22 @@
+# รันบนเครื่องเดียวกับ backend (H-Ticket-Backend) และเข้า Docker network ของ backend
+# Cloudflare Tunnel ของ backend ส่ง path อื่นที่ไม่ใช่ /api และ /healthz มาที่ http://frontend:3000
+#
+#   docker compose up -d --build
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://ticket.sumfu.store}
+    # เปิดเฉพาะในเครื่องไว้เช็กตรง ๆ (คนนอกเข้าผ่าน Cloudflare Tunnel เท่านั้น)
+    ports:
+      - "${FRONTEND_BIND:-127.0.0.1:13000}:3000"
+    networks:
+      backend:
+        aliases: [frontend]
+    restart: unless-stopped
+
+networks:
+  backend:
+    name: h-ticket-backend_default
+    external: true

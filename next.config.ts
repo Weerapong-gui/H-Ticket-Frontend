@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // รันใน Docker ด้วย .next/standalone/server.js (ดู Dockerfile)
+  output: "standalone",
   experimental: {
     agentFeedback: true,
   },
