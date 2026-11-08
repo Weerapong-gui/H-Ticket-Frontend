@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test:booking": "node scripts/verify-booking.cjs",
     "format": "prettier --write app components lib scripts README.md",
-    "test:api": "node scripts/verify-api.cjs"
+    "test:api": "node scripts/verify-api.cjs",
+    "test:scare": "node scripts/verify-scare.cjs"
   },
   "dependencies": {
     "lucide-react": "^1.70.0",
