@@ -43,7 +43,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="th" data-scroll-behavior="smooth" className={fontVars}>
+    <html
+      lang="th"
+      data-scroll-behavior="smooth"
+      className={fontVars}
+      // หน้าแรกตั้ง data-hh-entered ด้วย inline script ก่อน hydrate
+      suppressHydrationWarning
+    >
       <body>
         <a href="#main-content" className="skip-link">
           ข้ามไปที่เนื้อหา

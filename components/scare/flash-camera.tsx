@@ -72,7 +72,13 @@ function drawMockMirror(
   glass.addColorStop(1, lit ? "#6d6a65" : "#0e0f12");
   ctx.fillStyle = glass;
   ctx.beginPath();
-  ctx.roundRect(r.x, r.y, r.w, r.h, [r.w / 2, r.w / 2, 6, 6]);
+  // ยอดโค้ง: roundRect ไม่มีใน iOS Safari < 16 / Firefox < 112 จึงวาดเองด้วย arc
+  const rad = r.w / 2;
+  ctx.moveTo(r.x, r.y + rad);
+  ctx.arc(r.x + rad, r.y + rad, rad, Math.PI, 0);
+  ctx.lineTo(r.x + r.w, r.y + r.h);
+  ctx.lineTo(r.x, r.y + r.h);
+  ctx.closePath();
   ctx.fill();
   ctx.lineWidth = 14;
   ctx.strokeStyle = lit ? "#5a4026" : "#1a120b";
@@ -170,7 +176,12 @@ export function FlashCamera() {
   // วาดภาพมืดทุกครั้งที่รูปพร้อมหรือสถานะกระจกเปลี่ยน
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
-    if (ctx && images) render(ctx, images, darkView(), null);
+    if (!ctx || !images) return;
+    try {
+      render(ctx, images, darkView(), null);
+    } catch {
+      // วาดไม่ได้ก็ปล่อยกรอบดำ ห้ามทำให้ทั้งหน้าพัง
+    }
   }, [images, darkView]);
 
   function shoot() {
@@ -191,8 +202,13 @@ export function FlashCamera() {
       plan.kind === "mirror"
         ? plan
         : ({ kind: "photo", photoIndex: plan.photoIndex } as const);
-    render(ctx, images, view, plan);
-    const url = canvas.toDataURL("image/jpeg", 0.8);
+    let url: string;
+    try {
+      render(ctx, images, view, plan);
+      url = canvas.toDataURL("image/jpeg", 0.8);
+    } catch {
+      return;
+    }
 
     const fl = flashRef.current;
     if (fl) {

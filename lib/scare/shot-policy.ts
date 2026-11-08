@@ -19,7 +19,8 @@ export function planShot(
 ): ShotPlan {
   if (mirrorArmed) return { kind: "mirror" };
   const photoIndex = shotCount % photoCount;
-  const ghostSpot =
-    rand() < GHOST_CHANCE ? Math.floor(rand() * spotCounts[photoIndex]) : null;
+  const spots = spotCounts[photoIndex] ?? 0;
+  if (spots <= 0) return { kind: "photo", photoIndex, ghostSpot: null };
+  const ghostSpot = rand() < GHOST_CHANCE ? Math.floor(rand() * spots) : null;
   return { kind: "photo", photoIndex, ghostSpot };
 }

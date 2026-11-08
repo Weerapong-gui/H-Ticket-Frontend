@@ -16,9 +16,12 @@ import { Reveal } from "@/components/reveal";
 import { ScareLayer } from "@/components/scare/scare-layer";
 import { FlashCamera } from "@/components/scare/flash-camera";
 import { HeroBackdrop } from "@/components/scare/hero-backdrop";
+import { ENTRY_GATE_SCRIPT } from "@/lib/scare/storage";
 export default function Home() {
   return (
     <ScareLayer>
+      {/* ต้องรันก่อน paint: ซ่อนหน้าประตูสำหรับคนที่เคยเข้าแล้ว */}
+      <script dangerouslySetInnerHTML={{ __html: ENTRY_GATE_SCRIPT }} />
       <main>
         <section className="hero">
           <HeroBackdrop />

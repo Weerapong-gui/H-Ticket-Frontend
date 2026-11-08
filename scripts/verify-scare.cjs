@@ -27,9 +27,11 @@ const {
   parseFigure,
   serializeFigure,
 } = load("lib/scare/figure-state.ts");
-const { shouldWhisper } = load("lib/scare/whisper-policy.ts");
+const { shouldWhisper, createScrollGate } = load("lib/scare/whisper-policy.ts");
 const { canShoot, planShot } = load("lib/scare/shot-policy.ts");
-const { KEYS, readKey, writeKey } = load("lib/scare/storage.ts");
+const { KEYS, readKey, writeKey, ENTRY_GATE_SCRIPT } = load(
+  "lib/scare/storage.ts",
+);
 
 // figure-state
 let s = { ...initialFigure, lastSeenAt: 0 };
@@ -102,4 +104,45 @@ const kv = {
 };
 writeKey(kv, KEYS.muted, "1");
 assert.equal(readKey(kv, KEYS.muted), "1");
+// review fix: at most one pending step per sighting (several returns while scrolled away = 1 step)
+let away = { ...initialFigure, step: 2, lastSeenAt: 0 };
+away = registerReturn(away, 30_000);
+away = registerReturn({ ...away, lastSeenAt: 0 }, 60_000);
+away = registerReturn({ ...away, lastSeenAt: 0 }, 90_000);
+assert.equal(away.pending, 1);
+
+// review fix: one whisper roll per scroll gesture, not per scroll event
+const gate = createScrollGate(1_000);
+assert.equal(gate(0), true);
+assert.equal(gate(100), false);
+assert.equal(gate(900), false);
+assert.equal(gate(1_950), true); // >1s since the last scroll event = new gesture
+assert.equal(gate(2_000), false);
+
+// review fix: a photo with no ghost spots never yields a ghost
+assert.deepEqual(
+  planShot(1, 2, [2, 0], false, () => 0.1),
+  {
+    kind: "photo",
+    photoIndex: 1,
+    ghostSpot: null,
+  },
+);
+// review fix: pre-paint script marks returning visitors, and never throws when storage is blocked
+function runGateScript(storage) {
+  const attrs = {};
+  const document = {
+    documentElement: { setAttribute: (k, v) => (attrs[k] = v) },
+  };
+  new Function("localStorage", "document", ENTRY_GATE_SCRIPT)(
+    storage,
+    document,
+  );
+  return attrs;
+}
+assert.deepEqual(runGateScript({ getItem: () => "1" }), {
+  "data-hh-entered": "",
+});
+assert.deepEqual(runGateScript({ getItem: () => null }), {});
+assert.deepEqual(runGateScript(throwing), {});
 console.log("Scare logic checks passed.");

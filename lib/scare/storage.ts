@@ -32,3 +32,9 @@ export function browserStore(): KV | null {
     return null;
   }
 }
+
+/**
+ * inline script บนหน้าแรก รันก่อน paint: ถ้าเคยผ่านหน้าประตูแล้ว ติด data-hh-entered ที่ <html>
+ * ให้ CSS ซ่อนหน้าประตู (ก่อน React อ่าน localStorage เสร็จ) คนที่เคยเข้าแล้วจะไม่เห็นจอดำแวบ
+ */
+export const ENTRY_GATE_SCRIPT = `try{if(localStorage.getItem(${JSON.stringify(KEYS.entered)})==="1")document.documentElement.setAttribute("data-hh-entered","")}catch(e){}`;

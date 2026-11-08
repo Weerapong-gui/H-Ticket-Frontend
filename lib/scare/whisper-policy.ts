@@ -11,3 +11,16 @@ export function shouldWhisper(
   if (lastAt !== null && now - lastAt < WHISPER_COOLDOWN_MS) return false;
   return rand < WHISPER_CHANCE;
 }
+
+/**
+ * scroll ยิงหลายสิบครั้งต่อวินาที ถ้าสุ่มทุกครั้งเสียงจะดังแทบแน่นอนทุก 15 วินาที
+ * gate นี้คืน true เฉพาะ event แรกของการเลื่อนแต่ละครั้ง (เว้นนิ่ง ≥ idleMs = ครั้งใหม่)
+ */
+export function createScrollGate(idleMs: number): (now: number) => boolean {
+  let last: number | null = null;
+  return (now) => {
+    const fresh = last === null || now - last >= idleMs;
+    last = now;
+    return fresh;
+  };
+}

@@ -22,8 +22,9 @@ export const initialFigure: FigureState = {
 export function registerReturn(s: FigureState, now: number): FigureState {
   if (s.lastSeenAt === null || now - s.lastSeenAt < RETURN_MIN_AWAY_MS)
     return s;
-  if (s.step + s.pending >= FIGURE_GONE) return s;
-  return { ...s, pending: s.pending + 1 };
+  // ค้างได้แค่ 1 ระยะ: กลับมาหลายครั้งตอนไม่เห็น hero ก็ขยับให้เห็นทีละก้าว ไม่กระโดดข้ามระยะใกล้สุด
+  if (s.pending >= 1 || s.step >= FIGURE_GONE) return s;
+  return { ...s, pending: 1 };
 }
 
 export function markSeen(s: FigureState, now: number): FigureState {

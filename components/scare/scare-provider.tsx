@@ -18,7 +18,7 @@ import {
   serializeFigure,
   type FigureState,
 } from "@/lib/scare/figure-state";
-import { shouldWhisper } from "@/lib/scare/whisper-policy";
+import { createScrollGate, shouldWhisper } from "@/lib/scare/whisper-policy";
 import { browserStore, KEYS, readKey, writeKey } from "@/lib/scare/storage";
 import { WhisperEngine } from "./whisper-engine";
 
@@ -124,18 +124,31 @@ export function ScareProvider({ children }: { children: React.ReactNode }) {
 
   // ทริกเกอร์เสียงกระซิบจากการแตะ/เลื่อน
   useEffect(() => {
-    const onPointer = () => {
+    // ปลดล็อกเสียงได้เฉพาะ event ที่เบราว์เซอร์นับเป็น user activation
+    // (บนจอสัมผัส pointerdown ไม่นับ ต้องเป็น touchend/click) — สำหรับคนที่เคยเข้าแล้วไม่ผ่านหน้าประตู
+    const onActivate = () => {
       const s = live.current;
       if (!s.entered || s.muted) return;
-      const e = getEngine();
-      if (e.unlocked) whisperMaybe();
-      else void e.unlock({ overrideSilent: true }).then(whisperMaybe);
+      try {
+        const e = getEngine();
+        if (!e.unlocked)
+          void e.unlock({ overrideSilent: true }).catch(() => {});
+      } catch {
+        // Web Audio ใช้ไม่ได้ — เว็บทำงานต่อแบบไม่มีเสียง
+      }
     };
-    window.addEventListener("pointerdown", onPointer);
-    window.addEventListener("scroll", whisperMaybe, { passive: true });
+    const scrollGate = createScrollGate(1_000);
+    const onScroll = () => {
+      if (scrollGate(Date.now())) whisperMaybe();
+    };
+    const activation = ["click", "touchend", "keydown"] as const;
+    activation.forEach((t) => window.addEventListener(t, onActivate));
+    window.addEventListener("pointerdown", whisperMaybe);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
-      window.removeEventListener("pointerdown", onPointer);
-      window.removeEventListener("scroll", whisperMaybe);
+      activation.forEach((t) => window.removeEventListener(t, onActivate));
+      window.removeEventListener("pointerdown", whisperMaybe);
+      window.removeEventListener("scroll", onScroll);
     };
   }, [whisperMaybe]);
 
@@ -147,24 +160,36 @@ export function ScareProvider({ children }: { children: React.ReactNode }) {
     writeKey(store, KEYS.muted, withSound ? "0" : "1");
     live.current.entered = true;
     live.current.muted = !withSound;
-    if (withSound) {
-      const e = getEngine();
-      e.setMuted(false);
-      live.current.lastAt = Date.now();
-      void e.unlock({ overrideSilent: true }).then(() => e.play());
-    }
+    // เปลี่ยน state ก่อน เผื่อสร้าง AudioContext ไม่ได้ (เบราว์เซอร์/webview ที่ปิด Web Audio) จะได้ไม่ค้างที่หน้าประตู
     setMuted(!withSound);
     setEntered(true);
+    if (withSound) {
+      try {
+        const e = getEngine();
+        e.setMuted(false);
+        live.current.lastAt = Date.now();
+        void e
+          .unlock({ overrideSilent: true })
+          .then(() => e.play())
+          .catch(() => {});
+      } catch {
+        // ไม่มีเสียงก็เข้าบ้านได้ตามปกติ
+      }
+    }
   }, []);
 
   const toggleMute = useCallback(() => {
     const next = !live.current.muted;
     live.current.muted = next;
     writeKey(browserStore(), KEYS.muted, next ? "1" : "0");
-    const e = getEngine();
-    e.setMuted(next);
-    if (!next) void e.unlock({ overrideSilent: true });
     setMuted(next);
+    try {
+      const e = getEngine();
+      e.setMuted(next);
+      if (!next) void e.unlock({ overrideSilent: true }).catch(() => {});
+    } catch {
+      // Web Audio ใช้ไม่ได้
+    }
   }, []);
 
   const heroVisible = useCallback(
