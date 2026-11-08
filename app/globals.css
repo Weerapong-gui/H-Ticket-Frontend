@@ -1882,3 +1882,27 @@ footer {
     filter: none;
   }
 }
+.hero-scene,
+.hero-blink {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+}
+.hero-scene {
+  opacity: 0;
+  transition: opacity 1.5s ease-in;
+}
+.hero-scene.ready {
+  opacity: 1;
+}
+.hero-scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hero-blink {
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.25s;
+}

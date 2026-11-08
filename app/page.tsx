@@ -15,19 +15,13 @@ import {
 import { Reveal } from "@/components/reveal";
 import { ScareLayer } from "@/components/scare/scare-layer";
 import { FlashCamera } from "@/components/scare/flash-camera";
+import { HeroBackdrop } from "@/components/scare/hero-backdrop";
 export default function Home() {
   return (
     <ScareLayer>
       <main>
         <section className="hero">
-          <Image
-            src="/images/mansion.jpg"
-            alt="บ้านเก่าทรุดโทรมใต้พระจันทร์สีแดง"
-            fill
-            loading="eager"
-            sizes="100vw"
-            className="hero-image"
-          />
+          <HeroBackdrop />
           <div className="hero-shade" />
           <div className="fog" />
           <div className="hero-content">
