@@ -46,7 +46,14 @@ export default function ScanPage() {
     [],
   );
 
+  /** ยกเลิกตัวจับเวลาของป้าย "แจกบัตรแล้ว" — ไม่ให้มาลบการ์ดของคนถัดไปที่เริ่มค้นแล้ว */
+  const clearDone = () => {
+    if (doneTimer.current !== null) window.clearTimeout(doneTimer.current);
+    doneTimer.current = null;
+  };
+
   const backToScanning = useCallback(() => {
+    clearDone();
     // นับช่วงกันอ่านซ้ำจากตอนกลับมาสแกน ไม่ใช่ตอนสแกน: QR เดิมอาจยังค้างหน้ากล้องหลังกดยืนยัน
     if (lastScan.current)
       lastScan.current = { ...lastScan.current, at: Date.now() };
@@ -55,6 +62,7 @@ export default function ScanPage() {
   }, []);
 
   const lookup = useCallback((id: string) => {
+    clearDone();
     setError(null);
     setView({ step: "looking", id });
     lookupPickup(id, api)
@@ -68,6 +76,7 @@ export default function ScanPage() {
     (raw: string) => {
       const id = parseScan(raw);
       if (!id) {
+        clearDone();
         setError(null);
         setView({ step: "card", id: raw, result: { kind: "not_found" } });
         return;
@@ -88,15 +97,17 @@ export default function ScanPage() {
   );
 
   const confirm = useCallback(
-    (id: string, result: CardResult) => {
+    (id: string, result: CardResult, retryOf: string | null = null) => {
+      clearDone();
       setError(null);
       setView({ step: "confirming", id, result });
-      confirmPickup(id, api)
+      confirmPickup(id, api, retryOf)
         .then((r) => {
           if (r.kind !== "done") {
             setView({ step: "card", id, result: r });
             return;
           }
+          setTyped("");
           setView({ step: "done", label: r.order.ticket_label });
           doneTimer.current = window.setTimeout(backToScanning, DONE_MS);
         })
@@ -110,7 +121,8 @@ export default function ScanPage() {
 
   const result =
     view.step === "card" || view.step === "confirming" ? view.result : null;
-  const busy = view.step === "looking" || view.step === "confirming";
+  const busy =
+    (view.step === "looking" && !error) || view.step === "confirming";
 
   return (
     <>
@@ -148,11 +160,18 @@ export default function ScanPage() {
           </button>
         </form>
       ) : (
-        <QrScanner paused={view.step !== "scanning"} onScan={onScan} />
+        // ซ่อนกล้อง (แต่ไม่ปิด) ระหว่างแสดงผล การ์ดจะได้อยู่บนจอโดยไม่ต้องเลื่อน
+        <div
+          className={view.step === "scanning" ? undefined : "scan-collapsed"}
+        >
+          <QrScanner paused={view.step !== "scanning"} onScan={onScan} />
+        </div>
       )}
 
       <div aria-live="polite">
-        {view.step === "looking" && <p role="status">กำลังค้นหาบัตร…</p>}
+        {view.step === "looking" && !error && (
+          <p role="status">กำลังค้นหาบัตร…</p>
+        )}
         {view.step === "done" && (
           <p className="scan-done" role="status">
             แจกบัตร {view.label} แล้ว
@@ -229,7 +248,14 @@ export default function ScanPage() {
             onClick={() =>
               error.retry.kind === "lookup"
                 ? lookup(error.retry.id)
-                : confirm(error.retry.id, error.retry.result)
+                : confirm(
+                    error.retry.id,
+                    error.retry.result,
+                    // ครั้งก่อนอาจบันทึกสำเร็จแต่คำตอบหาย ให้ confirmPickup รู้ว่าเป็นบัตรใบไหน
+                    error.retry.result.kind === "ready"
+                      ? error.retry.result.order.id
+                      : null,
+                  )
             }
           >
             ลองใหม่

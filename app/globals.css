@@ -2034,3 +2034,12 @@ html[data-hh-entered] .entry-gate {
   display: grid;
   gap: 10px;
 }
+/* กล้องยังเปิดอยู่ (iOS อาจหยุดวิดีโอถ้า display: none) แต่ไม่กินที่บนจอ */
+.scan-collapsed {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

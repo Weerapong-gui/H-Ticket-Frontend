@@ -130,6 +130,19 @@ const { parseScan, resolvePickup, confirmPickup, acceptScan } =
     acceptScan("6700000000", 10, { text: "6831501178", at: 0 }),
     true,
   );
+  // review fix I-1: retry after a lost response — our own earlier request succeeded
+  f = fake([[done]], done);
+  assert.deepEqual(await confirmPickup("6831501178", f, "a"), {
+    kind: "done",
+    order: done,
+  });
+  assert.equal(f.calls.filter((c) => c[0] === "pickup").length, 0);
+  // a different order picked up (not the one we tried) still shows as picked
+  f = fake(
+    [[order({ id: "other", picked_up_at: "2026-11-08T12:00:00Z" })]],
+    done,
+  );
+  assert.equal((await confirmPickup("6831501178", f, "a")).kind, "picked");
   console.log("Pickup logic checks passed.");
 })().catch((e) => {
   console.error(e);

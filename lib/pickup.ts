@@ -56,8 +56,15 @@ export type ConfirmResult =
 export async function confirmPickup(
   studentId: string,
   deps: PickupApi,
+  /**
+   * ลองใหม่หลังการยืนยันครั้งก่อนล้มเหลว: id ของบัตรที่พยายามบันทึก
+   * ถ้าบัตรใบนั้นถูกบันทึกแล้ว แปลว่าครั้งก่อนสำเร็จจริงแต่คำตอบหาย → นับเป็นแจกสำเร็จ ไม่ใช่การ์ดส้ม
+   */
+  retryOf: string | null = null,
 ): Promise<ConfirmResult> {
   const latest = await lookupPickup(studentId, deps);
+  if (latest.kind === "picked" && latest.order.id === retryOf)
+    return { kind: "done", order: latest.order };
   if (latest.kind !== "ready") return latest;
   const order = await deps.pickup(latest.order.id, true);
   return { kind: "done", order };
