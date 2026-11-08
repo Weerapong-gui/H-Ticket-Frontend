@@ -17,6 +17,7 @@ import { ScareLayer } from "@/components/scare/scare-layer";
 import { FlashCamera } from "@/components/scare/flash-camera";
 import { HeroBackdrop } from "@/components/scare/hero-backdrop";
 import { ENTRY_GATE_SCRIPT } from "@/lib/scare/storage";
+import { pageImages } from "@/lib/scare/camera-config";
 export default function Home() {
   return (
     <ScareLayer>
@@ -68,8 +69,8 @@ export default function Home() {
         <section className="section story" id="attraction">
           <Reveal className="story-image">
             <Image
-              src="/images/mansion.jpg"
-              alt="บ้านร้างกับหน้าต่างมืด ๆ"
+              src={pageImages.story.src}
+              alt={pageImages.story.alt}
               fill
               sizes="(max-width: 700px) 100vw, 45vw"
             />

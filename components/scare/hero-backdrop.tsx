@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useScare } from "./scare-provider";
 import type { FogScene } from "./fog-scene";
+import { pageImages } from "@/lib/scare/camera-config";
 
 /**
  * พื้นหลัง hero: รูปนิ่ง (SSR, LCP และ fallback) + ทุ่งหมอก Three.js ที่โหลดทีหลัง
@@ -96,8 +97,8 @@ export function HeroBackdrop() {
   return (
     <>
       <Image
-        src="/images/mansion.jpg"
-        alt="บ้านเก่าทรุดโทรมใต้พระจันทร์สีแดง"
+        src={pageImages.hero.src}
+        alt={pageImages.hero.alt}
         fill
         loading="eager"
         sizes="100vw"
