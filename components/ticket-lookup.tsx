@@ -7,6 +7,7 @@ import { api, ApiError, IssuedTicket } from "@/lib/api";
 import { validStudentId } from "@/lib/booking";
 import { ErrorNotice } from "./error-notice";
 import { EventFacts } from "./event-facts";
+import { TicketQr } from "./ticket-qr";
 export function TicketLookup({
   studentId = "",
   justIssued = false,
@@ -111,6 +112,7 @@ export function TicketLookup({
           <p className="eyebrow">THE HAUNTED HOUSE · บัตรล่วงหน้า</p>
           <p>เลขบัตร / ลำดับคิว</p>
           <strong className="ticket-number">{ticket.ticket_label}</strong>
+          <TicketQr studentId={ticket.student_id} />
           <h2>{ticket.name}</h2>
           <p>รหัสนักศึกษา {ticket.student_id}</p>
           <div
