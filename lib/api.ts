@@ -75,13 +75,24 @@ export function getAdminToken() {
     return null;
   }
 }
+const tokenListeners = new Set<() => void>();
+/** ให้หน้า admin รู้ทันทีเมื่อ token เปลี่ยน (login, ออกจากระบบ, โดน 401) */
+export function subscribeAdminToken(listener: () => void) {
+  tokenListeners.add(listener);
+  return () => {
+    tokenListeners.delete(listener);
+  };
+}
+const notifyToken = () => tokenListeners.forEach((listener) => listener());
 export function setAdminToken(token: string) {
   sessionStorage.setItem(TOKEN_KEY, token);
+  notifyToken();
 }
 export function clearAdminToken() {
   try {
     sessionStorage.removeItem(TOKEN_KEY);
   } catch {}
+  notifyToken();
 }
 async function request<T>(
   path: string,

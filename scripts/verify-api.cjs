@@ -25,6 +25,7 @@ const {
   setAdminToken,
   getAdminToken,
   clearAdminToken,
+  subscribeAdminToken,
   API_URL,
 } = m.exports;
 const storage = new Map();
@@ -303,6 +304,16 @@ async function main() {
     global.fetch = originalFetch;
     AbortSignal.timeout = originalTimeout;
   }
+  clearAdminToken();
+  // admin shell re-renders when the token changes (login, logout, 401)
+  let notified = 0;
+  const unsubscribe = subscribeAdminToken(() => notified++);
+  setAdminToken("t1");
+  clearAdminToken();
+  assert.equal(notified, 2);
+  unsubscribe();
+  setAdminToken("t2");
+  assert.equal(notified, 2);
   clearAdminToken();
   console.log(
     "Mocked contracts passed for buyer and all admin endpoints, multipart bytes, error codes/contact, 429 retry data, bearer authentication, slip blobs, 401 logout, malformed-response handling and timeout/cancellation. No real backend mutations were made.",

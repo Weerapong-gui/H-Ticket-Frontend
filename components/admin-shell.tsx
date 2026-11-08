@@ -1,35 +1,33 @@
 ﻿"use client";
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { clearAdminToken, getAdminToken } from "@/lib/api";
+import { clearAdminToken, getAdminToken, subscribeAdminToken } from "@/lib/api";
+
+const LOGIN = "/admin/login";
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
-  const [allowed, setAllowed] = useState(false);
+  // token อยู่ใน sessionStorage ฝั่ง server ไม่รู้ (null) — ฝั่ง client อ่านตรง ๆ และอัปเดตเมื่อ login/ออกจากระบบ/โดน 401
+  const signedIn = useSyncExternalStore(
+    subscribeAdminToken,
+    () => !!getAdminToken(),
+    () => null,
+  );
+
   useEffect(() => {
-    if (path === "/admin/login") return;
-    queueMicrotask(() => {
-      const token = getAdminToken();
-      setAllowed(!!token);
-      if (!token) router.replace("/admin/login");
-    });
-  }, [path, router]);
-  if (path === "/admin/login") return children;
-  if (!allowed)
-    return <main className="booking-main">กำลังตรวจสอบสิทธิ์…</main>;
+    if (path !== LOGIN && signedIn === false) router.replace(LOGIN);
+  }, [path, signedIn, router]);
+
+  if (path === LOGIN) return children;
+  // ยังไม่รู้ (ระหว่าง hydrate) หรือกำลังพาไปหน้า login: ไม่แสดงอะไร แทนข้อความ "กำลังตรวจสอบสิทธิ์…"
+  if (!signedIn) return <main className="admin-main" />;
   return (
     <main className="admin-main">
       <div className="admin-heading">
         <h1>ระบบทีมงาน · บ้านผีสิง</h1>
-        <button
-          className="text-link"
-          onClick={() => {
-            clearAdminToken();
-            setAllowed(false);
-            router.replace("/admin/login");
-          }}
-        >
+        <button className="text-link" onClick={clearAdminToken}>
           ออกจากระบบ
         </button>
       </div>
