@@ -21,7 +21,6 @@ export default function Login() {
   return (
     <main className="booking-main">
       <div className="login-panel">
-        <p className="eyebrow">ทีมงาน</p>
         <h1>เข้าสู่ระบบแอดมิน</h1>
         <p>สำหรับทีมงานขายและแจกบัตร</p>
         <form
@@ -71,7 +70,7 @@ export default function Login() {
           </button>
         </form>
         <p className="privacy-note">
-          เซสชันมีอายุ 12 ชั่วโมง เก็บ token เฉพาะแท็บนี้
+          เข้าระบบค้างไว้ได้ 12 ชั่วโมง ถ้าปิดแท็บต้องเข้าใหม่
         </p>
       </div>
     </main>

@@ -19,7 +19,7 @@ export default function Dashboard() {
           disabled={loading || pending}
           onClick={() => void refresh()}
         >
-          อัปเดตข้อมูล →
+          อัปเดตข้อมูล
         </button>
       </div>
       <ErrorNotice error={error} />
@@ -45,7 +45,7 @@ export default function Dashboard() {
             <h2>สถานะการขาย</h2>
             <p>{salesMessage(data)}</p>
             {data.closed_forever ? (
-              <p>ปิด Pre-sale ถาวรแล้ว ไม่สามารถเปิดใหม่ได้</p>
+              <p>ปิดขายออนไลน์ถาวรแล้ว เปิดใหม่ไม่ได้</p>
             ) : (
               <div className="action-buttons">
                 <button
@@ -77,14 +77,14 @@ export default function Dashboard() {
                   disabled={pending || loading || !!error}
                   onClick={() => setCloseDialog(true)}
                 >
-                  ปิด Pre-sale ถาวร
+                  ปิดขายออนไลน์ถาวร
                 </button>
               </div>
             )}
           </section>
           <section className="admin-panel">
-            <h2>เลขบัตรกระดาษที่ยังขายได้</h2>
-            <p>สำหรับทีมขายหน้างาน · อัปเดตข้อมูลก่อนใช้เลขบัตร</p>
+            <h2>เลขบัตรที่ยังว่าง</h2>
+            <p>ใช้ขายบัตรกระดาษหน้างาน กดอัปเดตข้อมูลก่อนใช้ทุกครั้ง</p>
             <p className="free-numbers">
               {numberRanges(data.free_numbers) || "ไม่มีเลขว่าง"}
             </p>
@@ -93,8 +93,8 @@ export default function Dashboard() {
       )}
       {closeDialog && (
         <ActionDialog
-          title="ปิด Pre-sale ถาวร"
-          description="การกระทำนี้ย้อนกลับไม่ได้ หลังปิดแล้วผู้ซื้อจะต้องซื้อที่หน้างาน"
+          title="ปิดขายออนไลน์ถาวร"
+          description="ปิดแล้วเปิดคืนไม่ได้ หลังจากนี้ต้องซื้อบัตรที่หน้างานเท่านั้น"
           fieldLabel="พิมพ์ ปิดถาวร เพื่อยืนยัน"
           expected="ปิดถาวร"
           onCancel={() => setCloseDialog(false)}

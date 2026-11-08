@@ -21,12 +21,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="admin-main">
       <div className="admin-heading">
-        <div>
-          <p className="eyebrow">THE HAUNTED HOUSE · ทีมงาน</p>
-          <h1>
-            จัดการบัตร <em>Pre-sale</em>
-          </h1>
-        </div>
+        <h1>ระบบทีมงาน · บ้านผีสิง</h1>
         <button
           className="text-link"
           onClick={() => {
@@ -35,14 +30,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             router.replace("/admin/login");
           }}
         >
-          ออกจากระบบ →
+          ออกจากระบบ
         </button>
       </div>
       <nav className="admin-nav" aria-label="เมนูแอดมิน">
         {[
-          ["/admin", "ภาพรวม / เปิดปิดขาย"],
+          ["/admin", "ภาพรวม"],
           ["/admin/scan", "สแกนแจกบัตร"],
-          ["/admin/orders", "ผู้ซื้อ / แจกบัตร"],
+          ["/admin/orders", "รายชื่อผู้ซื้อ"],
           ["/admin/rejected", "รายการที่ถูกปฏิเสธ"],
         ].map(([url, label]) => (
           <Link

@@ -1253,12 +1253,7 @@ footer {
   margin-bottom: 30px;
 }
 .admin-heading h1 {
-  font: 42px/1.4 var(--serif);
-  margin-top: 12px;
-}
-.admin-heading h1 em {
-  font-weight: 400;
-  color: #a99486;
+  font-size: 22px;
 }
 .admin-heading button {
   background: none;
@@ -1288,7 +1283,7 @@ footer {
   margin-bottom: 22px;
 }
 .admin-section-heading h2 {
-  font-size: 30px;
+  font-size: 22px;
   line-height: 1.5;
 }
 .admin-section-heading button {
@@ -1302,7 +1297,7 @@ footer {
   margin-top: 25px;
 }
 .admin-panel h2 {
-  font-size: 28px;
+  font-size: 19px;
   margin-bottom: 20px;
   line-height: 1.5;
 }
@@ -1326,8 +1321,9 @@ footer {
 }
 .stats-grid strong {
   display: block;
-  font: 45px var(--serif);
-  margin-top: 10px;
+  font-size: 32px;
+  font-weight: 600;
+  margin-top: 6px;
 }
 .action-buttons {
   display: flex;
@@ -1467,9 +1463,9 @@ footer {
   margin: 20px auto;
 }
 .login-panel h1 {
-  font-size: 30px;
-  line-height: 1.7;
-  margin: 15px 0;
+  font-size: 24px;
+  line-height: 1.5;
+  margin: 0 0 10px;
 }
 .login-panel > p {
   font-size: 12px;
@@ -2042,4 +2038,13 @@ html[data-hh-entered] .entry-gate {
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
+}
+/* หน้าทีมงานเป็นเครื่องมือ: ใช้ฟอนต์อ่านง่าย ไม่ใช้ฟอนต์ตกแต่งแบบหน้าโฆษณา */
+.admin-main h1,
+.admin-main h2,
+.admin-main h3,
+.login-panel h1 {
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: 0;
 }

@@ -1,5 +1,6 @@
 ﻿"use client";
 import { useCallback, useRef, useState } from "react";
+import Link from "next/link";
 import { api, Order } from "@/lib/api";
 import { thaiTime } from "@/lib/booking";
 import { replaceById } from "@/lib/pickup";
@@ -23,13 +24,13 @@ export default function Orders() {
   return (
     <>
       <div className="admin-section-heading">
-        <h2>ผู้ซื้อ / แจกบัตรหน้างาน</h2>
+        <h2>รายชื่อผู้ซื้อ</h2>
         <button
           className="text-link"
           disabled={loading || !!busy}
           onClick={() => void refresh()}
         >
-          อัปเดตข้อมูล →
+          อัปเดตข้อมูล
         </button>
       </div>
       <form
@@ -60,8 +61,8 @@ export default function Orders() {
         </button>
       </form>
       <p className="privacy-note">
-        เวลาที่แสดงเป็นเวลาไทย (Asia/Bangkok) · ตรวจชื่อ เลขบัตร
-        และสลิปก่อนแจกบัตรจริง
+        วันงานแจกบัตรที่หน้า <Link href="/admin/scan">สแกนแจกบัตร</Link>{" "}
+        จะเร็วกว่า
       </p>
       <ErrorNotice error={error} />
       <ErrorNotice error={actionError} />

@@ -22,13 +22,10 @@ export default function Rejected() {
           disabled={loading}
           onClick={() => void refresh()}
         >
-          อัปเดตข้อมูล →
+          อัปเดตข้อมูล
         </button>
       </div>
-      <p>
-        ใช้ตรวจสอบเมื่อผู้ซื้อแจ้งว่าโอนเงินแล้วแต่ระบบไม่ออกบัตร ·
-        เวลาประเทศไทย
-      </p>
+      <p>ใช้ดูตอนผู้ซื้อแจ้งว่าโอนเงินแล้วแต่ไม่ได้บัตร</p>
       <ErrorNotice error={error} />
       {loading && !data && <p role="status">กำลังโหลดรายการ…</p>}
       <div className="order-list">
