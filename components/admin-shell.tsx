@@ -41,6 +41,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <nav className="admin-nav" aria-label="เมนูแอดมิน">
         {[
           ["/admin", "ภาพรวม / เปิดปิดขาย"],
+          ["/admin/scan", "สแกนแจกบัตร"],
           ["/admin/orders", "ผู้ซื้อ / แจกบัตร"],
           ["/admin/rejected", "รายการที่ถูกปฏิเสธ"],
         ].map(([url, label]) => (
