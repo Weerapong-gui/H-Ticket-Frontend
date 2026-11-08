@@ -13,7 +13,7 @@ function load(file) {
   new Function("exports", "require", "module", output)(m.exports, require, m);
   return m.exports;
 }
-const { parseScan, resolvePickup, confirmPickup, acceptScan } =
+const { parseScan, resolvePickup, confirmPickup, acceptScan, replaceById } =
   load("lib/pickup.ts");
 
 (async () => {
@@ -143,6 +143,19 @@ const { parseScan, resolvePickup, confirmPickup, acceptScan } =
     done,
   );
   assert.equal((await confirmPickup("6831501178", f, "a")).kind, "picked");
+  // replaceById: update one row in place after pickup/cancel (no full reload)
+  const rows = [order({ id: "a" }), order({ id: "b", ticket_label: "013" })];
+  const updated = order({
+    id: "b",
+    ticket_label: "013",
+    picked_up_at: "2026-11-08T12:00:00Z",
+  });
+  const next = replaceById(rows, updated);
+  assert.deepEqual(next, [rows[0], updated]);
+  assert.notEqual(next, rows); // new array so React re-renders
+  assert.equal(rows[1].picked_up_at, null); // original untouched
+  assert.equal(replaceById(null, updated), null);
+  assert.deepEqual(replaceById(rows, order({ id: "zzz" })), rows); // unknown id: unchanged
   console.log("Pickup logic checks passed.");
 })().catch((e) => {
   console.error(e);

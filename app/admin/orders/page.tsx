@@ -2,6 +2,7 @@
 import { useCallback, useRef, useState } from "react";
 import { api, Order } from "@/lib/api";
 import { thaiTime } from "@/lib/booking";
+import { replaceById } from "@/lib/pickup";
 import { useAdminData } from "@/components/use-admin-data";
 import { ErrorNotice } from "@/components/error-notice";
 import { ActionDialog, SlipDialog } from "@/components/admin-dialogs";
@@ -13,7 +14,7 @@ export default function Orders() {
     () => api.orders(filters.query, filters.status),
     [filters],
   );
-  const { data, loading, error, refresh } = useAdminData(loader);
+  const { data, loading, error, refresh, update } = useAdminData(loader);
   const [slip, setSlip] = useState<string | null>(null);
   const [cancel, setCancel] = useState<Order | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -64,7 +65,7 @@ export default function Orders() {
       </p>
       <ErrorNotice error={error} />
       <ErrorNotice error={actionError} />
-      {loading && <p role="status">กำลังโหลดรายการ…</p>}
+      {loading && !data && <p role="status">กำลังโหลดรายการ…</p>}
       <div className="order-list">
         {data?.map((order) => (
           <article
@@ -107,8 +108,11 @@ export default function Orders() {
                       setBusy(order.id);
                       setActionError(null);
                       try {
-                        await api.pickup(order.id, !order.picked_up_at);
-                        await refresh();
+                        const updated = await api.pickup(
+                          order.id,
+                          !order.picked_up_at,
+                        );
+                        update((list) => replaceById(list, updated));
                       } catch (e) {
                         setActionError(e);
                         await refresh();
@@ -146,8 +150,8 @@ export default function Orders() {
           fieldLabel="เหตุผลการยกเลิก (จำเป็น)"
           onCancel={() => setCancel(null)}
           onConfirm={async (reason) => {
-            await api.cancel(cancel.id, reason);
-            await refresh();
+            const updated = await api.cancel(cancel.id, reason);
+            update((list) => replaceById(list, updated));
           }}
         />
       )}

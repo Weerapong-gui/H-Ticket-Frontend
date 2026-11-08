@@ -30,7 +30,7 @@ export default function Rejected() {
         เวลาประเทศไทย
       </p>
       <ErrorNotice error={error} />
-      {loading && <p role="status">กำลังโหลดรายการ…</p>}
+      {loading && !data && <p role="status">กำลังโหลดรายการ…</p>}
       <div className="order-list">
         {data?.map((item) => (
           <article className="order-card" key={item.id}>

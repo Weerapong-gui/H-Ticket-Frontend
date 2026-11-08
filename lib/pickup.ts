@@ -77,3 +77,12 @@ export type LastScan = { text: string; at: number } | null;
 export function acceptScan(text: string, now: number, last: LastScan): boolean {
   return !(last && last.text === text && now - last.at < SAME_SCAN_COOLDOWN_MS);
 }
+
+/** แทนแถวเดียวในรายการด้วยข้อมูลที่ API ส่งกลับ (หลังรับบัตร/ยกเลิก) โดยไม่ต้องโหลดทั้งรายการใหม่ */
+export function replaceById<T extends { id: string }>(
+  list: T[] | null,
+  item: T,
+): T[] | null {
+  if (!list) return list;
+  return list.map((row) => (row.id === item.id ? item : row));
+}

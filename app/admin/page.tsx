@@ -24,7 +24,7 @@ export default function Dashboard() {
       </div>
       <ErrorNotice error={error} />
       <ErrorNotice error={actionError} />
-      {loading && <p role="status">กำลังโหลดข้อมูล…</p>}
+      {loading && !data && <p role="status">กำลังโหลดข้อมูล…</p>}
       {data && (
         <>
           <div className="stats-grid">
