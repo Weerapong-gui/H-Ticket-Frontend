@@ -1,5 +1,5 @@
 ﻿"use client";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { api, Order } from "@/lib/api";
 import { thaiTime } from "@/lib/booking";
@@ -20,7 +20,6 @@ export default function Orders() {
   const [cancel, setCancel] = useState<Order | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [actionError, setActionError] = useState<unknown>(null);
-  const guard = useRef(false);
   return (
     <>
       <div className="admin-section-heading">
@@ -104,8 +103,7 @@ export default function Orders() {
                     className="button pickup-button"
                     disabled={!!busy || loading || !!error}
                     onClick={async () => {
-                      if (guard.current) return;
-                      guard.current = true;
+                      if (busy) return;
                       setBusy(order.id);
                       setActionError(null);
                       try {
@@ -118,7 +116,6 @@ export default function Orders() {
                         setActionError(e);
                         await refresh();
                       } finally {
-                        guard.current = false;
                         setBusy(null);
                       }
                     }}

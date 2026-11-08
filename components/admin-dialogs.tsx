@@ -1,6 +1,5 @@
 ﻿"use client";
 import { useEffect, useId, useRef, useState } from "react";
-import Image from "next/image";
 import { api } from "@/lib/api";
 import { ErrorNotice } from "./error-notice";
 export function ActionDialog({
@@ -23,7 +22,6 @@ export function ActionDialog({
   const [value, setValue] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<unknown>(null);
-  const guard = useRef(false);
   useEffect(() => {
     const dialog = ref.current;
     dialog?.showModal();
@@ -45,13 +43,8 @@ export function ActionDialog({
         className="form-fields"
         onSubmit={async (e) => {
           e.preventDefault();
-          if (
-            guard.current ||
-            !value.trim() ||
-            (expected && value !== expected)
-          )
+          if (pending || !value.trim() || (expected && value !== expected))
             return;
-          guard.current = true;
           setPending(true);
           setError(null);
           try {
@@ -60,7 +53,6 @@ export function ActionDialog({
           } catch (e) {
             setError(e);
           } finally {
-            guard.current = false;
             setPending(false);
           }
         }}
@@ -152,13 +144,8 @@ export function SlipDialog({
       </div>
       <ErrorNotice error={error} />
       {url ? (
-        <Image
-          src={url}
-          alt="รูปสลิปการโอนเงิน"
-          width={900}
-          height={1200}
-          unoptimized
-        />
+        // eslint-disable-next-line @next/next/no-img-element -- blob URL ของรูปสลิปที่ต้องใช้ token
+        <img src={url} alt="รูปสลิปการโอนเงิน" />
       ) : (
         !error && <p role="status">กำลังโหลดรูปสลิป…</p>
       )}

@@ -1,5 +1,5 @@
 ﻿"use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, setAdminToken } from "@/lib/api";
 import { ErrorNotice } from "@/components/error-notice";
@@ -9,7 +9,6 @@ export default function Login() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [remaining, setRemaining] = useState(0);
-  const sending = useRef(false);
   useEffect(() => {
     if (remaining <= 0) return;
     const timer = setTimeout(
@@ -27,8 +26,7 @@ export default function Login() {
           className="form-fields"
           onSubmit={async (e) => {
             e.preventDefault();
-            if (sending.current || remaining > 0) return;
-            sending.current = true;
+            if (pending || remaining > 0) return;
             setPending(true);
             setError(null);
             try {
@@ -41,7 +39,6 @@ export default function Login() {
               if (e instanceof ApiError && e.data.code === "too_many_attempts")
                 setRemaining(Math.max(1, e.data.retry_after_secs ?? 60));
             } finally {
-              sending.current = false;
               setPending(false);
             }
           }}
