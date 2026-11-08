@@ -28,11 +28,19 @@ npm run dev
 
 รายละเอียด API และข้อตกลงกับทีม backend อยู่ใน [FRONTEND_HANDOFF.md](FRONTEND_HANDOFF.md) และ `docs/BACKEND_API.md`
 
+## ลูกเล่นหน้าแรก
+
+หน้าแรก (`/`) มีหน้าประตู เสียงกระซิบ ร่างชุดดำในทุ่งหมอก และกล้องแฟลช ทั้งหมดอยู่ใน `components/scare/` และ `lib/scare/` หน้าอื่นไม่มีลูกเล่นเลย รายละเอียดการออกแบบอยู่ที่ `docs/superpowers/specs/2026-11-08-scare-layer-design.md`
+
+- **เปลี่ยนรูปวันงาน:** วางรูปใน `public/images/` แล้วแก้ `lib/scare/camera-config.ts` (รายชื่อรูป, จุดที่ผียืน, และกรอบกระจกในรูปกระจก) พอมีรูปกระจกจริงแล้วให้ตั้ง `mockFrame: false`
+- **ทดสอบตั้งแต่ต้น:** ลบ `localStorage` key `hh-entered` (หน้าประตู), `hh-muted` (เสียง), `hh-figure` (ระยะของร่าง) หรือเปิด private window
+
 ## ตรวจก่อน push
 
 ```sh
 npm run test:booking
 npm run test:api
+npm run test:scare
 npm run lint
 npm run typecheck
 npm run build
