@@ -15,27 +15,23 @@ export type SalesStatus = {
   sold: number;
   remaining: number;
 };
+/** การจองของ 1 คน · ไม่มีเลขบัตร (staff หยิบบัตรใบถัดไปให้ที่หน้างาน) */
 export type IssuedTicket = {
-  ticket_no: number;
-  ticket_label: string;
   name: string;
   student_id: string;
   picked_up: boolean;
   group_size?: number;
   /** เพื่อนที่ซื้อกลุ่มเดียวกัน (มีเฉพาะตอนค้นบัตร) */
-  group?: { ticket_label: string; name: string }[];
+  group?: { name: string; picked_up: boolean }[];
   /** ทุกบัตรในออเดอร์ (มีเฉพาะตอนสร้างออเดอร์) */
   tickets?: IssuedTicket[];
 };
 export type AdminStats = SalesStatus & {
   cancelled: number;
   picked_up: number;
-  free_numbers: number[];
 };
 export type Order = {
   id: string;
-  ticket_no: number;
-  ticket_label: string;
   status: "active" | "cancelled";
   name: string;
   student_id: string;
@@ -59,7 +55,6 @@ export type ApiErrorData = {
   code: string;
   message: string;
   contact?: string | Record<string, unknown>;
-  ticket_label?: string;
   student_id?: string;
   retry_after_secs?: number;
 };

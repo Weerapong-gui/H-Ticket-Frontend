@@ -1188,13 +1188,6 @@ footer {
   margin-top: 18px;
   font-size: 12px;
 }
-.ticket-number {
-  display: block;
-  font: 500 clamp(100px, 18vw, 190px)/1.2 var(--display);
-  letter-spacing: 8px;
-  color: #f2ddc6;
-  text-shadow: 0 0 35px #9b111e22;
-}
 .issued-ticket h2 {
   font-size: 35px;
   overflow-wrap: anywhere;
@@ -1340,14 +1333,13 @@ footer {
   background: none;
   border: 0;
 }
+.reserved-count {
+  font: 40px/1.4 var(--display) !important;
+  color: #e8d4c0;
+  margin-top: 16px;
+}
 .danger-link {
   color: #e28b82;
-}
-.free-numbers {
-  font: 24px/1.8 var(--serif) !important;
-  color: #e8d4c0;
-  margin-top: 20px;
-  overflow-wrap: anywhere;
 }
 .admin-filters {
   display: flex;
@@ -1382,10 +1374,6 @@ footer {
   display: flex;
   align-items: center;
   gap: 22px;
-}
-.order-number {
-  font: 50px var(--display);
-  color: #e3c3ab;
 }
 .order-card h3 {
   font-size: 18px;
@@ -1492,9 +1480,6 @@ footer {
   .issued-ticket {
     padding: 25px 18px;
   }
-  .ticket-number {
-    font-size: 110px;
-  }
   .issued-ticket h2 {
     font-size: 28px;
   }
@@ -1558,9 +1543,6 @@ footer {
     width: 100%;
     margin: 0;
     text-align: center;
-  }
-  .order-number {
-    font-size: 42px;
   }
   .order-card .action-buttons > .button {
     flex: 1;
@@ -1994,12 +1976,6 @@ html[data-hh-entered] .entry-gate {
   font-weight: 600;
   color: var(--foreground);
 }
-.scan-card-number {
-  display: block;
-  font: 600 64px/1.1 var(--display);
-  color: var(--foreground);
-  margin: 6px 0;
-}
 .scan-card h3 {
   font-size: 22px;
   margin-bottom: 4px;
@@ -2100,15 +2076,6 @@ html[data-hh-entered] .entry-gate {
   width: 100%;
   height: auto;
 }
-.ticket-art-number {
-  position: absolute;
-  left: 82.3%;
-  top: 50.1%;
-  transform: translate(-50%, -50%) rotate(-90deg);
-  font: 700 10.5cqw/1 var(--display);
-  letter-spacing: 0.04em;
-  color: rgb(243 67 43);
-}
 .home-ticket-art {
   max-width: 760px;
   margin: 0 auto 34px;
@@ -2150,12 +2117,14 @@ html[data-hh-entered] .entry-gate {
 }
 .group-tickets li {
   display: flex;
+  justify-content: space-between;
   gap: 16px;
   padding: 6px 0;
 }
 .group-tickets li strong {
-  font-family: var(--display);
-  color: #f2ddc6;
+  font-weight: 500;
+  color: #ddaf92;
+  white-space: nowrap;
 }
 .group-tickets li.self span::after {
   content: " (คุณ)";

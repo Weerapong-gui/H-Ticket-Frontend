@@ -19,8 +19,6 @@ const { parseScan, resolvePickup, confirmPickup, acceptScan, replaceById } =
 (async () => {
   const order = (o) => ({
     id: "a",
-    ticket_no: 12,
-    ticket_label: "012",
     status: "active",
     name: "สมชาย ใจดี",
     student_id: "6831501178",
@@ -144,10 +142,10 @@ const { parseScan, resolvePickup, confirmPickup, acceptScan, replaceById } =
   );
   assert.equal((await confirmPickup("6831501178", f, "a")).kind, "picked");
   // replaceById: update one row in place after pickup/cancel (no full reload)
-  const rows = [order({ id: "a" }), order({ id: "b", ticket_label: "013" })];
+  const rows = [order({ id: "a" }), order({ id: "b", name: "สมหญิง" })];
   const updated = order({
     id: "b",
-    ticket_label: "013",
+    name: "สมหญิง",
     picked_up_at: "2026-11-08T12:00:00Z",
   });
   const next = replaceById(rows, updated);

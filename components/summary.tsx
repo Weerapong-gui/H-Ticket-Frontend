@@ -34,7 +34,7 @@ export function Summary({ children }: { children?: React.ReactNode }) {
 export function Progress({ step }: { step: number }) {
   return (
     <div className="progress" aria-label={`ขั้นตอน ${step} จาก 3`}>
-      {["บัตรและวิธีโอน", "ข้อมูลและสลิป", "รับเลขบัตร"].map((label, i) => (
+      {["บัตรและวิธีโอน", "ข้อมูลและสลิป", "ยืนยันการจอง"].map((label, i) => (
         <div className={step >= i + 1 ? "active" : ""} key={label}>
           <span>{String(i + 1).padStart(2, "0")}</span>
           {label}

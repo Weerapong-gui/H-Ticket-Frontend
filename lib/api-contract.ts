@@ -12,11 +12,6 @@ const count = (value: unknown): value is number =>
   typeof value === "number" && Number.isInteger(value) && value >= 0;
 const text = (value: unknown): value is string => typeof value === "string";
 const nullableText = (value: unknown) => value === null || text(value);
-const ticketNumber = (value: Record<string, unknown>) =>
-  count(value.ticket_no) &&
-  value.ticket_no >= 1 &&
-  value.ticket_no <= 600 &&
-  value.ticket_label === String(value.ticket_no).padStart(3, "0");
 
 export function isSalesStatus(value: unknown): value is SalesStatus {
   return (
@@ -33,7 +28,6 @@ export function isSalesStatus(value: unknown): value is SalesStatus {
 export function isIssuedTicket(value: unknown): value is IssuedTicket {
   return (
     record(value) &&
-    ticketNumber(value) &&
     text(value.name) &&
     !!value.name.trim() &&
     text(value.student_id) &&
@@ -42,7 +36,7 @@ export function isIssuedTicket(value: unknown): value is IssuedTicket {
     (value.group === undefined ||
       (Array.isArray(value.group) &&
         value.group.every(
-          (g) => record(g) && text(g.ticket_label) && text(g.name),
+          (g) => record(g) && text(g.name) && typeof g.picked_up === "boolean",
         ))) &&
     (value.tickets === undefined ||
       (Array.isArray(value.tickets) && value.tickets.every(isIssuedTicket)))
@@ -67,15 +61,13 @@ export function isAdminStats(value: unknown): value is AdminStats {
     isSalesStatus(value) &&
     count(data.cancelled) &&
     count(data.picked_up) &&
-    Array.isArray(data.free_numbers) &&
-    data.free_numbers.every((n) => count(n) && n >= 1 && n <= value.total)
+    data.picked_up <= value.sold
   );
 }
 export function isOrder(value: unknown): value is Order {
   return (
     record(value) &&
     text(value.id) &&
-    ticketNumber(value) &&
     (value.status === "active" || value.status === "cancelled") &&
     text(value.name) &&
     text(value.student_id) &&

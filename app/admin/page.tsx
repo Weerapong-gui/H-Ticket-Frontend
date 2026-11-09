@@ -1,7 +1,7 @@
 ﻿"use client";
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { numberRanges, salesMessage } from "@/lib/booking";
+import { salesMessage } from "@/lib/booking";
 import { useAdminData } from "@/components/use-admin-data";
 import { ErrorNotice } from "@/components/error-notice";
 import { ActionDialog } from "@/components/admin-dialogs";
@@ -83,11 +83,13 @@ export default function Dashboard() {
             )}
           </section>
           <section className="admin-panel">
-            <h2>เลขบัตรที่ยังว่าง</h2>
-            <p>ใช้ขายบัตรกระดาษหน้างาน กดอัปเดตข้อมูลก่อนใช้ทุกครั้ง</p>
-            <p className="free-numbers">
-              {numberRanges(data.free_numbers) || "ไม่มีเลขว่าง"}
+            <h2>บัตรกระดาษที่ต้องเก็บไว้</h2>
+            <p>
+              คนจองออนไลน์ที่ยังไม่มารับบัตร
+              ต้องกันบัตรกระดาษไว้ให้อย่างน้อยเท่านี้ ก่อนขายหน้างาน ·
+              กดอัปเดตข้อมูลก่อนใช้ทุกครั้ง
             </p>
+            <p className="reserved-count">{data.sold - data.picked_up} ใบ</p>
           </section>
         </>
       )}
