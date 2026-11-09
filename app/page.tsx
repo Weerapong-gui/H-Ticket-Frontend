@@ -3,6 +3,7 @@ import { TicketAccordion } from "@/components/ticket-accordion";
 import { TICKET_PRICE, money, packages } from "@/lib/booking";
 import { TicketArt } from "@/components/ticket-art";
 import { TicketCounter } from "@/components/ticket-counter";
+import { ChantTicker } from "@/components/chant-ticker";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -105,14 +106,7 @@ export default function Home() {
             รับบัตรที่หน้างานด้วยรหัสนักศึกษา
           </p>
         </section>
-        <section className="final-cta">
-          <h2>
-            กล้า<em>เข้ามาไหม?</em>
-          </h2>
-          <Link href="/booking" className="button">
-            จองบัตร <ArrowRight size={17} />
-          </Link>
-        </section>
+        <ChantTicker />
       </main>
     </ScareLayer>
   );

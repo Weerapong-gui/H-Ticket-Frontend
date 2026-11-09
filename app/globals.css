@@ -385,19 +385,6 @@ p {
   margin-top: 25px;
   color: #796d66;
 }
-.final-cta {
-  text-align: center;
-  padding: 80px 20px 100px;
-  border-top: 1px solid #362020;
-  background: radial-gradient(ellipse at bottom, #3f111b44, transparent 65%);
-}
-.final-cta .eyebrow {
-  justify-content: center;
-}
-.final-cta h2 {
-  font-size: 60px;
-  margin: 20px 0 30px;
-}
 footer {
   padding: 50px 5.5% 22px;
   border-top: 1px solid #ffffff12;
@@ -760,12 +747,6 @@ footer {
   }
   .center-heading h2 {
     font-size: 42px;
-  }
-  .final-cta {
-    padding: 65px 6%;
-  }
-  .final-cta h2 {
-    font-size: 43px;
   }
   .footer-top {
     flex-wrap: wrap;
@@ -2206,4 +2187,98 @@ html[data-hh-entered] .entry-gate {
   flex-wrap: wrap;
   max-width: 420px;
   margin-top: 16px;
+}
+
+/* แถบบทสวดท้ายหน้าแรก: บนอิติปิโสถอยหลังวิ่งซ้าย ล่างแบบปกติวิ่งขวา */
+.chant-band {
+  display: grid;
+  gap: 6px;
+  padding: 70px 0 80px;
+  overflow: hidden;
+  border-top: 1px solid #362020;
+  background: radial-gradient(ellipse at center, #3f111b55, transparent 70%);
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+  animation: chant-flicker 9s steps(1) infinite;
+}
+.chant-row {
+  display: flex;
+  width: max-content;
+  animation: chant-left 150s linear infinite;
+  will-change: transform;
+}
+.chant-row.back {
+  animation: chant-right 180s linear infinite;
+}
+.chant-row span {
+  font:
+    700 clamp(30px, 4.4vw, 60px) / 1.7 var(--f-chant),
+    var(--serif);
+  white-space: nowrap;
+  padding-right: 0.5em;
+  color: #a3161f;
+  text-shadow:
+    0 0 14px #ff1f1f66,
+    0 0 40px #9b111e55;
+}
+.chant-row.back span {
+  color: #cdbba8;
+  opacity: 0.45;
+  text-shadow: 0 0 18px #e8ded233;
+}
+.chant-row i {
+  font-style: normal;
+  font-size: 0.5em;
+  vertical-align: middle;
+  margin: 0 0.4em;
+  color: #6d0f17;
+}
+@keyframes chant-left {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes chant-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+/* ไฟกระพริบเป็นช่วง ๆ เหมือนหลอดใกล้ดับ */
+@keyframes chant-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  61% {
+    opacity: 0.55;
+  }
+  62% {
+    opacity: 1;
+  }
+  64% {
+    opacity: 0.3;
+  }
+  66% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chant-band,
+  .chant-row,
+  .chant-row.back {
+    animation: none;
+  }
+}
+@media (max-width: 700px) {
+  .chant-band {
+    padding: 50px 0 60px;
+  }
 }

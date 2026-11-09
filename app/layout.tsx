@@ -6,6 +6,7 @@ import {
   DM_Sans,
   Noto_Sans_Thai,
   Noto_Serif_Thai,
+  Srisakdi,
 } from "next/font/google";
 import "./globals.css";
 import { PackageProvider, SalesProvider } from "@/components/booking-provider";
@@ -28,7 +29,20 @@ const notoSerifThai = Noto_Serif_Thai({
   subsets: ["thai"],
   variable: "--f-serif-thai",
 });
-const fontVars = [cinzel, cormorant, dmSans, notoSansThai, notoSerifThai]
+// ตัวไทยโบราณหัวม้วน ใช้กับแถบบทสวดท้ายหน้าแรกเท่านั้น
+const srisakdi = Srisakdi({
+  subsets: ["thai"],
+  weight: ["700"],
+  variable: "--f-chant",
+});
+const fontVars = [
+  cinzel,
+  cormorant,
+  dmSans,
+  notoSansThai,
+  notoSerifThai,
+  srisakdi,
+]
   .map((f) => f.variable)
   .join(" ");
 

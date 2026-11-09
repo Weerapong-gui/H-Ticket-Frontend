@@ -87,7 +87,7 @@ export function TicketCounter() {
     return (
       <div className={low ? "ticket-counter low" : "ticket-counter"}>
         <p className="ticket-counter-label">
-          <span className="live-dot" /> บัตรล่วงหน้าคงเหลือ
+          <span className="live-dot" /> บัตร pre-sale
           {low && <span className="ticket-counter-warn">ใกล้หมดแล้ว</span>}
         </p>
         <p className="ticket-counter-value">
