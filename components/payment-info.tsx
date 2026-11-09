@@ -1,10 +1,13 @@
+"use client";
 import { eventConfig } from "@/lib/event-config";
-import { money, TICKET_PRICE } from "@/lib/booking";
+import { money, packageFor } from "@/lib/booking";
 import { AccountCopyField } from "@/components/account-copy-field";
+import { usePackage } from "@/components/booking-provider";
 
 /** ข้อมูลโอนเงิน มาจาก lib/event-config.ts (backend ไม่ได้ส่งข้อมูลนี้มา) */
 export function PaymentInfo() {
   const p = eventConfig.payment;
+  const pack = packageFor(usePackage().size);
   const ready = !!(p.accountNumber || p.promptPayQr);
   return (
     <section
@@ -12,7 +15,10 @@ export function PaymentInfo() {
       aria-label="วิธีโอนเงิน"
     >
       <p className="eyebrow">วิธีชำระเงิน</p>
-      <h2>โอนเงิน {money(TICKET_PRICE)} แล้วแนบสลิป</h2>
+      <h2>โอนเงิน {money(pack.price)} แล้วแนบสลิป</h2>
+      {pack.size > 1 && (
+        <p>โปร {pack.name} · โอนครั้งเดียวยอดรวมทั้งกลุ่ม แล้วแนบสลิปเดียว</p>
+      )}
       {ready ? (
         <dl>
           {p.bankName && (
