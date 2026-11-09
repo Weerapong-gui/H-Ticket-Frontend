@@ -3,7 +3,7 @@ import {
   ANALYSIS_W,
   OUT_H,
   OUT_W,
-  flipBox,
+  spriteRect,
   matchBrightness,
 } from "./compose-math";
 import type { Box } from "./mask";
@@ -62,7 +62,7 @@ function peakLuma(ctx: CanvasRenderingContext2D, box: Box) {
 
 /** เบลอแบบย่อแล้วขยาย (ใช้ได้ทุกเบราว์เซอร์ ไม่พึ่ง ctx.filter) */
 function softBlur(src: HTMLCanvasElement, blurPx: number) {
-  const f = 1 / Math.max(1, blurPx * 2.2);
+  const f = 1 / Math.max(1, blurPx);
   const small = canvas(
     Math.max(1, Math.round(src.width * f)),
     Math.max(1, Math.round(src.height * f)),
@@ -77,6 +77,40 @@ function softBlur(src: HTMLCanvasElement, blurPx: number) {
   return out;
 }
 
+/**
+ * รูปผีที่ขอบค่อย ๆ จางเป็นดำ (ผสม screen แล้วดำ = มองไม่เห็น) กันเส้นตัดตรง ๆ ของไฟล์
+ * keepLeft: ผีครึ่งหน้า ไม่จางฝั่งซ้าย (รอยตัดที่ต้องชนขอบภาพ)
+ */
+function featheredSprite(
+  sprite: CanvasImageSource,
+  w: number,
+  h: number,
+  keepLeft: boolean,
+) {
+  const c = canvas(Math.max(1, Math.round(w)), Math.max(1, Math.round(h)));
+  const x = ctx2d(c);
+  x.drawImage(sprite, 0, 0, c.width, c.height);
+  const fade = (x0: number, y0: number, x1: number, y1: number) => {
+    const g = x.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, "rgba(0,0,0,1)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    x.fillStyle = g;
+    x.fillRect(
+      Math.min(x0, x1),
+      Math.min(y0, y1),
+      Math.abs(x1 - x0) || c.width,
+      Math.abs(y1 - y0) || c.height,
+    );
+  };
+  const fx = c.width * 0.18;
+  const fy = c.height * 0.15;
+  if (!keepLeft) fade(0, 0, fx, 0);
+  fade(c.width, 0, c.width - fx, 0);
+  fade(0, 0, 0, fy);
+  fade(0, c.height, 0, c.height - fy);
+  return c;
+}
+
 /** ชั้นผี: วาดลงกรอบ ปรับสี/ความสว่างให้เข้ากับฉากหลังตรงนั้น แล้วเบลอ */
 function ghostLayer(
   photo: CanvasRenderingContext2D,
@@ -88,27 +122,28 @@ function ghostLayer(
   const g = ctx2d(layer);
   g.fillStyle = "#000";
   g.fillRect(0, 0, OUT_W, OUT_H);
-  // กลับด้านทั้งแคนวาส แล้ววาดที่ flipBox(box) → ผีกลับซ้ายขวาแต่ยังอยู่ตรง box
-  const at = p.flipX ? flipBox(box, OUT_W) : box;
-  g.save();
-  if (p.flipX) {
-    g.translate(OUT_W, 0);
-    g.scale(-1, 1);
-  }
+  const edgeRight = p.variant === "edge" && box.x + box.w / 2 > OUT_W / 2;
   if (sprite) {
-    // ย่อให้พอดีกรอบโดยไม่ยืดภาพ ชิดล่าง · ผีมุมจอชิดด้านในกรอบ (ฝั่งกลางภาพ) ให้โผล่เข้ามา
     const { width: sw, height: sh } = sprite as {
       width: number;
       height: number;
     };
-    const k = Math.min(at.w / sw, at.h / sh);
-    const dx =
-      p.variant === "edge" ? at.x + at.w - sw * k : at.x + (at.w - sw * k) / 2;
-    g.drawImage(sprite, dx, at.y + at.h - sh * k, sw * k, sh * k);
+    const r = spriteRect(sw, sh, box, p.variant, OUT_W);
+    // ผีมุมจอฝั่งขวาต้องกลับด้านเสมอ (รอยตัดไปอยู่ขอบขวา)
+    const flip = p.variant === "edge" ? edgeRight : p.flipX;
+    const art = featheredSprite(sprite, r.w, r.h, p.variant === "edge");
+    g.save();
+    if (flip) {
+      g.translate(r.x + r.w, r.y);
+      g.scale(-1, 1);
+      g.drawImage(art, 0, 0, r.w, r.h);
+    } else {
+      g.drawImage(art, r.x, r.y, r.w, r.h);
+    }
+    g.restore();
   } else {
-    drawGhost(g, at.x + at.w / 2, at.y + at.h, at.h, "#e9e4dc", 6);
+    drawGhost(g, box.x + box.w / 2, box.y + box.h, box.h, "#e9e4dc", 6);
   }
-  g.restore();
 
   {
     const bg = regionMean(photo, box);
@@ -121,7 +156,8 @@ function ghostLayer(
     g.fillRect(0, 0, OUT_W, OUT_H);
     g.globalCompositeOperation = "source-over";
   }
-  return softBlur(layer, p.blurPx * (OUT_W / ANALYSIS_W) * 0.5);
+  // เบลอพอนุ่ม (2–6 px) ไม่งั้นผีแคบ ๆ อย่างผีครึ่งหน้าจะเบลอจนหายไป
+  return softBlur(layer, p.blurPx * 1.5);
 }
 
 /** ตัวคนจากรูป (ขอบนุ่ม) สำหรับวาดทับผี */

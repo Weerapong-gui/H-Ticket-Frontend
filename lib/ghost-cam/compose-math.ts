@@ -15,7 +15,25 @@ export function matchBrightness(ghostPeak: number, bgMean: number): number {
   return Math.min(1, (bgMean + LIFT) / ghostPeak);
 }
 
-/** กลับกรอบซ้ายขวาภายในภาพกว้าง width */
-export function flipBox(box: Box, width: number): Box {
-  return { ...box, x: width - box.x - box.w };
+/**
+ * ตำแหน่งวาดรูปผีจริง (พิกัดภาพผลลัพธ์): ย่อให้พอดีกรอบไม่ยืด ชิดล่าง
+ * ผีมุมจอ (ครึ่งหน้า รอยตัดอยู่ด้านซ้ายของไฟล์): ให้ฝั่งรอยตัดเลยขอบภาพออกไป 5%
+ * ไม่งั้นรอยตัดจะลอยอยู่กลางภาพ
+ */
+export function spriteRect(
+  sw: number,
+  sh: number,
+  box: Box,
+  variant: string,
+  outW: number,
+): Box {
+  const k = Math.min(box.w / sw, box.h / sh);
+  const w = sw * k;
+  const h = sh * k;
+  const y = box.y + box.h - h;
+  if (variant === "edge") {
+    const right = box.x + box.w / 2 > outW / 2;
+    return { x: right ? outW - w * 0.95 : -w * 0.05, y, w, h };
+  }
+  return { x: box.x + (box.w - w) / 2, y, w, h };
 }

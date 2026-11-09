@@ -177,7 +177,10 @@ for (let i = 0; i < 200; i++) {
     const p = planGhost(closeUp, W, H, noHand, { figure, rand: seeded(i) });
     const vx = Math.min(p.box.x + p.box.w, W) - Math.max(p.box.x, 0);
     const vy = Math.min(p.box.y + p.box.h, H) - Math.max(p.box.y, 0);
-    assert.ok(vx >= W * 0.12 && vy >= H * 0.3, `${p.variant} too small: ${vx}x${vy}`);
+    assert.ok(
+      vx >= W * 0.12 && vy >= H * 0.3,
+      `${p.variant} too small: ${vx}x${vy}`,
+    );
     assert.ok(!overlap(p.box, closeUp.head), `${p.variant} covers the head`);
     assert.equal(p.front, true, "no room behind → must be drawn in front");
   }
@@ -185,15 +188,19 @@ for (let i = 0; i < 200; i++) {
 // ผีมุมจอเลือกฝั่งที่มีที่ว่างมากกว่า และไม่เล็กจนมองไม่เห็น
 const oneSide = maskStats(rectMask(W, H, 0, 460, 150, H), W, H); // ว่างขวา 140
 for (let i = 0; i < 200; i++) {
-  const p = planGhost(oneSide, W, H, noHand, { figure: false, rand: seeded(i) });
+  const p = planGhost(oneSide, W, H, noHand, {
+    figure: false,
+    rand: seeded(i),
+  });
   if (p.variant !== "edge") continue;
   assert.ok(p.box.x > W / 2, "edge on the side without room");
 }
-// ปกติ (มีที่ว่าง) ผีอยู่หลังคน
-assert.equal(
-  planGhost(selfie, W, H, noHand, { figure: false, rand: seeded(1) }).front,
-  false,
-);
+// ผีหลังไหล่/ไกล อยู่หลังคน · ผีมุมจอวาดด้านหน้าเสมอ (ผม/ไหล่ที่ขอบภาพจะได้ไม่บังผี) แต่ไม่ทับหัว
+for (let i = 0; i < 300; i++) {
+  const p = planGhost(selfie, W, H, noHand, { figure: false, rand: seeded(i) });
+  if (p.variant === "edge") assert.equal(p.front, true);
+  else assert.equal(p.front, false, p.variant);
+}
 
 // camera-flow: สลับกล้อง live → starting (พลาดแล้วไป unavailable ได้)
 assert.equal(nextCam("live", "switch"), "starting");
@@ -221,18 +228,29 @@ const figNone = planGhost(null, W, H, ghostSprites, {
 assert.equal(figNone.variant, "figure");
 
 // compose-math: ปรับความสว่างผีให้ peak ≈ ฉากหลัง × 1.35, กลับซ้ายขวา
-const { matchBrightness, flipBox } = load("lib/ghost-cam/compose-math.ts");
+const { matchBrightness, spriteRect } = load("lib/ghost-cam/compose-math.ts");
 assert.ok(Math.abs(255 * matchBrightness(255, 40) - 170) < 0.5); // ฉากหลัง + 130
 assert.ok(Math.abs(255 * matchBrightness(255, 10) - 140) < 0.5);
 assert.ok(matchBrightness(255, 240) <= 1); // ไม่สว่างเกินต้นฉบับ
 assert.ok(matchBrightness(255, 0) > 0); // รูปมืดสนิทยังเห็นผีจาง ๆ
 assert.equal(matchBrightness(0, 40), 0);
-assert.deepEqual(flipBox({ x: 10, y: 5, w: 100, h: 50 }, 600), {
-  x: 490,
-  y: 5,
-  w: 100,
-  h: 50,
-});
+// ผีครึ่งหน้า (รอยตัดอยู่ซ้ายของไฟล์): ฝั่งรอยตัดต้องเลยขอบภาพเสมอ
+{
+  const box = { x: 900, y: 100, w: 300, h: 500 };
+  const r = spriteRect(100, 400, box, "edge", 1080);
+  assert.ok(
+    Math.abs(r.x + r.w * 0.95 - 1080) < 1e-6,
+    "right edge not at frame edge",
+  );
+  assert.equal(r.y + r.h, box.y + box.h);
+  const l = spriteRect(100, 400, { ...box, x: -100 }, "edge", 1080);
+  assert.ok(Math.abs(l.x + l.w * 0.05) < 1e-6, "left edge not at frame edge");
+  // ผีปกติ: ย่อพอดีกรอบไม่ยืด กึ่งกลางแนวนอน ชิดล่าง
+  const b = spriteRect(100, 400, box, "behind-left", 1080);
+  assert.ok(Math.abs(b.w / b.h - 0.25) < 1e-9);
+  assert.ok(Math.abs(b.x + b.w / 2 - (box.x + box.w / 2)) < 1e-9);
+  assert.equal(b.y + b.h, box.y + box.h);
+}
 
 // camera-flow: สถานะหน้ากล้อง
 const flow = [

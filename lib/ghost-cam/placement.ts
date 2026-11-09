@@ -95,7 +95,7 @@ export function planGhost(
     const fh = head.h * between(rand, 3.6, 4.2);
     const fw = fh * 0.6;
     // ต้องเห็นได้อย่างน้อย 12% ของความกว้างภาพ ไม่งั้นฉากจบหายไปเฉย ๆ
-    if (Math.max(stats.freeLeft, stats.freeRight) < w * 0.12)
+    if (Math.max(stats.freeLeft, stats.freeRight) < w * MIN_FREE)
       return frontFallback("figure", sprite);
     return {
       variant: "figure",
@@ -147,7 +147,8 @@ export function planGhost(
       box,
       flipX: right && sprite.flippable,
       ...faint(),
-      front: false,
+      // อยู่ชิดขอบภาพ ไม่ทับหัว: วาดหน้าตัวคนได้ (ผม/ไหล่ที่ขอบภาพจะได้ไม่บังผีจนหาย)
+      front: true,
     };
   };
 
