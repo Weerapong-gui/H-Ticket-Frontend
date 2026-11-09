@@ -12,7 +12,8 @@
     "format": "prettier --write app components lib scripts README.md",
     "test:api": "node scripts/verify-api.cjs",
     "test:scare": "node scripts/verify-scare.cjs",
-    "test:pickup": "node scripts/verify-pickup.cjs"
+    "test:pickup": "node scripts/verify-pickup.cjs",
+    "test:ghost": "node scripts/verify-ghost.cjs"
   },
   "dependencies": {
     "jsqr": "^1.4.0",
