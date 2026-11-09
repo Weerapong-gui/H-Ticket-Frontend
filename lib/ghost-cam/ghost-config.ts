@@ -14,20 +14,32 @@ export type GhostSprite = {
 
 export const ghostSprites: GhostSprite[] = [
   {
-    id: "placeholder-behind",
-    src: "procedural:behind",
+    id: "long-hair",
+    src: "/ghosts/long-hair.webp",
     kind: "behind",
     flippable: true,
   },
   {
-    id: "placeholder-far",
-    src: "procedural:far",
+    id: "chada-withered",
+    src: "/ghosts/chada-withered.webp",
+    kind: "behind",
+    flippable: true,
+  },
+  {
+    id: "white-dress",
+    src: "/ghosts/white-dress.webp",
     kind: "far",
     flippable: true,
   },
   {
-    id: "placeholder-edge",
-    src: "procedural:edge",
+    id: "crouching",
+    src: "/ghosts/crouching.webp",
+    kind: "far",
+    flippable: true,
+  },
+  {
+    id: "chada-peek",
+    src: "/ghosts/chada-peek.webp",
     kind: "edge",
     flippable: true,
   },

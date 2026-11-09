@@ -100,7 +100,19 @@ function ghostLayer(
     g.clearRect(0, 0, OUT_W, OUT_H);
     drawGhost(g, box.x + box.w / 2, box.y + box.h, box.h, "#050505", 6);
   } else if (sprite) {
-    g.drawImage(sprite, at.x, at.y, at.w, at.h);
+    // ย่อให้พอดีกรอบโดยไม่ยืดภาพ ชิดล่าง กึ่งกลางแนวนอน
+    const { width: sw, height: sh } = sprite as {
+      width: number;
+      height: number;
+    };
+    const k = Math.min(at.w / sw, at.h / sh);
+    g.drawImage(
+      sprite,
+      at.x + (at.w - sw * k) / 2,
+      at.y + at.h - sh * k,
+      sw * k,
+      sh * k,
+    );
   } else {
     drawGhost(g, at.x + at.w / 2, at.y + at.h, at.h, "#e9e4dc", 6);
   }
