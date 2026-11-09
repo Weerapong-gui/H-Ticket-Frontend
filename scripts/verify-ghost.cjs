@@ -102,7 +102,7 @@ for (let i = 0; i < 500; i++) {
   seen.add(p.variant);
   if (p.variant !== "hand")
     assert.ok(!overlap(p.box, mid.head), `${p.variant} covers the head`);
-  assert.ok(p.opacity >= 0.28 && p.opacity <= 0.45, String(p.opacity));
+  assert.ok(p.opacity >= 0.45 && p.opacity <= 0.7, String(p.opacity));
   assert.ok(p.blurPx >= 1.5 && p.blurPx <= 4);
   assert.ok(p.sprite && p.sprite.kind === kindOf(p.variant), p.variant);
 }
@@ -119,14 +119,68 @@ for (let i = 0; i < 300; i++)
     "hand",
   );
 
+// เซลฟี่: ไหล่เต็มความกว้างด้านล่าง แต่ข้างหัวมีที่ว่าง → ต้องวางผีหลังไหล่ได้ (สิ่งที่เจ้าของงานเน้น)
+function selfieMask(w, h) {
+  const m = new Float32Array(w * h);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const head = y >= 80 && y < 300 && x >= 200 && x < 400;
+      const body = y >= 300 && x >= 20 && x < 590;
+      if (head || body) m[y * w + x] = 1;
+    }
+  return m;
+}
+const selfie = maskStats(selfieMask(W, H), W, H);
+assert.equal(selfie.freeLeft, 200); // วัดที่ระดับหัว ไม่ใช่ทั้งตัว
+assert.equal(selfie.freeRight, 200);
+const selfieSeen = new Set();
+for (let i = 0; i < 300; i++) {
+  const p = planGhost(selfie, W, H, noHand, { figure: false, rand: seeded(i) });
+  selfieSeen.add(p.variant);
+  assert.ok(!overlap(p.box, selfie.head), `${p.variant} covers the head`);
+  if (p.variant === "edge") {
+    // มุมจอต้องอยู่ช่วงข้างหัว (ด้านล่างโดนไหล่บังหมด)
+    assert.ok(p.box.y < selfie.head.y + selfie.head.h, "edge hidden by shoulders");
+  }
+}
+assert.ok(selfieSeen.has("behind-left") && selfieSeen.has("behind-right"));
+// ผีไกลในเซลฟี่: อยู่ในที่ว่างข้างหัว ไม่ชิดมุมภาพ
+for (let i = 0; i < 200; i++) {
+  const p = planGhost(selfie, W, H, noHand, { figure: false, rand: seeded(i) });
+  if (p.variant !== "far") continue;
+  const inLeft = p.box.x + p.box.w <= selfie.head.x + 1;
+  const inRight = p.box.x >= selfie.head.x + selfie.head.w - 1;
+  assert.ok(inLeft || inRight, "far ghost not beside the head");
+  assert.ok(p.box.y >= H * 0.05, "far ghost jammed in the corner");
+}
+// ผีหลังไหล่ต้องอยู่ในภาพอย่างน้อยครึ่งหนึ่ง และชิดข้างหัว
+for (let i = 0; i < 200; i++) {
+  const p = planGhost(selfie, W, H, noHand, { figure: false, rand: seeded(i) });
+  if (p.variant === "behind-left") {
+    assert.ok(p.box.x + p.box.w / 2 >= 0, "mostly off-frame");
+    assert.ok(Math.abs(p.box.x + p.box.w - selfie.head.x) < 1);
+  }
+  if (p.variant === "behind-right") {
+    assert.ok(p.box.x + p.box.w / 2 <= W, "mostly off-frame");
+    assert.ok(Math.abs(p.box.x - (selfie.head.x + selfie.head.w)) < 1);
+  }
+}
+
 // ฉากจบผีชุดดำ
 const fig = planGhost(mid, W, H, ghostSprites, {
   figure: true,
   rand: seeded(3),
 });
 assert.equal(fig.variant, "figure");
-assert.equal(fig.sprite, null);
-assert.equal(fig.box.y + fig.box.h, mid.person.y + mid.person.h);
+// ฉากจบ: ผีผมยาว (เห็นได้แม้ฉากหลังมืด) ยืนชิดข้างหัวพอดี ใหญ่และชัดกว่าผีปกติ
+assert.equal(fig.sprite.kind, "behind");
+assert.ok(fig.opacity >= 0.8);
+assert.ok(!overlap(fig.box, mid.head));
+assert.ok(
+  Math.abs(fig.box.x + fig.box.w - mid.head.x) < 1 ||
+    Math.abs(fig.box.x - (mid.head.x + mid.head.w)) < 1,
+);
+assert.ok(fig.box.h > mid.head.h * 3.4);
 const figNone = planGhost(null, W, H, ghostSprites, {
   figure: true,
   rand: seeded(3),
@@ -135,7 +189,8 @@ assert.equal(figNone.variant, "figure");
 
 // compose-math: ปรับความสว่างผีให้ peak ≈ ฉากหลัง × 1.35, กลับซ้ายขวา
 const { matchBrightness, flipBox } = load("lib/ghost-cam/compose-math.ts");
-assert.ok(Math.abs(255 * matchBrightness(255, 40) - 54) < 0.5);
+assert.ok(Math.abs(255 * matchBrightness(255, 40) - 170) < 0.5); // ฉากหลัง + 130
+assert.ok(Math.abs(255 * matchBrightness(255, 10) - 140) < 0.5);
 assert.ok(matchBrightness(255, 240) <= 1); // ไม่สว่างเกินต้นฉบับ
 assert.ok(matchBrightness(255, 0) > 0); // รูปมืดสนิทยังเห็นผีจาง ๆ
 assert.equal(matchBrightness(0, 40), 0);
@@ -145,5 +200,25 @@ assert.deepEqual(flipBox({ x: 10, y: 5, w: 100, h: 50 }, 600), {
   w: 100,
   h: 50,
 });
+
+// camera-flow: สถานะหน้ากล้อง
+const { nextCam } = load("lib/ghost-cam/camera-flow.ts");
+const flow = [
+  ["idle", "open", "starting"],
+  ["starting", "granted", "live"],
+  ["starting", "denied", "unavailable"],
+  ["live", "shoot", "developing"],
+  ["developing", "developed", "result"],
+  ["result", "retake", "starting"],
+  ["live", "close", "idle"],
+  ["result", "close", "idle"],
+  ["unavailable", "close", "idle"],
+  ["idle", "shoot", "idle"],
+  ["developing", "shoot", "developing"],
+  ["live", "open", "live"],
+  ["unavailable", "granted", "unavailable"],
+];
+for (const [from, ev, to] of flow)
+  assert.equal(nextCam(from, ev), to, `${from} + ${ev}`);
 
 console.log("Ghost camera logic checks passed.");

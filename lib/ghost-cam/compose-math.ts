@@ -6,14 +6,13 @@ export const ANALYSIS_H = 360;
 export const OUT_W = 1080;
 export const OUT_H = 1440;
 
-/** ผีต้องสว่างกว่าฉากหลังแค่นิดเดียว · รูปมืดสนิทยังให้เห็นจาง ๆ */
-const LIFT = 1.35;
-const MIN_PEAK = 28;
+/** จุดที่สว่างที่สุดของผี = ฉากหลังตรงนั้น + 130 (ผสม screen ที่ความเข้ม ~0.5 แล้วเห็นนิด ๆ) */
+const LIFT = 130;
 
-/** คืนตัวคูณความสว่างของผี (0–1) ให้จุดที่สว่างที่สุดของผี ≈ ค่าเฉลี่ยฉากหลัง × 1.35 */
+/** คืนตัวคูณความสว่างของผี (0–1) ให้จุดที่สว่างที่สุดของผี ≈ ค่าเฉลี่ยฉากหลัง + 130 */
 export function matchBrightness(ghostPeak: number, bgMean: number): number {
   if (ghostPeak <= 0) return 0;
-  return Math.min(1, Math.max(bgMean * LIFT, MIN_PEAK) / ghostPeak);
+  return Math.min(1, (bgMean + LIFT) / ghostPeak);
 }
 
 /** กลับกรอบซ้ายขวาภายในภาพกว้าง width */

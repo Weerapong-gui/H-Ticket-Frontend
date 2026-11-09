@@ -5,7 +5,7 @@ export type Variant =
   "behind-left" | "behind-right" | "far" | "edge" | "hand" | "figure";
 export type Placement = {
   variant: Variant;
-  /** null = ผีชุดดำ (วาดด้วยโค้ด) */
+  /** null = ไม่มีไฟล์ผี วาดร่างผีด้วยโค้ดแทน */
   sprite: GhostSprite | null;
   box: Box;
   flipX: boolean;
@@ -35,34 +35,43 @@ export function planGhost(
   const { rand } = opts;
   const of = (k: GhostKind) => sprites.filter((s) => s.kind === k);
   const faint = () => ({
-    opacity: between(rand, 0.28, 0.45),
+    opacity: between(rand, 0.45, 0.7),
     blurPx: between(rand, 1.5, 4),
   });
 
   if (opts.figure) {
+    // ฉากจบเรื่องผีชุดดำ: "อยู่ข้างหลังคุณ" — ผีผมยาวยืนชิดหัว ใหญ่และชัดกว่าผีปกติ
+    // (เงาดำล้วนมองไม่เห็นในรูปที่ฉากหลังมืด จึงใช้ผีหน้าซีดแทน)
+    const behind = of("behind");
+    const sprite =
+      behind.find((s) => s.id === "long-hair") ?? behind[0] ?? null;
     if (!stats) {
-      const fh = h * 0.8;
+      const fh = h * 0.7;
       return {
         variant: "figure",
-        sprite: null,
-        box: { x: (w - fh * 0.5) / 2, y: h * 0.95 - fh, w: fh * 0.5, h: fh },
+        sprite,
+        box: { x: w * 0.05, y: h * 0.05, w: fh * 0.6, h: fh },
         flipX: false,
         opacity: 0.85,
-        blurPx: 2,
+        blurPx: 1.5,
       };
     }
-    const p = stats.person;
-    const fh = Math.min(p.h * 1.05, h * 0.98);
-    const fw = fh * 0.5;
-    const cx =
-      stats.freeLeft >= stats.freeRight ? p.x + p.w * 0.15 : p.x + p.w * 0.85;
+    const head = stats.head;
+    const left = stats.freeLeft >= stats.freeRight;
+    const fh = head.h * between(rand, 3.6, 4.2);
+    const fw = fh * 0.6;
     return {
       variant: "figure",
-      sprite: null,
-      box: { x: cx - fw / 2, y: p.y + p.h - fh, w: fw, h: fh },
-      flipX: false,
+      sprite,
+      box: {
+        x: left ? head.x - fw : head.x + head.w,
+        y: Math.max(0, head.y - fh * 0.08),
+        w: fw,
+        h: fh,
+      },
+      flipX: !left && !!sprite?.flippable,
       opacity: 0.85,
-      blurPx: 2,
+      blurPx: 1.5,
     };
   }
 
@@ -70,8 +79,16 @@ export function planGhost(
     const sprite = pick(rand, of("edge").length ? of("edge") : sprites);
     const right = rand() < 0.5;
     let eh = h * between(rand, 0.45, 0.6);
-    let y = between(rand, h * 0.05, h - eh);
     const out = between(rand, 0.4, 0.6);
+    if (stats) {
+      // ส่วนที่โผล่เข้ามาต้องไม่เกินที่ว่างข้างหัว ไม่งั้นโดนตัวคนบังหมด
+      const free = right ? stats.freeRight : stats.freeLeft;
+      eh = Math.min(eh, (free * 0.95) / (1 - out) / 0.6);
+    }
+    // อยู่ช่วงข้างหัว (ด้านล่างมักโดนไหล่บัง)
+    let y = stats
+      ? between(rand, 0, Math.max(0, stats.head.y + stats.head.h * 0.6))
+      : between(rand, h * 0.05, h - eh);
     const place = () => {
       const ew = eh * 0.6;
       return { x: right ? w - ew * (1 - out) : -ew * out, y, w: ew, h: eh };
@@ -121,15 +138,13 @@ export function planGhost(
 
   if (variant === "behind-left" || variant === "behind-right") {
     const sprite = pick(rand, of("behind"));
-    const bh = p.h * between(rand, 0.9, 1.1);
+    const free = variant === "behind-left" ? stats.freeLeft : stats.freeRight;
+    // ขนาดอิงหัว (เซลฟี่ตัวคนเต็มจอ ใช้ความสูงตัวไม่ได้) และต้องอยู่ในภาพอย่างน้อยครึ่งตัว
+    const bh = Math.min(head.h * between(rand, 2.6, 3.4), (2 * free) / 0.6);
     const bw = bh * 0.6;
-    const lap = bw * between(rand, 0.15, 0.3);
-    const y = Math.max(0, p.y + bh * between(rand, -0.05, 0.1));
-    // ซ้อนเข้าไปหลังตัวคนได้ แต่ไม่เกินขอบหัว (ตัวคนจะถูกวาดทับอยู่แล้ว)
-    const x =
-      variant === "behind-left"
-        ? Math.min(p.x + lap, head.x) - bw
-        : Math.max(p.x + p.w - lap, head.x + head.w);
+    const y = Math.max(0, head.y - bh * between(rand, 0, 0.15));
+    // ชิดข้างหัวพอดี ส่วนล่างของผีจะถูกไหล่บัง (ตัวคนวาดทับ)
+    const x = variant === "behind-left" ? head.x - bw : head.x + head.w;
     return {
       variant,
       sprite,
@@ -140,18 +155,21 @@ export function planGhost(
   }
 
   if (variant === "far") {
+    // ผีทั้งตัวเล็ก ๆ ไกลในฉาก: อยู่ในที่ว่างข้างหัว ระดับเดียวกับหัว (ด้านล่างโดนไหล่บัง)
     const sprite = pick(rand, of("far"));
-    const fh = p.h * between(rand, 0.25, 0.4);
-    const fw = fh * 0.5;
     const useLeft = stats.freeLeft >= stats.freeRight;
-    const lo = useLeft ? 0 : p.x + p.w;
-    const hi = useLeft ? Math.max(0, p.x - fw) : Math.max(lo, w - fw);
+    const free = useLeft ? stats.freeLeft : stats.freeRight;
+    const fh = Math.min(p.h * between(rand, 0.3, 0.45), h * 0.5);
+    const fw = Math.min(fh * 0.5, free * 0.9);
+    const lo = useLeft ? free * 0.05 : head.x + head.w;
+    const hi = useLeft ? head.x - fw : w - fw - free * 0.05;
+    const yLo = Math.max(h * 0.05, head.y - fh * 0.4);
     return {
       variant,
       sprite,
       box: {
-        x: between(rand, lo, hi),
-        y: between(rand, 0, Math.max(0, h / 3 - fh / 2)),
+        x: between(rand, lo, Math.max(lo, hi)),
+        y: between(rand, yLo, Math.max(yLo, head.y + head.h - fh * 0.5)),
         w: fw,
         h: fh,
       },

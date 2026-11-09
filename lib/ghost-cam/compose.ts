@@ -95,30 +95,22 @@ function ghostLayer(
     g.translate(OUT_W, 0);
     g.scale(-1, 1);
   }
-  if (p.variant === "figure") {
-    // ผีชุดดำ: เงาดำ (ไม่ใช้ screen) วาดบนพื้นใสแทน
-    g.clearRect(0, 0, OUT_W, OUT_H);
-    drawGhost(g, box.x + box.w / 2, box.y + box.h, box.h, "#050505", 6);
-  } else if (sprite) {
-    // ย่อให้พอดีกรอบโดยไม่ยืดภาพ ชิดล่าง กึ่งกลางแนวนอน
+  if (sprite) {
+    // ย่อให้พอดีกรอบโดยไม่ยืดภาพ ชิดล่าง · ผีมุมจอชิดด้านในกรอบ (ฝั่งกลางภาพ) ให้โผล่เข้ามา
     const { width: sw, height: sh } = sprite as {
       width: number;
       height: number;
     };
     const k = Math.min(at.w / sw, at.h / sh);
-    g.drawImage(
-      sprite,
-      at.x + (at.w - sw * k) / 2,
-      at.y + at.h - sh * k,
-      sw * k,
-      sh * k,
-    );
+    const dx =
+      p.variant === "edge" ? at.x + at.w - sw * k : at.x + (at.w - sw * k) / 2;
+    g.drawImage(sprite, dx, at.y + at.h - sh * k, sw * k, sh * k);
   } else {
     drawGhost(g, at.x + at.w / 2, at.y + at.h, at.h, "#e9e4dc", 6);
   }
   g.restore();
 
-  if (p.variant !== "figure") {
+  {
     const bg = regionMean(photo, box);
     const scale = matchBrightness(peakLuma(g, box), bg.luma);
     const top = Math.max(bg.r, bg.g, bg.b, 1);
@@ -177,13 +169,13 @@ function grade(ctx: CanvasRenderingContext2D) {
   const v = ctx.createRadialGradient(
     OUT_W / 2,
     OUT_H / 2,
-    OUT_W * 0.35,
+    OUT_W * 0.45,
     OUT_W / 2,
     OUT_H / 2,
     OUT_H * 0.75,
   );
   v.addColorStop(0, "rgba(0,0,0,0)");
-  v.addColorStop(1, "rgba(0,0,0,0.6)");
+  v.addColorStop(1, "rgba(0,0,0,0.45)");
   ctx.fillStyle = v;
   ctx.fillRect(0, 0, OUT_W, OUT_H);
 }
@@ -208,8 +200,7 @@ export async function composeGhostPhoto(
   const ghost = ghostLayer(ctx, placement, box, sprite);
   ctx.save();
   ctx.globalAlpha = placement.opacity;
-  ctx.globalCompositeOperation =
-    placement.variant === "figure" ? "source-over" : "screen";
+  ctx.globalCompositeOperation = "screen";
   ctx.drawImage(ghost, 0, 0);
   ctx.restore();
 
