@@ -20,7 +20,7 @@ type View =
   | { step: "looking"; id: string }
   | { step: "card"; id: string; result: CardResult }
   | { step: "confirming"; id: string; result: CardResult }
-  | { step: "done"; label: string };
+  | { step: "done"; name: string };
 
 const DONE_MS = 1_500;
 /** ขั้นที่ล้มเหลว เก็บเป็นข้อมูล แล้วปุ่ม "ลองใหม่" เรียกซ้ำตอนกด */
@@ -108,7 +108,7 @@ export default function ScanPage() {
             return;
           }
           setTyped("");
-          setView({ step: "done", label: r.order.ticket_label });
+          setView({ step: "done", name: r.order.name });
           doneTimer.current = window.setTimeout(backToScanning, DONE_MS);
         })
         .catch((e: unknown) => {
@@ -174,7 +174,7 @@ export default function ScanPage() {
         )}
         {view.step === "done" && (
           <p className="scan-done" role="status">
-            แจกบัตร {view.label} แล้ว
+            แจกบัตรให้ {view.name} แล้ว
           </p>
         )}
       </div>
@@ -187,11 +187,9 @@ export default function ScanPage() {
           {result.kind === "ready" && (
             <>
               <p className="scan-card-tag">ยังไม่รับบัตร</p>
-              <strong className="scan-card-number">
-                {result.order.ticket_label}
-              </strong>
               <h3>{result.order.name}</h3>
               <p>รหัส {result.order.student_id}</p>
+              <p>หยิบบัตรกระดาษใบถัดไปให้ แล้วกดยืนยัน</p>
               <button
                 type="button"
                 className="button scan-confirm"
@@ -200,7 +198,7 @@ export default function ScanPage() {
               >
                 {view.step === "confirming"
                   ? "กำลังบันทึก…"
-                  : `ยืนยันแจกบัตร ${result.order.ticket_label}`}
+                  : "ยืนยันแจกบัตรแล้ว"}
               </button>
             </>
           )}
@@ -212,10 +210,8 @@ export default function ScanPage() {
                   ? thaiTime(result.order.picked_up_at)
                   : ""}
               </p>
-              <strong className="scan-card-number">
-                {result.order.ticket_label}
-              </strong>
               <h3>{result.order.name}</h3>
+              <p>รหัส {result.order.student_id}</p>
             </>
           )}
           {result.kind === "cancelled" && (

@@ -24,21 +24,16 @@ export function ErrorNotice({
         </p>
       )}
       {data?.code === "already_has_ticket" && (
-        <>
-          <p>
-            เลขบัตรเดิม: <strong>{data.ticket_label}</strong>
-          </p>
-          <Link
-            className="text-link"
-            href={
-              data.student_id || studentId
-                ? `/ticket/${encodeURIComponent((data.student_id || studentId)!.trim())}`
-                : "/ticket"
-            }
-          >
-            ดูบัตรของฉัน →
-          </Link>
-        </>
+        <Link
+          className="text-link"
+          href={
+            data.student_id || studentId
+              ? `/ticket/${encodeURIComponent((data.student_id || studentId)!.trim())}`
+              : "/ticket"
+          }
+        >
+          ดูบัตรของฉัน →
+        </Link>
       )}
       {(data?.code === "network" || data?.code === "invalid_response") && (
         <Link className="text-link" href="/ticket">

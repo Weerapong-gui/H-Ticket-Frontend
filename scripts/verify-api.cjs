@@ -54,8 +54,6 @@ global.fetch = async (url, init) => {
   });
 };
 const ticket = {
-  ticket_no: 12,
-  ticket_label: "012",
   name: "Test Student",
   student_id: "6831501178",
   picked_up: false,
@@ -140,7 +138,7 @@ async function main() {
         code,
         message: "ข้อความจาก backend",
         contact: "staff-contact",
-        ticket_label: "012",
+        student_id: "6831501178",
       },
       status,
     );
@@ -152,7 +150,7 @@ async function main() {
         e.data.code === code &&
         e.message === "ข้อความจาก backend" &&
         e.data.contact === "staff-contact" &&
-        e.data.ticket_label === "012",
+        e.data.student_id === "6831501178",
     );
   }
   response({ token: "test-token" });
@@ -177,7 +175,6 @@ async function main() {
     remaining: 558,
     cancelled: 3,
     picked_up: 10,
-    free_numbers: [7, 43, 44],
   });
   await api.stats();
   assert.equal(last().init.headers.get("Authorization"), "Bearer test-token");
@@ -198,8 +195,6 @@ async function main() {
   assert.equal(last().init.method, "POST");
   response({
     id: "order-id",
-    ticket_no: 12,
-    ticket_label: "012",
     status: "active",
     name: "Test Student",
     student_id: "6831501178",
@@ -254,8 +249,8 @@ async function main() {
     );
   }
   for (const payload of [
-    { ...ticket, ticket_label: "12" },
-    { ...ticket, ticket_no: 601, ticket_label: "601" },
+    { ...ticket, name: " " },
+    { ...ticket, group: [{ name: "A" }] },
     { ...ticket, student_id: "bad" },
     { ...ticket, picked_up: undefined },
   ]) {
@@ -318,6 +313,39 @@ async function main() {
     global.fetch = originalFetch;
     AbortSignal.timeout = originalTimeout;
   }
+  // กล้องผี: ยิงนับแล้วลืม ไม่มี body · เน็ตล่มก็ห้าม throw (Review Focus 5)
+  calls = [];
+  next = { status: 204, body: "" };
+  api.countGhostShot();
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(last().url, `${API_URL}/api/ghost-shots`);
+  assert.equal(last().init.method, "POST");
+  assert.equal(last().init.body, undefined);
+  next = new Error("offline");
+  assert.doesNotThrow(() => api.countGhostShot());
+  await new Promise((r) => setTimeout(r, 0));
+  next = { status: 429, body: "{}" };
+  assert.doesNotThrow(() => api.countGhostShot());
+  await new Promise((r) => setTimeout(r, 0));
+  const statsBase = {
+    open: true,
+    closed_forever: false,
+    total: 600,
+    sold: 1,
+    remaining: 599,
+    cancelled: 0,
+    picked_up: 0,
+  };
+  setAdminToken("test-token");
+  response({ ...statsBase, ghost_shots: 7 });
+  assert.equal((await api.stats()).ghost_shots, 7);
+  response(statsBase);
+  await api.stats();
+  response({ ...statsBase, ghost_shots: -1 });
+  await assert.rejects(
+    () => api.stats(),
+    (e) => e.data.code === "invalid_response",
+  );
   clearAdminToken();
   // admin shell re-renders when the token changes (login, logout, 401)
   let notified = 0;

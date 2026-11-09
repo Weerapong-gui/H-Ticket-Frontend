@@ -40,11 +40,11 @@ export default function Orders() {
         }}
       >
         <label>
-          ค้นชื่อ รหัส เบอร์ หรือเลขบัตร
+          ค้นชื่อ รหัส หรือเบอร์
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="รหัสนักศึกษา หรือ 012"
+            placeholder="รหัสนักศึกษา หรือชื่อ"
           />
         </label>
         <label>
@@ -73,7 +73,6 @@ export default function Orders() {
             className={`order-card ${order.status === "cancelled" ? "cancelled" : ""}`}
           >
             <div className="order-card-head">
-              <strong className="order-number">{order.ticket_label}</strong>
               <div>
                 <h3>{order.name}</h3>
                 <p>
@@ -136,7 +135,7 @@ export default function Orders() {
                     disabled={!!busy || loading || !!error}
                     onClick={() => setCancel(order)}
                   >
-                    ยกเลิกบัตร
+                    ยกเลิกการจอง
                   </button>
                 </>
               )}
@@ -148,8 +147,8 @@ export default function Orders() {
       {slip && <SlipDialog id={slip} onClose={() => setSlip(null)} />}
       {cancel && (
         <ActionDialog
-          title={`ยกเลิกบัตร ${cancel.ticket_label}`}
-          description={`ยืนยันยกเลิกบัตรของ ${cancel.name} เลขบัตรนี้จะกลับไปว่างและไม่สามารถใช้บัตรเดิมแลกบัตรได้`}
+          title={`ยกเลิกการจองของ ${cancel.name}`}
+          description={`ยืนยันยกเลิกการจองของ ${cancel.name} (${cancel.student_id}) โควตาจะคืน 1 ใบ และรหัสนี้จะรับบัตรที่หน้างานไม่ได้`}
           fieldLabel="เหตุผลการยกเลิก (จำเป็น)"
           onCancel={() => setCancel(null)}
           onConfirm={async (reason) => {

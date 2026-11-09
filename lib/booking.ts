@@ -48,20 +48,6 @@ export function salesMessage(sales: SalesStatus | null) {
 }
 export const canOrder = (sales: SalesStatus | null) =>
   !!sales && sales.open && !sales.closed_forever && sales.remaining > 0;
-export function numberRanges(numbers: number[]) {
-  const sorted = [...new Set(numbers)].sort((a, b) => a - b);
-  const ranges: string[] = [];
-  const label = (n: number) => String(n).padStart(3, "0");
-  for (let i = 0; i < sorted.length; i++) {
-    const first = sorted[i];
-    let last = first;
-    while (sorted[i + 1] === last + 1) last = sorted[++i];
-    ranges.push(
-      first === last ? label(first) : `${label(first)}–${label(last)}`,
-    );
-  }
-  return ranges.join(", ");
-}
 export const thaiTime = (date: string) =>
   new Date(date).toLocaleString("th-TH", {
     timeZone: "Asia/Bangkok",

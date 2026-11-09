@@ -1,24 +1,16 @@
 import { eventConfig } from "@/lib/event-config";
 import { TicketAccordion } from "@/components/ticket-accordion";
-import { TICKET_PRICE, money, packages } from "@/lib/booking";
+import { money } from "@/lib/booking";
 import { TicketArt } from "@/components/ticket-art";
+import { TicketCounter } from "@/components/ticket-counter";
+import { ChantTicker } from "@/components/chant-ticker";
 import Link from "next/link";
-import Image from "next/image";
-import {
-  ArrowRight,
-  ArrowDown,
-  Clock3,
-  MapPin,
-  CalendarDays,
-  Ticket,
-  Flame,
-} from "lucide-react";
+import { ArrowRight, ArrowDown } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import { ScareLayer } from "@/components/scare/scare-layer";
-import { FlashCamera } from "@/components/scare/flash-camera";
+import { GhostCamera } from "@/components/scare/ghost-camera";
 import { HeroBackdrop } from "@/components/scare/hero-backdrop";
 import { ENTRY_GATE_SCRIPT } from "@/lib/scare/storage";
-import { pageImages } from "@/lib/scare/camera-config";
 export default function Home() {
   return (
     <ScareLayer>
@@ -34,7 +26,7 @@ export default function Home() {
               <h1>
                 <span>THE</span>HAUNTED
                 <br />
-                HOUSE<span className="title-mark">✦</span>
+                HOUSE
               </h1>
               <p className="hero-subtitle">บ้านผีสิง</p>
               <p className="hero-description">เข้าไปแล้ว อย่าหันหลังกลับ</p>
@@ -43,70 +35,42 @@ export default function Home() {
                   จองบัตร <ArrowRight size={18} />
                 </Link>
                 <Link href="#attraction" className="text-link">
-                  เกี่ยวกับงาน <ArrowDown size={15} />
+                  บัตรคงเหลือ <ArrowDown size={15} />
                 </Link>
-              </div>
-              <div className="hero-note">
-                <span className="live-dot" /> {eventConfig.type} ·{" "}
-                {eventConfig.date}
               </div>
             </Reveal>
           </div>
         </section>
-        <div className="info-strip">
+        <p className="info-strip">
+          <span>{eventConfig.date}</span>
+          <span>{eventConfig.time}</span>
+          <span>{eventConfig.location}</span>
           <span>
-            <MapPin /> สถานที่: {eventConfig.location}
+            จองเว็บ {money(eventConfig.ticket.packages[0].price)} / หน้างาน{" "}
+            {money(eventConfig.ticket.doorPrice)}
           </span>
-          <span>
-            <Clock3 /> เวลา: {eventConfig.time}
-          </span>
-          <span>
-            <CalendarDays /> วันที่: {eventConfig.date}
-          </span>
-          <span>
-            <Ticket /> {money(TICKET_PRICE)} ต่อคน
-          </span>
-        </div>
-        <section className="section story" id="attraction">
-          <Reveal className="story-image">
-            <Image
-              src={pageImages.story.src}
-              alt={pageImages.story.alt}
-              fill
-              sizes="(max-width: 700px) 100vw, 45vw"
-            />
-          </Reveal>
-          <Reveal className="story-copy">
-            <p className="eyebrow">เกี่ยวกับงาน</p>
-            <h2>
-              บ้านหลังนี้
-              <br />
-              <em>ไม่เคยว่าง</em>
-            </h2>
-            <p>ไฟดับ ประตูเปิดค้างไว้ และมีบางอย่างรอคุณอยู่ข้างใน</p>
-            <p>เดินเข้าไป หาทางออกให้เจอ แล้วอย่าหันกลับไปมอง</p>
+        </p>
+        <section className="section counter-section" id="attraction">
+          <Reveal>
+            <TicketCounter />
           </Reveal>
         </section>
         <section className="section camera-section" id="camera">
-          <FlashCamera />
+          <GhostCamera />
         </section>
         <section className="quote">
-          <Flame />
           <p>
-            “ผนังบ้านนี้ไม่ได้มีแค่หู
+            ผนังบ้านนี้ไม่ได้มีแค่หู
             <br />
-            <em>มันจำทุกอย่างได้”</em>
+            มันจำทุกอย่างได้
           </p>
         </section>
         <section className="section tickets-section" id="tickets">
           <Reveal className="center-heading">
-            <p className="eyebrow">บัตร</p>
-            <h2>
-              บัตร<em>ล่วงหน้า</em>
-            </h2>
+            <h2>บัตรล่วงหน้า</h2>
             <p className="promo-lead">
-              โปรเฉพาะในเว็บ ·{" "}
-              {packages.map((p) => `${p.name} ${money(p.price)}`).join(" · ")}
+              ซื้อหน้างานใบละ {money(eventConfig.ticket.doorPrice)}{" "}
+              จองผ่านเว็บถูกกว่า
             </p>
           </Reveal>
           <Reveal className="early-bird-home">
@@ -116,19 +80,8 @@ export default function Home() {
               จองบัตร <ArrowRight size={16} />
             </Link>
           </Reveal>
-          <p className="ticket-note">
-            มากันเป็นกลุ่มคุ้มกว่า · โอนครั้งเดียว แนบสลิปเดียว
-            รับเลขบัตรทุกคนทันที
-          </p>
         </section>
-        <section className="final-cta">
-          <h2>
-            กล้า<em>เข้ามาไหม?</em>
-          </h2>
-          <Link href="/booking" className="button">
-            จองบัตร <ArrowRight size={17} />
-          </Link>
-        </section>
+        <ChantTicker />
       </main>
     </ScareLayer>
   );

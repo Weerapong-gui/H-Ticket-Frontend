@@ -6,6 +6,8 @@ import {
   DM_Sans,
   Noto_Sans_Thai,
   Noto_Serif_Thai,
+  Pirata_One,
+  Srisakdi,
 } from "next/font/google";
 import "./globals.css";
 import { PackageProvider, SalesProvider } from "@/components/booking-provider";
@@ -28,7 +30,26 @@ const notoSerifThai = Noto_Serif_Thai({
   subsets: ["thai"],
   variable: "--f-serif-thai",
 });
-const fontVars = [cinzel, cormorant, dmSans, notoSansThai, notoSerifThai]
+// หัวข้อ: ไทยใช้ Srisakdi (ตัวโบราณหัวม้วน แบบอักขระยันต์) อังกฤษ/ตัวเลขใช้ Pirata One
+const srisakdi = Srisakdi({
+  subsets: ["thai"],
+  weight: ["400", "700"],
+  variable: "--f-chant",
+});
+const pirata = Pirata_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--f-pirata",
+});
+const fontVars = [
+  cinzel,
+  cormorant,
+  dmSans,
+  notoSansThai,
+  notoSerifThai,
+  srisakdi,
+  pirata,
+]
   .map((f) => f.variable)
   .join(" ");
 

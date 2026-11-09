@@ -60,11 +60,8 @@ export function TicketLookup({
   return (
     <main className="booking-main ticket-lookup">
       <div className="page-heading">
-        <p className="eyebrow">ค้นบัตร</p>
-        <h1>
-          ค้นหา<em>บัตรของคุณ</em>
-        </h1>
-        <p>กรอกรหัสนักศึกษาเพื่อดูเลขบัตรและสถานะการรับบัตรกระดาษ</p>
+        <h1>ค้นหาบัตรของคุณ</h1>
+        <p>กรอกรหัสนักศึกษาเพื่อดูสถานะการจองและการรับบัตรกระดาษ</p>
       </div>
       <form
         className="lookup-form"
@@ -97,23 +94,20 @@ export function TicketLookup({
         </button>
       </form>
       <p className="privacy-note">
-        ผู้ที่ทราบรหัสนักศึกษาสามารถดูชื่อและเลขบัตรได้
+        ผู้ที่ทราบรหัสนักศึกษาสามารถดูชื่อและสถานะการจองได้
         โปรดเก็บลิงก์บัตรไว้กับตัว
       </p>
       {loading && <p role="status">กำลังค้นหาบัตร…</p>}
       <ErrorNotice error={error} />
       {ticket && !loading && (
-        <section className="issued-ticket" aria-label="บัตรจากระบบ">
+        <section className="issued-ticket" aria-label="การจองของคุณ">
           {justIssued && (
             <p className="success-banner" role="status">
-              ออกบัตรสำเร็จ! บันทึกหน้านี้ไว้ (บุ๊กมาร์กหรือแคปหน้าจอ)
-              ใช้แลกบัตรจริงหน้างาน
+              จองสำเร็จ! บันทึกหน้านี้ไว้ (บุ๊กมาร์กหรือแคปหน้าจอ)
+              ใช้รับบัตรจริงที่หน้างาน
             </p>
           )}
-          <TicketArt label={ticket.ticket_label} priority />
-          <p className="eyebrow">THE HAUNTED HOUSE · บัตรล่วงหน้า</p>
-          <p>เลขบัตร / ลำดับคิว</p>
-          <strong className="ticket-number">{ticket.ticket_label}</strong>
+          <TicketArt blank priority />
           <TicketQr studentId={ticket.student_id} />
           <h2>{ticket.name}</h2>
           <p>รหัสนักศึกษา {ticket.student_id}</p>
@@ -122,30 +116,30 @@ export function TicketLookup({
               ticket.picked_up ? "pickup-status picked" : "pickup-status"
             }
           >
-            {ticket.picked_up ? "รับบัตรกระดาษแล้ว" : "ยังไม่รับบัตรกระดาษ"}
+            {ticket.picked_up
+              ? "รับบัตรกระดาษแล้ว"
+              : "ชำระแล้ว · รอรับบัตรที่หน้างาน"}
           </div>
           {ticket.group && ticket.group.length > 1 && (
             <div className="group-tickets">
               <p>ซื้อเป็นกลุ่ม {ticket.group.length} คน</p>
               <ul>
-                {ticket.group.map((g) => (
-                  <li
-                    key={g.ticket_label}
-                    className={
-                      g.ticket_label === ticket.ticket_label ? "self" : ""
-                    }
-                  >
-                    <strong>{g.ticket_label}</strong>
+                {ticket.group.map((g, i) => (
+                  <li key={i} className={g.name === ticket.name ? "self" : ""}>
                     <span>{g.name}</span>
+                    <strong>{g.picked_up ? "รับบัตรแล้ว" : "ยังไม่รับ"}</strong>
                   </li>
                 ))}
               </ul>
-              <p>เพื่อนแต่ละคนค้นบัตรของตัวเองด้วยรหัสนักศึกษาของตัวเอง</p>
+              <p>
+                แต่ละคนมารับบัตรด้วยรหัสนักศึกษาของตัวเอง
+                หรือผู้ซื้อรับแทนทั้งกลุ่มก็ได้
+              </p>
             </div>
           )}
           <p className="ticket-instructions">
-            แสดงหน้าจอนี้กับทีมงานเพื่อแลกบัตรกระดาษ
-            เลขบัตรนี้ตรงกับบัตรจริงและลำดับคิวของคุณ
+            แสดงหน้าจอนี้กับทีมงานเพื่อแลกบัตรกระดาษ และจะได้เลขบัตรจริง ณ
+            วันงาน
           </p>
           <dl className="issued-event">
             <EventFacts />

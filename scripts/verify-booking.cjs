@@ -31,7 +31,6 @@ const {
   validateSlip,
   canOrder,
   salesMessage,
-  numberRanges,
   thaiTime,
   MAX_SLIP_BYTES,
 } = load("lib/booking.ts");
@@ -86,10 +85,7 @@ assert.equal(
   salesMessage({ ...open, closed_forever: true, remaining: 0 }),
   "ปิดขายผ่านเว็บแล้ว ซื้อได้ที่หน้างาน",
 );
-assert.equal(numberRanges([7, 43, 44, 45, 600, 7]), "007, 043–045, 600");
-assert.equal(numberRanges([]), "");
-assert.equal(numberRanges([3, 1, 2]), "001–003");
 assert.ok(thaiTime("2026-11-08T03:12:45.123Z").includes("10:12"));
 console.log(
-  "Buyer validation, original slip constraints, sales states, free-number ranges and Thai time checks passed.",
+  "Buyer validation, original slip constraints, sales states, and Thai time checks passed.",
 );

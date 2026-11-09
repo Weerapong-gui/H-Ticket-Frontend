@@ -5,6 +5,7 @@ import { cameraConfig } from "@/lib/scare/camera-config";
 import { drawGhost } from "@/lib/scare/ghost-shape";
 import { canShoot, planShot, type ShotPlan } from "@/lib/scare/shot-policy";
 import { useScare } from "./scare-provider";
+import { api } from "@/lib/api";
 
 const W = 600;
 const H = 800; // ครอปทุกรูปเป็น 3:4
@@ -134,7 +135,8 @@ function render(
   grain(ctx);
 }
 
-export function FlashCamera() {
+/** กล้องจำลอง (รูปบ้าน mock) — ใช้แทนเมื่อเปิดกล้องจริงไม่ได้ */
+export function FlashCamera({ showTitle = true }: { showTitle?: boolean }) {
   const { figure, consumeMirror, reducedMotion } = useScare();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
@@ -191,6 +193,7 @@ export function FlashCamera() {
     if (!canvas || !ctx || !images || !canShoot(now, lastShotAt.current))
       return;
     lastShotAt.current = now;
+    api.countGhostShot();
     const plan = planShot(
       shots,
       photoCount,
@@ -245,7 +248,7 @@ export function FlashCamera() {
 
   return (
     <div className="flash-camera">
-      <p className="eyebrow">ลองถ่ายรูปบ้าน</p>
+      {showTitle && <h2 className="flash-camera-title">ลองถ่ายรูปบ้านนี้ดู</h2>}
       <div className="flash-frame">
         <canvas
           ref={canvasRef}

@@ -50,7 +50,7 @@ export function Header() {
       <nav className={open ? "nav open" : "nav"} aria-label="เมนูหลัก">
         {[
           ["หน้าแรก", "/"],
-          ["เกี่ยวกับงาน", "/#attraction"],
+          ["บัตรคงเหลือ", "/#attraction"],
           ["บัตร", "/#tickets"],
           ["ค้นบัตร", "/ticket"],
         ].map(([label, url]) => (
@@ -87,7 +87,7 @@ export function Footer() {
       <div className="footer-bottom">
         <span>© The Haunted House · บัตรล่วงหน้า</span>
         <div>
-          <Link href="/#attraction">เกี่ยวกับงาน</Link>
+          <Link href="/#attraction">บัตรคงเหลือ</Link>
           <Link href="/ticket">ค้นบัตร</Link>
           <Link href="/admin/login">ทีมงาน</Link>
           <span

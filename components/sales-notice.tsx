@@ -21,12 +21,7 @@ export function SalesNotice() {
       ) : (
         <>
           <strong>{salesMessage(sales)}</strong>
-          {canOrder(sales) && (
-            <p>
-              เหลือ {sales!.remaining} / {sales!.total} ใบ · 1
-              รหัสนักศึกษาซื้อได้ 1 ใบ
-            </p>
-          )}
+          {canOrder(sales) && <p>หนึ่งรหัสนักศึกษาซื้อได้หนึ่งใบ</p>}
         </>
       )}
     </div>
