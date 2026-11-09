@@ -133,4 +133,17 @@ const figNone = planGhost(null, W, H, ghostSprites, {
 });
 assert.equal(figNone.variant, "figure");
 
+// compose-math: ปรับความสว่างผีให้ peak ≈ ฉากหลัง × 1.35, กลับซ้ายขวา
+const { matchBrightness, flipBox } = load("lib/ghost-cam/compose-math.ts");
+assert.ok(Math.abs(255 * matchBrightness(255, 40) - 54) < 0.5);
+assert.ok(matchBrightness(255, 240) <= 1); // ไม่สว่างเกินต้นฉบับ
+assert.ok(matchBrightness(255, 0) > 0); // รูปมืดสนิทยังเห็นผีจาง ๆ
+assert.equal(matchBrightness(0, 40), 0);
+assert.deepEqual(flipBox({ x: 10, y: 5, w: 100, h: 50 }, 600), {
+  x: 490,
+  y: 5,
+  w: 100,
+  h: 50,
+});
+
 console.log("Ghost camera logic checks passed.");

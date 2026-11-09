@@ -13,9 +13,13 @@
     "test:api": "node scripts/verify-api.cjs",
     "test:scare": "node scripts/verify-scare.cjs",
     "test:pickup": "node scripts/verify-pickup.cjs",
-    "test:ghost": "node scripts/verify-ghost.cjs"
+    "test:ghost": "node scripts/verify-ghost.cjs",
+    "sync:mediapipe": "node scripts/sync-mediapipe.cjs",
+    "predev": "npm run sync:mediapipe",
+    "prebuild": "npm run sync:mediapipe"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "1.1.1",
     "jsqr": "^1.4.0",
     "lucide-react": "^1.70.0",
     "motion": "^14.10.1",

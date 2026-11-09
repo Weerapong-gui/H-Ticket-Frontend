@@ -46,3 +46,6 @@ next-env.d.ts
 .superpowers/
 
 certificates
+
+# MediaPipe wasm คัดมาจาก node_modules ตอน dev/build
+/public/mediapipe/wasm/
