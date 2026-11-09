@@ -350,6 +350,15 @@ footer {
 .footer-top > p {
   font-size: 12px;
 }
+.footer-organizer {
+  text-align: right;
+  font-size: 13px !important;
+  line-height: 1.7;
+  color: #c8b9aa;
+}
+.app-version {
+  font-variant-numeric: tabular-nums;
+}
 .footer-top > a:last-child {
   font-size: 12px;
   display: flex;
@@ -677,6 +686,9 @@ footer {
   }
   .footer-top > p {
     font-size: 12px;
+  }
+  .footer-organizer {
+    text-align: left;
   }
   .footer-top > a:last-child {
     width: 100%;

@@ -73,37 +73,47 @@ export function Header() {
     </header>
   );
 }
+const SOCIAL = {
+  instagram: "https://www.instagram.com/su.mfu/",
+  facebook: "https://www.facebook.com/mfu.su/",
+};
+
 export function Footer() {
   return (
     <footer>
       <div className="footer-top">
         <Brand />
-        <p className="contact-demo">
-          ติดต่อผู้จัดงาน
+        <p className="footer-organizer">
+          องค์การบริหาร องค์การนักศึกษา
           <br />
-          รอประกาศช่องทางติดต่อ
+          มหาวิทยาลัยแม่ฟ้าหลวง X HLLC
         </p>
       </div>
       <div className="footer-bottom">
-        <span>© The Haunted House · บัตรล่วงหน้า</span>
+        <span className="app-version">
+          v{process.env.NEXT_PUBLIC_APP_VERSION} · อัปเดต{" "}
+          {process.env.NEXT_PUBLIC_BUILD_TIME}
+        </span>
         <div>
           <Link href="/#attraction">บัตรคงเหลือ</Link>
           <Link href="/ticket">ค้นบัตร</Link>
           <Link href="/admin/login">ทีมงาน</Link>
-          <span
-            role="img"
-            aria-label="Instagram — ยังไม่ประกาศบัญชี"
-            title="Instagram · ยังไม่ประกาศบัญชี"
+          <a
+            href={SOCIAL.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram องค์การนักศึกษา มฟล."
           >
             <Instagram size={17} />
-          </span>
-          <span
-            role="img"
-            aria-label="Facebook — ยังไม่ประกาศบัญชี"
-            title="Facebook · ยังไม่ประกาศบัญชี"
+          </a>
+          <a
+            href={SOCIAL.facebook}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook องค์การนักศึกษา มฟล."
           >
             <Facebook size={17} />
-          </span>
+          </a>
         </div>
       </div>
     </footer>

@@ -32,6 +32,7 @@ git pull
 docker compose up -d --build
 ```
 
+- ก่อนขึ้นเว็บทุกครั้งให้เพิ่มเลข `"version"` ใน `package.json` (เช่น 1.1.0 → 1.1.1) เลขนี้กับเวลา build โชว์ท้ายเว็บ ใช้เช็กว่าเครื่องจริงอัปเดตแล้ว
 - `NEXT_PUBLIC_API_URL` ถูกฝังตอน build (ค่าเริ่มต้น `https://ticket.sumfu.store`) เปลี่ยนแล้วต้อง build ใหม่
 - เส้นทางใน Cloudflare (tunnel `h-ticket` → Routes) เรียงจากบนลงล่าง:
   1. `ticket.sumfu.store` path `^/(api/.*|healthz)$` → `http://backend:8080`
