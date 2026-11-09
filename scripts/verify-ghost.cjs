@@ -40,6 +40,7 @@ const overlap = (a, b) =>
 const { maskStats } = load("lib/ghost-cam/mask.ts");
 const { planGhost } = load("lib/ghost-cam/placement.ts");
 const { ghostSprites } = load("lib/ghost-cam/ghost-config.ts");
+const { nextCam } = load("lib/ghost-cam/camera-flow.ts");
 
 /** mask ขนาด w×h ที่มีคนเป็นสี่เหลี่ยม x0..x1-1, y0..y1-1 */
 function rectMask(w, h, x0, x1, y0, y1) {
@@ -169,6 +170,35 @@ for (let i = 0; i < 200; i++) {
   }
 }
 
+// เซลฟี่หน้าเต็มจอ (ไม่มีที่ว่างข้างหัวเลย) → ยังต้องเห็นผี: วางทับไหล่ด้านหน้า (front) ไม่ทับหน้า
+const closeUp = maskStats(new Float32Array(W * H).fill(1), W, H);
+for (let i = 0; i < 200; i++) {
+  for (const figure of [false, true]) {
+    const p = planGhost(closeUp, W, H, noHand, { figure, rand: seeded(i) });
+    const vx = Math.min(p.box.x + p.box.w, W) - Math.max(p.box.x, 0);
+    const vy = Math.min(p.box.y + p.box.h, H) - Math.max(p.box.y, 0);
+    assert.ok(vx >= W * 0.12 && vy >= H * 0.3, `${p.variant} too small: ${vx}x${vy}`);
+    assert.ok(!overlap(p.box, closeUp.head), `${p.variant} covers the head`);
+    assert.equal(p.front, true, "no room behind → must be drawn in front");
+  }
+}
+// ผีมุมจอเลือกฝั่งที่มีที่ว่างมากกว่า และไม่เล็กจนมองไม่เห็น
+const oneSide = maskStats(rectMask(W, H, 0, 460, 150, H), W, H); // ว่างขวา 140
+for (let i = 0; i < 200; i++) {
+  const p = planGhost(oneSide, W, H, noHand, { figure: false, rand: seeded(i) });
+  if (p.variant !== "edge") continue;
+  assert.ok(p.box.x > W / 2, "edge on the side without room");
+}
+// ปกติ (มีที่ว่าง) ผีอยู่หลังคน
+assert.equal(
+  planGhost(selfie, W, H, noHand, { figure: false, rand: seeded(1) }).front,
+  false,
+);
+
+// camera-flow: สลับกล้อง live → starting (พลาดแล้วไป unavailable ได้)
+assert.equal(nextCam("live", "switch"), "starting");
+assert.equal(nextCam("starting", "denied"), "unavailable");
+
 // ฉากจบผีชุดดำ
 const fig = planGhost(mid, W, H, ghostSprites, {
   figure: true,
@@ -205,7 +235,6 @@ assert.deepEqual(flipBox({ x: 10, y: 5, w: 100, h: 50 }, 600), {
 });
 
 // camera-flow: สถานะหน้ากล้อง
-const { nextCam } = load("lib/ghost-cam/camera-flow.ts");
 const flow = [
   ["idle", "open", "starting"],
   ["starting", "granted", "live"],

@@ -72,7 +72,12 @@ export function GhostCamera() {
   const flashRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const resultRef = useRef<string | null>(null);
+  const blobRef = useRef<Blob | null>(null);
   const lastShotAt = useRef<number | null>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  /** นับคำขอกล้อง: คำขอเก่าที่ตอบกลับช้าต้องปิดกล้องทิ้ง ไม่งั้นไฟกล้องค้าง */
+  const requestRef = useRef(0);
+  const mountedRef = useRef(true);
   const send = useCallback((e: CamEvent) => setState((s) => nextCam(s, e)), []);
 
   const stop = useCallback(() => {
@@ -88,16 +93,49 @@ export function GhostCamera() {
   }, []);
 
   // ออกจากหน้า: ปิดกล้อง (ไฟกล้องดับ) และคืนหน่วยความจำรูป
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      // ตั้งใจเปลี่ยนค่าตัวนับ (ไม่ใช่ DOM ref) ให้คำขอกล้องที่ค้างอยู่รู้ว่าต้องปิดทิ้ง
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      requestRef.current++;
       streamRef.current?.getTracks().forEach((t) => t.stop());
       if (resultRef.current) URL.revokeObjectURL(resultRef.current);
-    },
-    [],
-  );
+    };
+  }, []);
+
+  // เลื่อนออกจากส่วนกล้อง หรือสลับไปแท็บอื่น: ปิดกล้อง กลับไปหน้าเริ่ม
+  const live = state === "live" || state === "starting";
+  useEffect(() => {
+    if (!live) return;
+    const off = () => {
+      requestRef.current++;
+      stop();
+      send("close");
+    };
+    const onHide = () => document.hidden && off();
+    document.addEventListener("visibilitychange", onHide);
+    const el = frameRef.current;
+    // ปิดเมื่อ "เลื่อนออก" เท่านั้น: ต้องเคยเห็นกรอบก่อน (ครั้งแรกที่ observer แจ้งอาจยังไม่อยู่ในจอ)
+    let seen = false;
+    const io =
+      el && "IntersectionObserver" in window
+        ? new IntersectionObserver(([e]) => {
+            if (e.isIntersecting) seen = true;
+            else if (seen) off();
+          })
+        : null;
+    if (el) io?.observe(el);
+    return () => {
+      document.removeEventListener("visibilitychange", onHide);
+      io?.disconnect();
+    };
+  }, [live, send, stop]);
 
   const start = useCallback(
     async (want: Facing) => {
+      const req = ++requestRef.current;
       stop();
       if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
         send("denied");
@@ -112,6 +150,10 @@ export function GhostCamera() {
           },
           audio: false,
         });
+        if (req !== requestRef.current || !mountedRef.current) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
         streamRef.current = stream;
         const v = videoRef.current;
         if (v) {
@@ -120,7 +162,7 @@ export function GhostCamera() {
         }
         send("granted");
       } catch {
-        send("denied");
+        if (req === requestRef.current && mountedRef.current) send("denied");
       }
     },
     [send, stop],
@@ -135,6 +177,7 @@ export function GhostCamera() {
   function flip() {
     const next: Facing = facing === "user" ? "environment" : "user";
     setFacing(next);
+    send("switch"); // ปุ่มกดไม่ได้ระหว่างเปิดกล้องใหม่ · พลาดแล้วไปกล้องจำลอง
     void start(next);
   }
 
@@ -171,6 +214,7 @@ export function GhostCamera() {
     const armed = figure.mirrorArmed;
 
     let out: HTMLCanvasElement = photo;
+    let ghosted = false;
     try {
       const seg = await segmentPerson(downscale(photo));
       const stats = seg ? maskStats(seg.mask, seg.w, seg.h) : null;
@@ -187,22 +231,50 @@ export function GhostCamera() {
           ? await loadImage(src).catch(() => null)
           : null;
       out = await composeGhostPhoto(photo, seg, placement, sprite);
+      ghosted = true;
     } catch (e) {
       console.warn("[ghost-cam] ใส่ผีไม่สำเร็จ ใช้รูปเดิม", e);
     }
     const blob = await canvasToJpegBlob(out).catch(() => null);
     await minWait;
+    if (!mountedRef.current) return;
     if (blob) {
       clearResult();
       const url = URL.createObjectURL(blob);
       resultRef.current = url;
+      blobRef.current = blob;
       setResult(url);
     }
-    if (armed) consumeMirror();
+    // ฉากจบใช้ไปก็ต่อเมื่อใส่ผีได้จริง
+    if (armed && ghosted) consumeMirror();
     send("developed");
   }
 
+  /** มือถือ: เปิดเมนูแชร์ (มี "บันทึกรูปภาพ" ลงคลังรูป) · ไม่รองรับก็ดาวน์โหลดไฟล์ */
+  async function save() {
+    const blob = blobRef.current;
+    const url = resultRef.current;
+    if (!blob || !url) return;
+    const file = new File([blob], "haunted-house-ghost.jpg", {
+      type: "image/jpeg",
+    });
+    if (navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch (e) {
+        // ผู้ใช้กดยกเลิกเอง ไม่ต้องดาวน์โหลดซ้ำ
+        if (e instanceof DOMException && e.name === "AbortError") return;
+      }
+    }
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "haunted-house-ghost.jpg";
+    a.click();
+  }
+
   function retake() {
+    blobRef.current = null;
     clearResult();
     send("retake");
     void start(facing);
@@ -217,11 +289,10 @@ export function GhostCamera() {
       </div>
     );
 
-  const live = state === "live" || state === "starting";
   return (
     <div className="flash-camera ghost-camera">
       <h2 className="flash-camera-title">ถ่ายรูปกับผีในบ้านนี้</h2>
-      <div className="flash-frame">
+      <div className="flash-frame" ref={frameRef}>
         {/* วิดีโออยู่ตลอด (ถ่ายใหม่ต้องต่อกล้องเข้ากับ element เดิมได้ทันที) */}
         <video
           ref={videoRef}
@@ -250,6 +321,11 @@ export function GhostCamera() {
         )}
         <div ref={flashRef} className="flash-overlay" aria-hidden="true" />
       </div>
+      {state === "result" && result && (
+        <p className="ghost-camera-note">
+          บันทึกไม่ได้? กดค้างที่รูปแล้วเลือกบันทึกรูปภาพ
+        </p>
+      )}
       <div className="action-buttons ghost-camera-actions">
         {state === "idle" && (
           <button type="button" className="button" onClick={open}>
@@ -280,13 +356,13 @@ export function GhostCamera() {
         {state === "result" && (
           <>
             {result && (
-              <a
+              <button
+                type="button"
                 className="button"
-                href={result}
-                download="haunted-house-ghost.jpg"
+                onClick={() => void save()}
               >
-                <Download size={18} /> ดาวน์โหลดรูป
-              </a>
+                <Download size={18} /> บันทึกรูป
+              </button>
             )}
             <button type="button" className="button outline" onClick={retake}>
               <RefreshCw size={18} /> ถ่ายใหม่

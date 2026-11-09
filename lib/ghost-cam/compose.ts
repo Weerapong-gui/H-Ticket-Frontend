@@ -204,8 +204,7 @@ export async function composeGhostPhoto(
   ctx.drawImage(ghost, 0, 0);
   ctx.restore();
 
-  if (seg && placement.variant !== "hand")
-    ctx.drawImage(personLayer(photo, seg), 0, 0);
+  if (seg && !placement.front) ctx.drawImage(personLayer(photo, seg), 0, 0);
 
   grade(ctx);
   return out;

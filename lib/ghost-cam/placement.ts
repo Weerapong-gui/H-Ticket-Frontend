@@ -11,6 +11,8 @@ export type Placement = {
   flipX: boolean;
   opacity: number;
   blurPx: number;
+  /** true = วาดทับตัวคน (ไม่มีที่ว่างข้างหลัง หรือเป็นมือแตะไหล่) */
+  front: boolean;
 };
 
 /** ฉากหลังข้างตัวคนต้องกว้างอย่างน้อยเท่านี้ (สัดส่วนความกว้างภาพ) ถึงวางผีหลังไหล่/ไกลได้ */
@@ -39,6 +41,37 @@ export function planGhost(
     blurPx: between(rand, 1.5, 4),
   });
 
+  /** ไม่มีที่ว่างข้างหัว (หน้าเต็มจอ): วางผีที่ขอบภาพทับไหล่ด้านหน้า ใต้แนวหัว ไม่ทับหน้า */
+  const frontFallback = (
+    variant: "edge" | "figure",
+    sprite: GhostSprite | null,
+  ): Placement => {
+    const stats0 = stats as MaskStats;
+    const top = stats0.head.y + stats0.head.h + 1;
+    const fh = Math.max(
+      h * 0.3,
+      Math.min(h - top, h * between(rand, 0.35, 0.5)),
+    );
+    const fw = fh * 0.6;
+    const right =
+      stats0.freeRight === stats0.freeLeft
+        ? rand() < 0.5
+        : stats0.freeRight > stats0.freeLeft;
+    return {
+      variant,
+      sprite,
+      box: {
+        x: right ? w - fw * 0.7 : -fw * 0.3,
+        y: Math.min(top, h - fh),
+        w: fw,
+        h: fh,
+      },
+      flipX: right && !!sprite?.flippable,
+      ...(variant === "figure" ? { opacity: 0.85, blurPx: 1.5 } : faint()),
+      front: true,
+    };
+  };
+
   if (opts.figure) {
     // ฉากจบเรื่องผีชุดดำ: "อยู่ข้างหลังคุณ" — ผีผมยาวยืนชิดหัว ใหญ่และชัดกว่าผีปกติ
     // (เงาดำล้วนมองไม่เห็นในรูปที่ฉากหลังมืด จึงใช้ผีหน้าซีดแทน)
@@ -54,12 +87,16 @@ export function planGhost(
         flipX: false,
         opacity: 0.85,
         blurPx: 1.5,
+        front: false,
       };
     }
     const head = stats.head;
     const left = stats.freeLeft >= stats.freeRight;
     const fh = head.h * between(rand, 3.6, 4.2);
     const fw = fh * 0.6;
+    // ต้องเห็นได้อย่างน้อย 12% ของความกว้างภาพ ไม่งั้นฉากจบหายไปเฉย ๆ
+    if (Math.max(stats.freeLeft, stats.freeRight) < w * 0.12)
+      return frontFallback("figure", sprite);
     return {
       variant: "figure",
       sprite,
@@ -72,39 +109,45 @@ export function planGhost(
       flipX: !left && !!sprite?.flippable,
       opacity: 0.85,
       blurPx: 1.5,
+      front: false,
     };
   }
 
   const edge = (): Placement => {
     const sprite = pick(rand, of("edge").length ? of("edge") : sprites);
-    const right = rand() < 0.5;
+    // ฝั่งที่มีที่ว่างมากกว่า (ไม่รู้ตำแหน่งคนก็สุ่ม)
+    const right =
+      !stats || stats.freeLeft === stats.freeRight
+        ? rand() < 0.5
+        : stats.freeRight > stats.freeLeft;
     let eh = h * between(rand, 0.45, 0.6);
     const out = between(rand, 0.4, 0.6);
     if (stats) {
       // ส่วนที่โผล่เข้ามาต้องไม่เกินที่ว่างข้างหัว ไม่งั้นโดนตัวคนบังหมด
       const free = right ? stats.freeRight : stats.freeLeft;
       eh = Math.min(eh, (free * 0.95) / (1 - out) / 0.6);
+      // ที่ว่างน้อยเกินจนผีเล็กมองไม่เห็น → วางด้านหน้าแทน
+      if (eh * 0.6 * (1 - out) < w * 0.12 || eh < h * 0.3)
+        return frontFallback("edge", sprite);
     }
     // อยู่ช่วงข้างหัว (ด้านล่างมักโดนไหล่บัง)
-    let y = stats
+    const y = stats
       ? between(rand, 0, Math.max(0, stats.head.y + stats.head.h * 0.6))
       : between(rand, h * 0.05, h - eh);
     const place = () => {
       const ew = eh * 0.6;
       return { x: right ? w - ew * (1 - out) : -ew * out, y, w: ew, h: eh };
     };
-    let box = place();
-    if (stats && overlaps(box, stats.head)) {
-      y = stats.head.y + stats.head.h + 1;
-      eh = Math.min(eh, h - y);
-      box = place();
-    }
+    const box = place();
+    if (stats && overlaps(box, stats.head))
+      return frontFallback("edge", sprite);
     return {
       variant: "edge",
       sprite,
       box,
       flipX: right && sprite.flippable,
       ...faint(),
+      front: false,
     };
   };
 
@@ -151,6 +194,7 @@ export function planGhost(
       box: { x, y, w: bw, h: bh },
       flipX: variant === "behind-right" && sprite.flippable,
       ...faint(),
+      front: false,
     };
   }
 
@@ -175,6 +219,7 @@ export function planGhost(
       },
       flipX: sprite.flippable && rand() < 0.5,
       ...faint(),
+      front: false,
     };
   }
 
@@ -193,5 +238,6 @@ export function planGhost(
     },
     flipX: sprite.flippable && rand() < 0.5,
     ...faint(),
+    front: true,
   };
 }

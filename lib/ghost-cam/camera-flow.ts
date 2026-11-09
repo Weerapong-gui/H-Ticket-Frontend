@@ -1,12 +1,19 @@
 export type CamState =
   "idle" | "starting" | "live" | "developing" | "result" | "unavailable";
 export type CamEvent =
-  "open" | "granted" | "denied" | "shoot" | "developed" | "retake" | "close";
+  | "open"
+  | "granted"
+  | "denied"
+  | "shoot"
+  | "developed"
+  | "retake"
+  | "switch"
+  | "close";
 
 const EDGES: Partial<Record<CamState, Partial<Record<CamEvent, CamState>>>> = {
   idle: { open: "starting" },
   starting: { granted: "live", denied: "unavailable" },
-  live: { shoot: "developing" },
+  live: { shoot: "developing", switch: "starting" },
   developing: { developed: "result" },
   result: { retake: "starting" },
 };
