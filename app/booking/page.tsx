@@ -5,11 +5,13 @@ import { TicketAccordion } from "@/components/ticket-accordion";
 import { EventFacts } from "@/components/event-facts";
 import { PaymentInfo } from "@/components/payment-info";
 import { SalesNotice } from "@/components/sales-notice";
-import { usePurchaseSales } from "@/components/booking-provider";
+import { usePackage, usePurchaseSales } from "@/components/booking-provider";
+import { TicketArt } from "@/components/ticket-art";
 import { Progress, Summary } from "@/components/summary";
-import { canOrder } from "@/lib/booking";
+import { canOrderPackage } from "@/lib/booking";
 export default function BookingPage() {
   const { sales } = usePurchaseSales();
+  const { size } = usePackage();
   return (
     <main className="booking-main">
       <Progress step={1} />
@@ -18,7 +20,9 @@ export default function BookingPage() {
         <h1>
           จอง<em>บัตร</em>
         </h1>
-        <p>โอนเงิน แนบสลิป แล้วรับเลขบัตรทันที · 1 รหัสนักศึกษา = 1 ใบ</p>
+        <p>
+          เลือกโปร โอนเงิน แนบสลิป แล้วรับเลขบัตรทันที · 1 รหัสนักศึกษา = 1 ใบ
+        </p>
       </div>
       <div className="booking-grid">
         <div className="booking-controls">
@@ -30,8 +34,9 @@ export default function BookingPage() {
             </dl>
           </section>
           <section className="booking-step">
-            <h2>บัตรล่วงหน้า</h2>
-            <TicketAccordion />
+            <h2>เลือกโปร</h2>
+            <TicketArt className="booking-ticket-art" />
+            <TicketAccordion selectable />
           </section>
           <PaymentInfo />
           <Link className="text-link" href="/ticket">
@@ -39,7 +44,7 @@ export default function BookingPage() {
           </Link>
         </div>
         <Summary>
-          {canOrder(sales) ? (
+          {canOrderPackage(sales, size) ? (
             <Link className="button" href="/checkout">
               โอนแล้ว ไปแนบสลิป <ArrowRight size={17} />
             </Link>

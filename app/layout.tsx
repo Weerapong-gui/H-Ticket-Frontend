@@ -8,7 +8,7 @@ import {
   Noto_Serif_Thai,
 } from "next/font/google";
 import "./globals.css";
-import { SalesProvider } from "@/components/booking-provider";
+import { PackageProvider, SalesProvider } from "@/components/booking-provider";
 import { Header, Footer } from "@/components/chrome";
 
 // โหลดฟอนต์ผ่าน next/font เพราะ @import ใน globals.css ถูกตัดทิ้งตอน build
@@ -55,15 +55,17 @@ export default function RootLayout({
           ข้ามไปที่เนื้อหา
         </a>
         <SalesProvider>
-          <Header />
-          <div id="main-content">
-            <Suspense
-              fallback={<main className="booking-main">กำลังโหลด…</main>}
-            >
-              {children}
-            </Suspense>
-          </div>
-          <Footer />
+          <PackageProvider>
+            <Header />
+            <div id="main-content">
+              <Suspense
+                fallback={<main className="booking-main">กำลังโหลด…</main>}
+              >
+                {children}
+              </Suspense>
+            </div>
+            <Footer />
+          </PackageProvider>
         </SalesProvider>
       </body>
     </html>

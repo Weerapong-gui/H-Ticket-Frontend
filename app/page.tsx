@@ -1,6 +1,7 @@
 import { eventConfig } from "@/lib/event-config";
 import { TicketAccordion } from "@/components/ticket-accordion";
-import { TICKET_PRICE, money } from "@/lib/booking";
+import { TICKET_PRICE, money, packages } from "@/lib/booking";
+import { TicketArt } from "@/components/ticket-art";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -103,15 +104,21 @@ export default function Home() {
             <h2>
               บัตร<em>ล่วงหน้า</em>
             </h2>
+            <p className="promo-lead">
+              โปรเฉพาะในเว็บ ·{" "}
+              {packages.map((p) => `${p.name} ${money(p.price)}`).join(" · ")}
+            </p>
           </Reveal>
           <Reveal className="early-bird-home">
+            <TicketArt className="home-ticket-art" />
             <TicketAccordion />
             <Link href="/booking" className="button">
               จองบัตร <ArrowRight size={16} />
             </Link>
           </Reveal>
           <p className="ticket-note">
-            1 รหัสนักศึกษา = 1 ใบ · โอนแล้วแนบสลิป รับเลขบัตรทันที
+            มากันเป็นกลุ่มคุ้มกว่า · โอนครั้งเดียว แนบสลิปเดียว
+            รับเลขบัตรทุกคนทันที
           </p>
         </section>
         <section className="final-cta">

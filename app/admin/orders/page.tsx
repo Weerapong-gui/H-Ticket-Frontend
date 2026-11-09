@@ -79,7 +79,12 @@ export default function Orders() {
                 <p>
                   รหัส {order.student_id} · โทร {order.phone}
                 </p>
-                <p>{thaiTime(order.created_at)}</p>
+                <p>
+                  {thaiTime(order.created_at)}
+                  {order.group_size && order.group_size > 1
+                    ? ` · ซื้อกลุ่ม ${order.group_size} คน (สลิปเดียวกัน)`
+                    : ""}
+                </p>
               </div>
               <span className="order-status">
                 {order.status === "cancelled"

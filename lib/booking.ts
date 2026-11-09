@@ -1,8 +1,31 @@
 ﻿import { eventConfig } from "./event-config";
 import type { SalesStatus } from "./api";
-export const TICKET_PRICE = eventConfig.ticket.price;
-export const tickets = { earlybird: eventConfig.ticket } as const;
+export const packages = eventConfig.ticket.packages;
+export type TicketPackage = (typeof packages)[number];
+export type PackageSize = TicketPackage["size"];
+/** ราคาบัตรเดี่ยว (1 คน) */
+export const TICKET_PRICE = packages[0].price;
+export const packageFor = (size: number): TicketPackage =>
+  packages.find((p) => p.size === size) ?? packages[0];
 export const money = (value: number) => `${value.toLocaleString("en-US")} THB`;
+/** ราคาเฉลี่ยต่อคน ปัดลงทศนิยม 1 ตำแหน่ง เช่น 67/2 = 33.5 */
+export const perPerson = (p: TicketPackage) =>
+  `${(Math.floor((p.price / p.size) * 10) / 10).toLocaleString("en-US")} THB`;
+/** โปรนี้ซื้อได้ไหม: ต้องเปิดขายและบัตรเหลือพอทั้งกลุ่ม */
+export const canOrderPackage = (sales: SalesStatus | null, size: number) =>
+  canOrder(sales) && sales!.remaining >= size;
+/** ตรวจรหัสนักศึกษาซ้ำในกลุ่ม คืน index ของช่องที่ซ้ำกับช่องก่อนหน้า */
+export function duplicateIndexes(ids: string[]) {
+  const seen = new Set<string>();
+  const dup = new Set<number>();
+  ids.forEach((id, i) => {
+    const v = id.trim();
+    if (!v) return;
+    if (seen.has(v)) dup.add(i);
+    seen.add(v);
+  });
+  return dup;
+}
 export const validStudentId = (value: string) => /^\d{10}$/.test(value.trim());
 export const validPhone = (value: string) => /^0\d{9}$/.test(value.trim());
 export const MAX_SLIP_BYTES = 5 * 1024 * 1024;

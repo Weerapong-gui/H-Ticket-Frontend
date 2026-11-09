@@ -83,8 +83,7 @@ async function main() {
   response(ticket, 201);
   assert.deepEqual(
     await api.createOrder({
-      name: " Test Student ",
-      student_id: " 6831501178 ",
+      people: [{ name: " Test Student ", student_id: " 6831501178 " }],
       phone: " 0812345678 ",
       slip: original,
     }),
@@ -107,6 +106,21 @@ async function main() {
     "Upload must preserve every original byte",
   );
   assert.equal(last().init.body.has("quantity"), false);
+  response(ticket, 201);
+  await api.createOrder({
+    people: [
+      { name: "A", student_id: "6800000001" },
+      { name: " B ", student_id: "6800000002" },
+    ],
+    phone: "0812345678",
+    slip: original,
+  });
+  assert.deepEqual(last().init.body.getAll("name"), ["A", "B"]);
+  assert.deepEqual(last().init.body.getAll("student_id"), [
+    "6800000001",
+    "6800000002",
+  ]);
+  assert.deepEqual(last().init.body.getAll("phone"), ["0812345678"]);
   response(ticket);
   assert.deepEqual(await api.ticket(" 6831501178 "), ticket);
   assert.equal(last().url, `${API_URL}/api/tickets/6831501178`);

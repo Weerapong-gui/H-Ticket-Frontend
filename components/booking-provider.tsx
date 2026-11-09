@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { api, errorMessage, SalesStatus } from "@/lib/api";
+import { packages, type PackageSize } from "@/lib/booking";
 const Context = createContext<{
   sales: SalesStatus | null;
   loading: boolean;
@@ -74,3 +75,33 @@ export function usePurchaseSales() {
   }, [refresh]);
   return state;
 }
+
+const PACK_KEY = "haunted-package";
+const PackageContext = createContext<{
+  size: PackageSize;
+  setSize: (size: PackageSize) => void;
+}>({ size: 1, setSize: () => {} });
+/** โปรที่เลือกไว้ ใช้ร่วมกันระหว่างหน้าจองและหน้าแนบสลิป (จำไว้ใน sessionStorage) */
+export function PackageProvider({ children }: { children: React.ReactNode }) {
+  const [size, setSizeState] = useState<PackageSize>(1);
+  useEffect(() => {
+    let saved: string | null = null;
+    try {
+      saved = sessionStorage.getItem(PACK_KEY);
+    } catch {}
+    const found = packages.find((p) => String(p.size) === saved);
+    if (found) queueMicrotask(() => setSizeState(found.size));
+  }, []);
+  const setSize = useCallback((next: PackageSize) => {
+    setSizeState(next);
+    try {
+      sessionStorage.setItem(PACK_KEY, String(next));
+    } catch {}
+  }, []);
+  return (
+    <PackageContext.Provider value={{ size, setSize }}>
+      {children}
+    </PackageContext.Provider>
+  );
+}
+export const usePackage = () => useContext(PackageContext);

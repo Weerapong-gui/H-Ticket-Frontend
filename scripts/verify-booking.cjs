@@ -20,7 +20,11 @@ function load(file) {
 }
 const {
   TICKET_PRICE,
-  tickets,
+  packages,
+  packageFor,
+  perPerson,
+  canOrderPackage,
+  duplicateIndexes,
   money,
   validStudentId,
   validPhone,
@@ -31,9 +35,21 @@ const {
   thaiTime,
   MAX_SLIP_BYTES,
 } = load("lib/booking.ts");
-assert.deepEqual(Object.keys(tickets), ["earlybird"]);
-assert.equal(TICKET_PRICE, 30);
-assert.equal(money(TICKET_PRICE), "30 THB");
+assert.deepEqual(
+  packages.map((p) => [p.size, p.price]),
+  [
+    [1, 35],
+    [2, 67],
+    [5, 167],
+  ],
+);
+assert.equal(TICKET_PRICE, 35);
+assert.equal(money(TICKET_PRICE), "35 THB");
+assert.equal(packageFor(5).price, 167);
+assert.equal(packageFor(3).size, 1);
+assert.equal(perPerson(packageFor(2)), "33.5 THB");
+assert.equal(perPerson(packageFor(5)), "33.4 THB");
+assert.deepEqual([...duplicateIndexes(["1", "2", " 1", ""])], [2]);
 assert.equal(validStudentId(" 6831501178 "), true);
 for (const value of ["", "123", "abcdefghij", "68315011789"])
   assert.equal(validStudentId(value), false);
@@ -58,6 +74,9 @@ assert.equal(canOrder(null), false);
 assert.equal(canOrder({ ...open, open: false }), false);
 assert.equal(canOrder({ ...open, remaining: 0 }), false);
 assert.equal(canOrder({ ...open, closed_forever: true }), false);
+assert.equal(canOrderPackage({ ...open, remaining: 4 }, 5), false);
+assert.equal(canOrderPackage({ ...open, remaining: 5 }, 5), true);
+assert.equal(canOrderPackage(null, 1), false);
 assert.equal(
   salesMessage({ ...open, open: false }),
   "ยังไม่เปิดขาย / ปิดขายชั่วคราว",
