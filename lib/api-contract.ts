@@ -61,7 +61,8 @@ export function isAdminStats(value: unknown): value is AdminStats {
     isSalesStatus(value) &&
     count(data.cancelled) &&
     count(data.picked_up) &&
-    data.picked_up <= value.sold
+    data.picked_up <= value.sold &&
+    (data.ghost_shots === undefined || count(data.ghost_shots))
   );
 }
 export function isOrder(value: unknown): value is Order {

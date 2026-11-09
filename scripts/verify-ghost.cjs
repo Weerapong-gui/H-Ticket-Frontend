@@ -140,7 +140,10 @@ for (let i = 0; i < 300; i++) {
   assert.ok(!overlap(p.box, selfie.head), `${p.variant} covers the head`);
   if (p.variant === "edge") {
     // มุมจอต้องอยู่ช่วงข้างหัว (ด้านล่างโดนไหล่บังหมด)
-    assert.ok(p.box.y < selfie.head.y + selfie.head.h, "edge hidden by shoulders");
+    assert.ok(
+      p.box.y < selfie.head.y + selfie.head.h,
+      "edge hidden by shoulders",
+    );
   }
 }
 assert.ok(selfieSeen.has("behind-left") && selfieSeen.has("behind-right"));

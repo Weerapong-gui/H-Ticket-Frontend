@@ -2219,3 +2219,44 @@ html[data-hh-entered] .entry-gate {
 .total strong {
   font-family: var(--num);
 }
+
+/* กล้องผี: วิดีโอสด / รูปผลลัพธ์ อยู่ในกรอบ 3:4 เดียวกับกล้องจำลอง */
+.ghost-video,
+.ghost-result {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ghost-video.mirrored {
+  transform: scaleX(-1);
+}
+.ghost-camera-idle,
+.ghost-developing {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: #a2968d;
+}
+.ghost-developing {
+  background: #0a0706e6;
+  font: 26px var(--serif);
+  color: #d7c9bc;
+  animation: counter-flicker 1.6s steps(1) infinite;
+}
+.ghost-camera-note {
+  font-size: 13px;
+}
+.ghost-camera-actions {
+  justify-content: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ghost-developing {
+    animation: none;
+  }
+}

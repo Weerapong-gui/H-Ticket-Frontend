@@ -8,7 +8,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowDown } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import { ScareLayer } from "@/components/scare/scare-layer";
-import { FlashCamera } from "@/components/scare/flash-camera";
+import { GhostCamera } from "@/components/scare/ghost-camera";
 import { HeroBackdrop } from "@/components/scare/hero-backdrop";
 import { ENTRY_GATE_SCRIPT } from "@/lib/scare/storage";
 export default function Home() {
@@ -56,7 +56,7 @@ export default function Home() {
           </Reveal>
         </section>
         <section className="section camera-section" id="camera">
-          <FlashCamera />
+          <GhostCamera />
         </section>
         <section className="quote">
           <p>

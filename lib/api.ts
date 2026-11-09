@@ -29,6 +29,8 @@ export type IssuedTicket = {
 export type AdminStats = SalesStatus & {
   cancelled: number;
   picked_up: number;
+  /** จำนวนครั้งที่กดชัตเตอร์กล้องผีบนหน้าแรก (backend เก่าไม่มีฟิลด์นี้) */
+  ghost_shots?: number;
 };
 export type Order = {
   id: string;
@@ -213,6 +215,15 @@ export const api = {
       isLoginResult,
     ),
   stats: () => request<AdminStats>("/api/admin/stats", {}, true, isAdminStats),
+  /** กล้องผีถ่าย 1 ครั้ง: ยิงแล้วลืม ไม่มีรูป ไม่มี body · พลาดก็เงียบ ห้ามกระทบการถ่ายรูป */
+  countGhostShot: () => {
+    try {
+      void fetch(`${API_URL}/api/ghost-shots`, {
+        method: "POST",
+        keepalive: true,
+      }).catch(() => {});
+    } catch {}
+  },
   /** แก้จำนวนบัตรทั้งหมด (ไม่น้อยกว่าที่ขายแล้ว) ตอบสถิติชุดใหม่ */
   setTotal: (total: number) =>
     request<AdminStats>(

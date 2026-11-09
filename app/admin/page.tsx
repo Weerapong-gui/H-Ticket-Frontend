@@ -38,6 +38,7 @@ export default function Dashboard() {
               ["คงเหลือ", data.remaining],
               ["ยกเลิก", data.cancelled],
               ["รับบัตรแล้ว", data.picked_up],
+              ["ถ่ายรูปผี", data.ghost_shots ?? 0],
             ].map(([label, value]) => (
               <div key={label}>
                 <span>{label}</span>

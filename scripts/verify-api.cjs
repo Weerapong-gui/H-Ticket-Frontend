@@ -313,6 +313,39 @@ async function main() {
     global.fetch = originalFetch;
     AbortSignal.timeout = originalTimeout;
   }
+  // กล้องผี: ยิงนับแล้วลืม ไม่มี body · เน็ตล่มก็ห้าม throw (Review Focus 5)
+  calls = [];
+  next = { status: 204, body: "" };
+  api.countGhostShot();
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(last().url, `${API_URL}/api/ghost-shots`);
+  assert.equal(last().init.method, "POST");
+  assert.equal(last().init.body, undefined);
+  next = new Error("offline");
+  assert.doesNotThrow(() => api.countGhostShot());
+  await new Promise((r) => setTimeout(r, 0));
+  next = { status: 429, body: "{}" };
+  assert.doesNotThrow(() => api.countGhostShot());
+  await new Promise((r) => setTimeout(r, 0));
+  const statsBase = {
+    open: true,
+    closed_forever: false,
+    total: 600,
+    sold: 1,
+    remaining: 599,
+    cancelled: 0,
+    picked_up: 0,
+  };
+  setAdminToken("test-token");
+  response({ ...statsBase, ghost_shots: 7 });
+  assert.equal((await api.stats()).ghost_shots, 7);
+  response(statsBase);
+  await api.stats();
+  response({ ...statsBase, ghost_shots: -1 });
+  await assert.rejects(
+    () => api.stats(),
+    (e) => e.data.code === "invalid_response",
+  );
   clearAdminToken();
   // admin shell re-renders when the token changes (login, logout, 401)
   let notified = 0;
