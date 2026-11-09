@@ -1,16 +1,11 @@
 "use client";
 import { EventFacts } from "./event-facts";
-import { Ticket } from "lucide-react";
 import { money, packageFor } from "@/lib/booking";
 import { usePackage } from "./booking-provider";
 export function Summary({ children }: { children?: React.ReactNode }) {
   const pack = packageFor(usePackage().size);
   return (
     <aside className="summary">
-      <div className="summary-top">
-        <Ticket size={22} />
-        <span>THE HAUNTED HOUSE</span>
-      </div>
       <h2>สรุปการจอง</h2>
       <dl>
         <EventFacts />

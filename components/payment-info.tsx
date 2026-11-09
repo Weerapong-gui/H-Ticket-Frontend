@@ -10,14 +10,12 @@ export function PaymentInfo() {
   const pack = packageFor(usePackage().size);
   const ready = !!(p.accountNumber || p.promptPayQr);
   return (
-    <section
-      className="fixed-event-panel payment-info"
-      aria-label="วิธีโอนเงิน"
-    >
-      <p className="eyebrow">วิธีชำระเงิน</p>
-      <h2>โอนเงิน {money(pack.price)} แล้วแนบสลิป</h2>
+    <section className="payment-info" aria-label="วิธีโอนเงิน">
+      <h2>
+        โอนเงิน <span className="num">{money(pack.price)}</span> แล้วแนบสลิป
+      </h2>
       {pack.size > 1 && (
-        <p>โปร {pack.name} · โอนครั้งเดียวยอดรวมทั้งกลุ่ม แล้วแนบสลิปเดียว</p>
+        <p>โอนครั้งเดียวเป็นยอดรวมทั้งกลุ่ม แล้วแนบสลิปใบเดียว</p>
       )}
       {ready ? (
         <dl>

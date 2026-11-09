@@ -8,7 +8,7 @@ const BACKWARD =
 function Row({ text, back = false }: { text: string; back?: boolean }) {
   const half = (
     <span>
-      {text} <i>✦</i> {text} <i>✦</i>{" "}
+      {text} <i>๏</i> {text} <i>๏</i>{" "}
     </span>
   );
   return (

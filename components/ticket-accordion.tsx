@@ -3,13 +3,7 @@ import { useId, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronDown, Ticket, Users } from "lucide-react";
 import { eventConfig } from "@/lib/event-config";
-import {
-  money,
-  packages,
-  perPerson,
-  canOrder,
-  canOrderPackage,
-} from "@/lib/booking";
+import { money, packages, canOrderPackage } from "@/lib/booking";
 import { usePackage, useSales } from "./booking-provider";
 
 /** โปรเฉพาะในเว็บ 1/2/5 คน · selectable = ให้เลือกโปร (หน้าจองบัตร) */
@@ -70,16 +64,9 @@ export function TicketAccordion({
                         {p.size > 1 && <Users size={15} aria-hidden="true" />}
                         {p.name}
                       </strong>
-                      <span className="ticket-available">
-                        <i aria-hidden="true" />
-                        {p.size === 1
-                          ? sales && canOrder(sales)
-                            ? `เหลือ ${sales.remaining} / ${sales.total} ใบ`
-                            : "บัตรล่วงหน้า"
-                          : available
-                            ? `เฉลี่ย ${perPerson(p)} ต่อคน`
-                            : "บัตรเหลือไม่พอ"}
-                      </span>
+                      {!available && (
+                        <span className="ticket-available">บัตรเหลือไม่พอ</span>
+                      )}
                     </div>
                     <div className="early-bird-price">
                       <strong>{money(p.price)}</strong>
@@ -110,9 +97,8 @@ export function TicketAccordion({
               })}
             </div>
             <p className="ticket-quantity-note">
-              โปรนี้มีเฉพาะการจองผ่านเว็บ · โอนครั้งเดียว แนบสลิปเดียว
-              จองได้ทุกคน · รับบัตรที่หน้างานด้วยรหัสนักศึกษา · 1 รหัสนักศึกษา =
-              1 ใบ
+              ราคานี้เฉพาะจองผ่านเว็บ มากันเป็นกลุ่มโอนครั้งเดียวได้ทุกคน
+              วันงานรับบัตรด้วยรหัสนักศึกษา
             </p>
           </motion.div>
         )}

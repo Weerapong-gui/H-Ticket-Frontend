@@ -12,8 +12,6 @@ import { api, ApiError } from "@/lib/api";
 import {
   canOrderPackage,
   duplicateIndexes,
-  money,
-  packageFor,
   validateSlip,
   validPhone,
   validStudentId,
@@ -49,7 +47,6 @@ export default function Checkout() {
   const router = useRouter();
   const { sales, refresh } = usePurchaseSales();
   const { size } = usePackage();
-  const pack = packageFor(size);
   const [form, setForm] = useState<Form>({ people: [blank()], phone: "" });
   // ให้จำนวนช่องกรอกตรงกับโปรที่เลือก (เก็บข้อมูลที่กรอกไว้แล้ว)
   if (form.people.length !== size)
@@ -160,12 +157,7 @@ export default function Checkout() {
     <main className="booking-main">
       <Progress step={2} />
       <div className="page-heading">
-        <p className="eyebrow">
-          โปร {pack.name} · {money(pack.price)}
-        </p>
-        <h1>
-          กรอกข้อมูล<em>และแนบสลิป</em>
-        </h1>
+        <h1>กรอกข้อมูลและแนบสลิป</h1>
         <p>
           {size === 1
             ? "กรอกข้อมูลของคุณและแนบสลิปโอนเงิน ระบบจะยืนยันการจองทันที"

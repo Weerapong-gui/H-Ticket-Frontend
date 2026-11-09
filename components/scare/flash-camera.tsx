@@ -245,7 +245,7 @@ export function FlashCamera() {
 
   return (
     <div className="flash-camera">
-      <p className="eyebrow">ลองถ่ายรูปบ้าน</p>
+      <h2 className="flash-camera-title">ลองถ่ายรูปบ้านนี้ดู</h2>
       <div className="flash-frame">
         <canvas
           ref={canvasRef}

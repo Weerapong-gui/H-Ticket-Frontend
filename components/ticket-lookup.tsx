@@ -60,10 +60,7 @@ export function TicketLookup({
   return (
     <main className="booking-main ticket-lookup">
       <div className="page-heading">
-        <p className="eyebrow">ค้นบัตร</p>
-        <h1>
-          ค้นหา<em>บัตรของคุณ</em>
-        </h1>
+        <h1>ค้นหาบัตรของคุณ</h1>
         <p>กรอกรหัสนักศึกษาเพื่อดูสถานะการจองและการรับบัตรกระดาษ</p>
       </div>
       <form
@@ -111,7 +108,6 @@ export function TicketLookup({
             </p>
           )}
           <TicketArt blank priority />
-          <p className="eyebrow">THE HAUNTED HOUSE · บัตรล่วงหน้า</p>
           <TicketQr studentId={ticket.student_id} />
           <h2>{ticket.name}</h2>
           <p>รหัสนักศึกษา {ticket.student_id}</p>

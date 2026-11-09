@@ -76,9 +76,7 @@ export function TicketCounter() {
     if (!canOrder(sales))
       return (
         <div className="ticket-counter closed" role="status">
-          <p className="ticket-counter-label">
-            <span className="live-dot" /> {salesMessage(sales)}
-          </p>
+          <p className="ticket-counter-label">{salesMessage(sales)}</p>
         </div>
       );
 
@@ -87,7 +85,7 @@ export function TicketCounter() {
     return (
       <div className={low ? "ticket-counter low" : "ticket-counter"}>
         <p className="ticket-counter-label">
-          <span className="live-dot" /> บัตร pre-sale
+          บัตร pre-sale
           {low && <span className="ticket-counter-warn">ใกล้หมดแล้ว</span>}
         </p>
         <p className="ticket-counter-value">

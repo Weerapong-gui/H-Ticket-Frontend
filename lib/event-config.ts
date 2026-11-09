@@ -2,9 +2,9 @@
 export const eventConfig = {
   name: "THE HAUNTED HOUSE",
   type: "งานวันเดียว",
-  date: "รอประกาศ",
-  time: "รอประกาศ",
-  location: "รอประกาศ",
+  date: "เสาร์ 14 พ.ย. 2569",
+  time: "17:00 น.",
+  location: "ลานดาว",
   payment: {
     bankName: "",
     accountName: "",
@@ -12,7 +12,9 @@ export const eventConfig = {
     promptPayQr: "",
   },
   ticket: {
-    category: "EARLY BIRD",
+    category: "บัตรล่วงหน้า",
+    /** ราคาซื้อหน้างาน (ไม่ได้ขายผ่านเว็บ) */
+    doorPrice: 40,
     /** โปรเฉพาะในเว็บ: จำนวนคนต้องตรงกับ GROUP_SIZES ใน backend (1, 2, 5) */
     packages: [
       { size: 1, name: "1 คน", price: 35 },
