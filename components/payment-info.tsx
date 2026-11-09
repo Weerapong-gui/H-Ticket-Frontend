@@ -3,37 +3,38 @@ import { eventConfig } from "@/lib/event-config";
 import { money, packageFor } from "@/lib/booking";
 import { AccountCopyField } from "@/components/account-copy-field";
 import { usePackage } from "@/components/booking-provider";
+import { useT } from "@/lib/i18n/client";
 
 /** ข้อมูลโอนเงิน มาจาก lib/event-config.ts (backend ไม่ได้ส่งข้อมูลนี้มา) */
 export function PaymentInfo() {
   const p = eventConfig.payment;
   const pack = packageFor(usePackage().size);
   const ready = !!(p.accountNumber || p.promptPayQr);
+  const t = useT();
   return (
-    <section className="payment-info" aria-label="วิธีโอนเงิน">
+    <section className="payment-info" aria-label={t.payment.aria}>
       <h2>
-        โอนเงิน <span className="num">{money(pack.price)}</span> แล้วแนบสลิป
+        {t.payment.pay} <span className="num">{money(pack.price)}</span>{" "}
+        {t.payment.thenSlip}
       </h2>
-      {pack.size > 1 && (
-        <p>โอนครั้งเดียวเป็นยอดรวมทั้งกลุ่ม แล้วแนบสลิปใบเดียว</p>
-      )}
+      {pack.size > 1 && <p>{t.payment.group}</p>}
       {ready ? (
         <dl>
           {p.bankName && (
             <div>
-              <dt>ธนาคาร</dt>
+              <dt>{t.payment.bank}</dt>
               <dd>{p.bankName}</dd>
             </div>
           )}
           {p.accountName && (
             <div>
-              <dt>ชื่อบัญชี</dt>
+              <dt>{t.payment.accountName}</dt>
               <dd>{p.accountName}</dd>
             </div>
           )}
         </dl>
       ) : (
-        <p>ผู้จัดงานยังไม่ประกาศบัญชีรับโอน</p>
+        <p>{t.payment.notAnnounced}</p>
       )}
       {p.accountNumber && <AccountCopyField accountNumber={p.accountNumber} />}
       {p.promptPayQr && (
@@ -41,12 +42,10 @@ export function PaymentInfo() {
         <img
           className="promptpay-qr"
           src={p.promptPayQr}
-          alt="QR พร้อมเพย์สำหรับโอนเงิน"
+          alt={t.payment.qrAlt}
         />
       )}
-      <p className="selection-hint">
-        ใช้รูปสลิปเต็มใบจากแอปธนาคาร ห้ามครอป ต้องเห็น QR บนสลิป
-      </p>
+      <p className="selection-hint">{t.payment.slipHint}</p>
     </section>
   );
 }

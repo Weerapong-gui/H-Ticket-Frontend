@@ -12,7 +12,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { PackageProvider, SalesProvider } from "@/components/booking-provider";
-import { Header, Footer } from "@/components/chrome";
+import { LoadingMain } from "@/components/i18n-bits";
 
 // โหลดฟอนต์ผ่าน next/font เพราะ @import ใน globals.css ถูกตัดทิ้งตอน build
 const cinzel = Cinzel({ subsets: ["latin"], variable: "--f-cinzel" });
@@ -80,20 +80,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <a href="#main-content" className="skip-link">
-          ข้ามไปที่เนื้อหา
-        </a>
         <SalesProvider>
           <PackageProvider>
-            <Header />
-            <div id="main-content">
-              <Suspense
-                fallback={<main className="booking-main">กำลังโหลด…</main>}
-              >
-                {children}
-              </Suspense>
-            </div>
-            <Footer />
+            <Suspense fallback={<LoadingMain />}>{children}</Suspense>
           </PackageProvider>
         </SalesProvider>
       </body>

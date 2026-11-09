@@ -1,7 +1,18 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X, ArrowUpRight, Ghost } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Menu,
+  X,
+  ArrowUpRight,
+  Ghost,
+  Globe,
+  ChevronUp,
+  Check,
+} from "lucide-react";
+import { LANGS, LANG_COOKIE, LANG_NAMES, swapLang } from "@/lib/i18n/dict";
+import { useHasLang, useHref, useLang, useT } from "@/lib/i18n/client";
 function Instagram({ size = 17 }: { size?: number }) {
   return (
     <svg
@@ -34,7 +45,7 @@ function Facebook({ size = 17 }: { size?: number }) {
 }
 export function Brand() {
   return (
-    <Link href="/" className="brand">
+    <Link href={useHref()("/")} className="brand">
       <Ghost size={27} />
       <span>
         THE HAUNTED<span>HOUSE</span>
@@ -44,27 +55,29 @@ export function Brand() {
 }
 export function Header() {
   const [open, setOpen] = useState(false);
+  const t = useT();
+  const href = useHref();
   return (
     <header className="header">
       <Brand />
-      <nav className={open ? "nav open" : "nav"} aria-label="เมนูหลัก">
+      <nav className={open ? "nav open" : "nav"} aria-label={t.common.menu}>
         {[
-          ["หน้าแรก", "/"],
-          ["บัตรคงเหลือ", "/#attraction"],
-          ["บัตร", "/#tickets"],
-          ["ค้นบัตร", "/ticket"],
+          [t.common.home, "/"],
+          [t.common.remaining, "/#attraction"],
+          [t.common.tickets, "/#tickets"],
+          [t.common.findTicket, "/ticket"],
         ].map(([label, url]) => (
-          <Link onClick={() => setOpen(false)} key={label} href={url}>
+          <Link onClick={() => setOpen(false)} key={label} href={href(url)}>
             {label}
           </Link>
         ))}
       </nav>
-      <Link className="button header-cta" href="/booking">
-        จองบัตร <ArrowUpRight size={15} />
+      <Link className="button header-cta" href={href("/booking")}>
+        {t.common.book} <ArrowUpRight size={15} />
       </Link>
       <button
         className="menu-toggle"
-        aria-label={open ? "ปิดเมนู" : "เปิดเมนู"}
+        aria-label={open ? t.common.closeMenu : t.common.openMenu}
         aria-expanded={open}
         onClick={() => setOpen(!open)}
       >
@@ -78,7 +91,90 @@ const SOCIAL = {
   facebook: "https://www.facebook.com/mfu.su/",
 };
 
+/** จำภาษาที่เลือกไว้ 1 ปี (proxy ใช้ตอนเปิดลิงก์ที่ไม่มี /th /en) */
+function rememberLang(to: string) {
+  document.cookie = `${LANG_COOKIE}=${to}; path=/; max-age=31536000; samesite=lax`;
+}
+
+/** ปุ่มเลือกภาษาท้ายเว็บ: สลับแล้วอยู่หน้าเดิม และจำไว้ใน cookie ให้ครั้งหน้า */
+function LanguageSwitcher() {
+  const lang = useLang();
+  const t = useT();
+  const router = useRouter();
+  const hasLang = useHasLang();
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: Event) => {
+      if (e instanceof KeyboardEvent && e.key !== "Escape") return;
+      if (e instanceof MouseEvent && box.current?.contains(e.target as Node))
+        return;
+      setOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [open]);
+  // หน้าแอดมินไม่มีภาษาอังกฤษ
+  if (!hasLang) return null;
+  const choose = (to: (typeof LANGS)[number]) => {
+    setOpen(false);
+    rememberLang(to);
+    if (to !== lang)
+      router.push(
+        swapLang(window.location.pathname, to) +
+          window.location.search +
+          window.location.hash,
+      );
+  };
+  return (
+    <div className="lang-switch" ref={box}>
+      {open && (
+        <ul className="lang-menu" role="menu" aria-label={t.common.language}>
+          {LANGS.map((l) => (
+            <li key={l} role="none">
+              <button
+                type="button"
+                role="menuitemradio"
+                aria-checked={l === lang}
+                className={l === lang ? "active" : undefined}
+                lang={l}
+                onClick={() => choose(l)}
+              >
+                {LANG_NAMES[l]}
+                {l === lang && <Check size={15} aria-hidden="true" />}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <button
+        type="button"
+        className="lang-toggle"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={`${t.common.language}: ${LANG_NAMES[lang]}`}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <Globe size={17} aria-hidden="true" />
+        {LANG_NAMES[lang]}
+        <ChevronUp
+          size={15}
+          aria-hidden="true"
+          className={open ? undefined : "lang-chevron-closed"}
+        />
+      </button>
+    </div>
+  );
+}
+
 export function Footer() {
+  const t = useT();
+  const href = useHref();
   return (
     <footer>
       <div className="footer-top">
@@ -91,18 +187,19 @@ export function Footer() {
       </div>
       <div className="footer-bottom">
         <span className="app-version">
-          v{process.env.NEXT_PUBLIC_APP_VERSION} · อัปเดต{" "}
+          v{process.env.NEXT_PUBLIC_APP_VERSION} · {t.common.updated}{" "}
           {process.env.NEXT_PUBLIC_BUILD_TIME}
         </span>
         <div>
-          <Link href="/#attraction">บัตรคงเหลือ</Link>
-          <Link href="/ticket">ค้นบัตร</Link>
-          <Link href="/admin/login">ทีมงาน</Link>
+          <LanguageSwitcher />
+          <Link href={href("/#attraction")}>{t.common.remaining}</Link>
+          <Link href={href("/ticket")}>{t.common.findTicket}</Link>
+          <Link href="/admin/login">{t.common.staff}</Link>
           <a
             href={SOCIAL.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Instagram องค์การนักศึกษา มฟล."
+            aria-label={t.common.socialIg}
           >
             <Instagram size={17} />
           </a>
@@ -110,7 +207,7 @@ export function Footer() {
             href={SOCIAL.facebook}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Facebook องค์การนักศึกษา มฟล."
+            aria-label={t.common.socialFb}
           >
             <Facebook size={17} />
           </a>

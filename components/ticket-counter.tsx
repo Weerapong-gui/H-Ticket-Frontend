@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, motion, useInView, useReducedMotion } from "motion/react";
 import { api, type SalesStatus } from "@/lib/api";
-import { canOrder, salesMessage } from "@/lib/booking";
+import { canOrder, salesState } from "@/lib/booking";
+import { useT } from "@/lib/i18n/client";
 
 const POLL_MS = 30_000;
 /** เหลือน้อยกว่านี้ (สัดส่วนของทั้งหมด) ขึ้น "ใกล้หมดแล้ว" */
@@ -13,6 +14,7 @@ export function TicketCounter() {
   const [sales, setSales] = useState<SalesStatus | null>(null);
   const [shown, setShown] = useState(0);
   const reduced = useReducedMotion();
+  const t = useT();
   const number = useRef<HTMLElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const inView = useInView(box, { once: true, amount: 0.4 });
@@ -76,7 +78,7 @@ export function TicketCounter() {
     if (!canOrder(sales))
       return (
         <div className="ticket-counter closed" role="status">
-          <p className="ticket-counter-label">{salesMessage(sales)}</p>
+          <p className="ticket-counter-label">{t.sales[salesState(sales)]}</p>
         </div>
       );
 
@@ -85,17 +87,17 @@ export function TicketCounter() {
     return (
       <div className={low ? "ticket-counter low" : "ticket-counter"}>
         <p className="ticket-counter-label">
-          บัตร pre-sale
-          {low && <span className="ticket-counter-warn">ใกล้หมดแล้ว</span>}
+          {t.counter.label}
+          {low && <span className="ticket-counter-warn">{t.counter.low}</span>}
         </p>
         <p className="ticket-counter-value">
           <span className="sr-only">
-            เหลือ {remaining} จาก {sales.total} ใบ
+            {t.counter.sr(remaining, sales.total)}
           </span>
           <strong ref={number} aria-hidden="true">
             {reduced ? remaining : shown}
           </strong>
-          <span aria-hidden="true">/ {sales.total} ใบ</span>
+          <span aria-hidden="true">{t.counter.of(sales.total)}</span>
         </p>
         <div className="ticket-counter-bar" aria-hidden="true">
           <motion.span

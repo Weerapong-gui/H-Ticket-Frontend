@@ -1,27 +1,30 @@
 ﻿"use client";
 import { useSales } from "./booking-provider";
-import { canOrder, salesMessage } from "@/lib/booking";
+import { canOrder, salesState } from "@/lib/booking";
+import { useLang, useT } from "@/lib/i18n/client";
 export function SalesNotice() {
   const { sales, loading, error, refresh } = useSales();
+  const t = useT();
+  const lang = useLang();
   return (
     <div className="sales-notice" role="status" aria-live="polite">
       {loading ? (
-        <p>กำลังตรวจสอบสถานะการขาย…</p>
+        <p>{t.sales.checking}…</p>
       ) : error ? (
         <>
-          <p>{error}</p>
+          <p>{lang === "th" ? error : t.sales.error}</p>
           <button
             type="button"
             className="text-link"
             onClick={() => void refresh()}
           >
-            ลองตรวจสอบอีกครั้ง →
+            {t.sales.retry}
           </button>
         </>
       ) : (
         <>
-          <strong>{salesMessage(sales)}</strong>
-          {canOrder(sales) && <p>หนึ่งรหัสนักศึกษาซื้อได้หนึ่งใบ</p>}
+          <strong>{t.sales[salesState(sales)]}</strong>
+          {canOrder(sales) && <p>{t.sales.onePerId}</p>}
         </>
       )}
     </div>

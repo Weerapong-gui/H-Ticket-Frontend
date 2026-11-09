@@ -12,10 +12,12 @@ import { api, ApiError } from "@/lib/api";
 import {
   canOrderPackage,
   duplicateIndexes,
-  validateSlip,
+  slipProblem,
   validPhone,
   validStudentId,
 } from "@/lib/booking";
+import type { Dict } from "@/lib/i18n/dict";
+import { useHref, useT } from "@/lib/i18n/client";
 
 type Person = { name: string; studentId: string };
 type Form = { people: Person[]; phone: string };
@@ -23,28 +25,33 @@ type ErrorKey = `name-${number}` | `studentId-${number}` | "phone" | "slip";
 const digits = (v: string) => v.replace(/\D/g, "");
 const blank = (): Person => ({ name: "", studentId: "" });
 
-function validate(form: Form, slip: File | null) {
+function validate(form: Form, slip: File | null, t: Dict) {
   const errors: Partial<Record<ErrorKey, string>> = {};
   const dup = duplicateIndexes(form.people.map((p) => p.studentId));
   form.people.forEach((person, i) => {
     const name = person.name.trim();
-    if (!name) errors[`name-${i}`] = "กรุณากรอกชื่อ-นามสกุล";
+    if (!name) errors[`name-${i}`] = t.checkout.errName;
     else if ([...name].length > 100)
-      errors[`name-${i}`] = "ชื่อยาวเกิน 100 ตัวอักษร";
+      errors[`name-${i}`] = t.checkout.errNameLong;
     if (!validStudentId(person.studentId))
-      errors[`studentId-${i}`] = "รหัสนักศึกษาต้องเป็นตัวเลข 10 หลัก";
-    else if (dup.has(i))
-      errors[`studentId-${i}`] = "รหัสนักศึกษาซ้ำกับคนอื่นในกลุ่ม";
+      errors[`studentId-${i}`] = t.common.studentIdDigits;
+    else if (dup.has(i)) errors[`studentId-${i}`] = t.checkout.errDupId;
   });
-  if (!validPhone(form.phone))
-    errors.phone = "เบอร์โทรต้องเป็นตัวเลข 10 หลัก ขึ้นต้นด้วย 0";
-  const slipError = validateSlip(slip);
-  if (slipError) errors.slip = slipError;
+  if (!validPhone(form.phone)) errors.phone = t.checkout.errPhone;
+  const problem = slipProblem(slip);
+  if (problem)
+    errors.slip = {
+      missing: t.checkout.errSlipMissing,
+      type: t.checkout.errSlipType,
+      size: t.checkout.errSlipSize,
+    }[problem];
   return errors;
 }
 
 export default function Checkout() {
   const router = useRouter();
+  const t = useT();
+  const href = useHref();
   const { sales, refresh } = usePurchaseSales();
   const { size } = usePackage();
   const [form, setForm] = useState<Form>({ people: [blank()], phone: "" });
@@ -61,7 +68,7 @@ export default function Checkout() {
   const [error, setError] = useState<unknown>(null);
   const guard = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const errors = validate(form, slip);
+  const errors = validate(form, slip, t);
   const show = (k: ErrorKey) => (submitted ? errors[k] : undefined);
 
   // ล้าง blob URL ของรูปตัวอย่างตอนออกจากหน้า
@@ -99,7 +106,9 @@ export default function Checkout() {
         slip: slip!, // ส่งไฟล์ต้นฉบับ ห้ามบีบอัด QR จะอ่านไม่ออก
       });
       // ปุ่มคงสถานะรอจนเปลี่ยนหน้า กันการกดส่งซ้ำ
-      router.push(`/ticket/${encodeURIComponent(ticket.student_id)}?new=1`);
+      router.push(
+        href(`/ticket/${encodeURIComponent(ticket.student_id)}?new=1`),
+      );
     } catch (err) {
       guard.current = false;
       setPending(false);
@@ -157,12 +166,8 @@ export default function Checkout() {
     <main className="booking-main">
       <Progress step={2} />
       <div className="page-heading">
-        <h1>กรอกข้อมูลและแนบสลิป</h1>
-        <p>
-          {size === 1
-            ? "กรอกข้อมูลของคุณและแนบสลิปโอนเงิน ระบบจะยืนยันการจองทันที"
-            : `กรอกข้อมูลทั้ง ${size} คน แนบสลิปเดียว ระบบจะยืนยันการจองให้ทุกคนทันที`}
-        </p>
+        <h1>{t.checkout.title}</h1>
+        <p>{size === 1 ? t.checkout.leadOne : t.checkout.leadGroup(size)}</p>
       </div>
       <form
         ref={formRef}
@@ -178,34 +183,28 @@ export default function Checkout() {
           >
             <div className="student-form-heading">
               {size > 1 ? <Users size={22} /> : <UserRound size={22} />}
-              <h2 id="buyer-heading">
-                {size > 1 ? `ข้อมูลทั้ง ${size} คน` : "ข้อมูลผู้ซื้อ"}
-              </h2>
+              <h2 id="buyer-heading">{t.checkout.peopleHeading(size)}</h2>
             </div>
             {form.people.map((person, i) => (
               <fieldset className="person-fields" key={i}>
-                {size > 1 && (
-                  <legend>
-                    {i === 0 ? "คนที่ 1 (ผู้ซื้อ)" : `คนที่ ${i + 1}`}
-                  </legend>
-                )}
+                {size > 1 && <legend>{t.checkout.person(i)}</legend>}
                 <div className="form-fields">
                   {field(
                     `name-${i}`,
-                    "ชื่อ-นามสกุล",
+                    t.checkout.name,
                     person.name,
                     (v) => setPerson(i, { name: v }),
                     {
                       type: "text",
                       autoComplete: i === 0 ? "name" : "off",
                       maxLength: 100,
-                      placeholder: "กรอกชื่อ-นามสกุล",
+                      placeholder: t.checkout.namePh,
                       onBlur: () => setPerson(i, { name: person.name.trim() }),
                     },
                   )}
                   {field(
                     `studentId-${i}`,
-                    "รหัสนักศึกษา",
+                    t.common.studentId,
                     person.studentId,
                     (v) => setPerson(i, { studentId: digits(v) }),
                     {
@@ -213,14 +212,14 @@ export default function Checkout() {
                       inputMode: "numeric",
                       autoComplete: "off",
                       maxLength: 10,
-                      placeholder: "ตัวเลข 10 หลัก",
+                      placeholder: t.common.tenDigits,
                     },
-                    i === 0 ? "ใช้ค้นบัตรและแลกบัตรจริง" : undefined,
+                    i === 0 ? t.checkout.idHint : undefined,
                   )}
                   {i === 0 &&
                     field(
                       "phone",
-                      "เบอร์โทรศัพท์",
+                      t.checkout.phone,
                       form.phone,
                       (v) => setForm((f) => ({ ...f, phone: digits(v) })),
                       {
@@ -230,9 +229,7 @@ export default function Checkout() {
                         maxLength: 10,
                         placeholder: "08XXXXXXXX",
                       },
-                      size > 1
-                        ? "ทีมงานจะติดต่อเบอร์นี้สำหรับทั้งกลุ่ม"
-                        : undefined,
+                      size > 1 ? t.checkout.phoneGroup : undefined,
                     )}
                 </div>
               </fieldset>
@@ -244,10 +241,10 @@ export default function Checkout() {
           >
             <div className="student-form-heading">
               <ImageUp size={22} />
-              <h2 id="slip-heading">สลิปโอนเงิน</h2>
+              <h2 id="slip-heading">{t.checkout.slipHeading}</h2>
             </div>
             <label htmlFor="f-slip">
-              รูปสลิป (JPG, PNG, WebP ไม่เกิน 5 MB){" "}
+              {t.checkout.slipLabel}{" "}
               <span className="required-mark" aria-hidden="true">
                 *
               </span>
@@ -261,10 +258,7 @@ export default function Checkout() {
                 aria-describedby={show("slip") ? "f-slip-error" : undefined}
                 onChange={(e) => pickSlip(e.target.files?.[0] ?? null)}
               />
-              <span className="field-hint">
-                ใช้รูปสลิปเต็มใบจากแอปธนาคาร ห้ามครอปหรือแคปบางส่วน ต้องเห็น QR
-                บนสลิป
-              </span>
+              <span className="field-hint">{t.checkout.slipRule}</span>
               {show("slip") && (
                 <span className="field-error" id="f-slip-error" role="alert">
                   {show("slip")}
@@ -276,28 +270,26 @@ export default function Checkout() {
               <img
                 className="slip-preview"
                 src={preview}
-                alt="ตัวอย่างสลิปที่เลือก"
+                alt={t.checkout.slipAlt}
               />
             )}
           </section>
           <PaymentInfo />
-          <Link className="text-link" href="/booking">
-            ← กลับไปเปลี่ยนโปร
+          <Link className="text-link" href={href("/booking")}>
+            {t.checkout.back}
           </Link>
         </div>
         <Summary>
           <ErrorNotice error={error} studentId={form.people[0].studentId} />
           <button type="submit" className="button" disabled={pending || !open}>
             {pending
-              ? "กำลังตรวจสลิป…"
+              ? t.checkout.checking
               : open
-                ? "ยืนยันการจอง"
-                : "ยังซื้อบัตรไม่ได้"}
+                ? t.checkout.confirm
+                : t.checkout.cannotBuy}
             <ArrowRight size={16} />
           </button>
-          <p className="selection-hint">
-            ตรวจข้อมูลให้ถูกต้องก่อนกด · ซื้อแล้วแก้ไขเองไม่ได้ ต้องติดต่อทีมงาน
-          </p>
+          <p className="selection-hint">{t.checkout.final}</p>
         </Summary>
       </form>
     </main>

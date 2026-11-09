@@ -2,6 +2,7 @@
 import { useId } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useScare } from "./scare-provider";
+import { useT } from "@/lib/i18n/client";
 
 /**
  * หน้าประตู: ขึ้นครั้งแรกที่เข้าเว็บ การแตะปุ่มทำให้เบราว์เซอร์ยอมเล่นเสียง
@@ -12,6 +13,7 @@ import { useScare } from "./scare-provider";
 export function EntryGate() {
   const { entered, enter, reducedMotion } = useScare();
   const titleId = useId();
+  const t = useT();
   return (
     <AnimatePresence>
       {entered !== true && (
@@ -27,23 +29,21 @@ export function EntryGate() {
           <p className="entry-gate-title" id={titleId}>
             THE HAUNTED HOUSE
           </p>
-          <p className="entry-gate-line">
-            บ้านหลังนี้มีเสียง ใส่หูฟังจะดีที่สุด
-          </p>
+          <p className="entry-gate-line">{t.gate.line}</p>
           <button
             type="button"
             className="button"
             autoFocus
             onClick={() => enter(true)}
           >
-            เข้าบ้าน (มีเสียง)
+            {t.gate.enter}
           </button>
           <button
             type="button"
             className="text-link entry-gate-quiet"
             onClick={() => enter(false)}
           >
-            เข้าแบบไม่มีเสียง
+            {t.gate.quiet}
           </button>
         </motion.div>
       )}

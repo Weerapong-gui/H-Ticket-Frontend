@@ -29,22 +29,44 @@ export function duplicateIndexes(ids: string[]) {
 export const validStudentId = (value: string) => /^\d{10}$/.test(value.trim());
 export const validPhone = (value: string) => /^0\d{9}$/.test(value.trim());
 export const MAX_SLIP_BYTES = 5 * 1024 * 1024;
+/** ปัญหาของไฟล์สลิปเป็นคีย์ (หน้าเว็บแปลตามภาษาเอง) */
+export function slipProblem(
+  file: Pick<File, "type" | "size"> | null,
+): "missing" | "type" | "size" | null {
+  if (!file) return "missing";
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type))
+    return "type";
+  if (file.size === 0 || file.size > MAX_SLIP_BYTES) return "size";
+  return null;
+}
 export function validateSlip(
   file: Pick<File, "type" | "size"> | null,
 ): string | null {
-  if (!file) return "กรุณาแนบรูปสลิปการโอนเงิน";
-  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type))
-    return "รองรับรูปสลิป JPG, PNG หรือ WebP เท่านั้น";
-  if (file.size === 0 || file.size > MAX_SLIP_BYTES)
-    return "รูปสลิปต้องมีขนาดไม่เกิน 5 MB และไม่ใช่ไฟล์ว่าง";
-  return null;
+  return {
+    missing: "กรุณาแนบรูปสลิปการโอนเงิน",
+    type: "รองรับรูปสลิป JPG, PNG หรือ WebP เท่านั้น",
+    size: "รูปสลิปต้องมีขนาดไม่เกิน 5 MB และไม่ใช่ไฟล์ว่าง",
+    none: null,
+  }[slipProblem(file) ?? "none"];
+}
+export type SalesState =
+  "checking" | "closedForever" | "soldOut" | "notOpen" | "open";
+/** สถานะการขายเป็นคีย์ (หน้าเว็บแปลตามภาษา · แอดมินใช้ salesMessage ภาษาไทย) */
+export function salesState(sales: SalesStatus | null): SalesState {
+  if (!sales) return "checking";
+  if (sales.closed_forever) return "closedForever";
+  if (sales.remaining === 0) return "soldOut";
+  if (!sales.open) return "notOpen";
+  return "open";
 }
 export function salesMessage(sales: SalesStatus | null) {
-  if (!sales) return "กำลังตรวจสอบสถานะการขาย";
-  if (sales.closed_forever) return "ปิดขายผ่านเว็บแล้ว ซื้อได้ที่หน้างาน";
-  if (sales.remaining === 0) return "บัตรหมดแล้ว";
-  if (!sales.open) return "ยังไม่เปิดขาย / ปิดขายชั่วคราว";
-  return "เปิดจองบัตรล่วงหน้า";
+  return {
+    checking: "กำลังตรวจสอบสถานะการขาย",
+    closedForever: "ปิดขายผ่านเว็บแล้ว ซื้อได้ที่หน้างาน",
+    soldOut: "บัตรหมดแล้ว",
+    notOpen: "ยังไม่เปิดขาย / ปิดขายชั่วคราว",
+    open: "เปิดจองบัตรล่วงหน้า",
+  }[salesState(sales)];
 }
 export const canOrder = (sales: SalesStatus | null) =>
   !!sales && sales.open && !sales.closed_forever && sales.remaining > 0;

@@ -2,9 +2,9 @@
 import { useId, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronDown, Ticket, Users } from "lucide-react";
-import { eventConfig } from "@/lib/event-config";
 import { money, packages, canOrderPackage } from "@/lib/booking";
 import { usePackage, useSales } from "./booking-provider";
+import { useT } from "@/lib/i18n/client";
 
 /** โปรเฉพาะในเว็บ 1/2/5 คน · selectable = ให้เลือกโปร (หน้าจองบัตร) */
 export function TicketAccordion({
@@ -18,6 +18,7 @@ export function TicketAccordion({
   const reduced = useReducedMotion();
   const { sales } = useSales();
   const { size, setSize } = usePackage();
+  const t = useT();
   return (
     <div className="ticket-accordion">
       <h3>
@@ -30,8 +31,8 @@ export function TicketAccordion({
         >
           <span className="ticket-category">
             <Ticket size={22} />
-            {eventConfig.ticket.category}
-            <span className="web-only-badge">โปรเฉพาะในเว็บ</span>
+            {t.pkg.category}
+            <span className="web-only-badge">{t.pkg.webOnly}</span>
           </span>
           <ChevronDown
             size={18}
@@ -53,7 +54,7 @@ export function TicketAccordion({
           >
             <div
               role={selectable ? "radiogroup" : undefined}
-              aria-label={selectable ? "เลือกโปร" : undefined}
+              aria-label={selectable ? t.pkg.choose : undefined}
             >
               {packages.map((p) => {
                 const available = !sales || canOrderPackage(sales, p.size);
@@ -62,15 +63,19 @@ export function TicketAccordion({
                     <div className="early-bird-name">
                       <strong>
                         {p.size > 1 && <Users size={15} aria-hidden="true" />}
-                        {p.name}
+                        {t.pkg.name(p.size)}
                       </strong>
                       {!available && (
-                        <span className="ticket-available">บัตรเหลือไม่พอ</span>
+                        <span className="ticket-available">
+                          {t.pkg.notEnough}
+                        </span>
                       )}
                     </div>
                     <div className="early-bird-price">
                       <strong>{money(p.price)}</strong>
-                      <span>{p.size === 1 ? "ต่อคน" : `${p.size} ใบ`}</span>
+                      <span>
+                        {p.size === 1 ? t.pkg.perPerson : t.pkg.tickets(p.size)}
+                      </span>
                     </div>
                   </>
                 );
@@ -96,10 +101,7 @@ export function TicketAccordion({
                 );
               })}
             </div>
-            <p className="ticket-quantity-note">
-              ราคานี้เฉพาะจองผ่านเว็บ มากันเป็นกลุ่มโอนครั้งเดียวได้ทุกคน
-              วันงานรับบัตรด้วยรหัสนักศึกษา
-            </p>
+            <p className="ticket-quantity-note">{t.pkg.note}</p>
           </motion.div>
         )}
       </AnimatePresence>

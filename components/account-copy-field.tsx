@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n/client";
 import { Check, Copy } from "lucide-react";
 
 const COPY_FEEDBACK_MS = 2000;
@@ -24,6 +25,7 @@ async function copyText(value: string) {
 /** แสดงเลขบัญชีตัวใหญ่ + ปุ่มคัดลอก (คัดลอกเฉพาะตัวเลข ไม่มีขีด/เว้นวรรค) */
 export function AccountCopyField({ accountNumber }: { accountNumber: string }) {
   const [copied, setCopied] = useState(false);
+  const t = useT();
   const timer = useRef<number | null>(null);
 
   useEffect(
@@ -50,14 +52,16 @@ export function AccountCopyField({ accountNumber }: { accountNumber: string }) {
       <button
         type="button"
         onClick={handleCopy}
-        className={copied ? "account-copy-button copied" : "account-copy-button"}
-        aria-label="คัดลอกเลขบัญชี"
+        className={
+          copied ? "account-copy-button copied" : "account-copy-button"
+        }
+        aria-label={t.payment.copyAria}
       >
         {copied ? <Check size={18} /> : <Copy size={18} />}
-        <span>{copied ? "คัดลอกแล้ว" : "คัดลอก"}</span>
+        <span>{copied ? t.payment.copied : t.payment.copy}</span>
       </button>
       <span className="sr-only" aria-live="polite">
-        {copied ? "คัดลอกเลขบัญชีแล้ว" : ""}
+        {copied ? t.payment.copiedSr : ""}
       </span>
     </div>
   );

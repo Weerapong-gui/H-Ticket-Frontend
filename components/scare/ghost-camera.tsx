@@ -21,6 +21,7 @@ import { planGhost } from "@/lib/ghost-cam/placement";
 import { preloadSegmenter, segmentPerson } from "@/lib/ghost-cam/segmenter";
 import { FlashCamera } from "./flash-camera";
 import { useScare } from "./scare-provider";
+import { useT } from "@/lib/i18n/client";
 
 /** หน้ารอ "กำลังล้างฟิล์ม…" แสดงอย่างน้อยเท่านี้ เพื่อความลุ้น */
 const DEVELOP_MS = 2_000;
@@ -65,6 +66,7 @@ function downscale(src: HTMLCanvasElement) {
 /** กล้องถ่ายภาพติดวิญญาณ: ทุกอย่างทำในเครื่อง รูปไม่ถูกส่งไปที่ไหน */
 export function GhostCamera() {
   const { figure, consumeMirror, reducedMotion } = useScare();
+  const t = useT();
   const [state, setState] = useState<CamState>("idle");
   const [facing, setFacing] = useState<Facing>("user");
   const [result, setResult] = useState<string | null>(null);
@@ -283,15 +285,15 @@ export function GhostCamera() {
   if (state === "unavailable")
     return (
       <div className="flash-camera ghost-camera">
-        <h2 className="flash-camera-title">ถ่ายรูปกับผีในบ้านนี้</h2>
-        <p className="ghost-camera-note">เปิดกล้องไม่ได้ ลองถ่ายบ้านแทน</p>
+        <h2 className="flash-camera-title">{t.camera.title}</h2>
+        <p className="ghost-camera-note">{t.camera.unavailable}</p>
         <FlashCamera showTitle={false} />
       </div>
     );
 
   return (
     <div className="flash-camera ghost-camera">
-      <h2 className="flash-camera-title">ถ่ายรูปกับผีในบ้านนี้</h2>
+      <h2 className="flash-camera-title">{t.camera.title}</h2>
       <div className="flash-frame" ref={frameRef}>
         {/* วิดีโออยู่ตลอด (ถ่ายใหม่ต้องต่อกล้องเข้ากับ element เดิมได้ทันที) */}
         <video
@@ -299,37 +301,29 @@ export function GhostCamera() {
           className={facing === "user" ? "ghost-video mirrored" : "ghost-video"}
           playsInline
           muted
-          aria-label="ภาพจากกล้อง"
+          aria-label={t.camera.videoAria}
         />
         {state === "result" && result && (
           // eslint-disable-next-line @next/next/no-img-element -- object URL จาก canvas ในเครื่อง
-          <img
-            className="ghost-result"
-            src={result}
-            alt="รูปของคุณจากกล้องผี"
-          />
+          <img className="ghost-result" src={result} alt={t.camera.resultAlt} />
         )}
         {state === "idle" && (
-          <p className="ghost-camera-idle">
-            รูปอยู่ในเครื่องคุณเท่านั้น ไม่ถูกส่งไปที่ไหน
-          </p>
+          <p className="ghost-camera-idle">{t.camera.privacy}</p>
         )}
         {state === "developing" && (
           <p className="ghost-developing" role="status">
-            กำลังล้างฟิล์ม…
+            {t.camera.developing}
           </p>
         )}
         <div ref={flashRef} className="flash-overlay" aria-hidden="true" />
       </div>
       {state === "result" && result && (
-        <p className="ghost-camera-note">
-          บันทึกไม่ได้? กดค้างที่รูปแล้วเลือกบันทึกรูปภาพ
-        </p>
+        <p className="ghost-camera-note">{t.camera.saveHint}</p>
       )}
       <div className="action-buttons ghost-camera-actions">
         {state === "idle" && (
           <button type="button" className="button" onClick={open}>
-            <Camera size={18} /> เปิดกล้อง
+            <Camera size={18} /> {t.camera.open}
           </button>
         )}
         {live && (
@@ -340,14 +334,14 @@ export function GhostCamera() {
               disabled={state !== "live"}
               onClick={() => void shoot()}
             >
-              <Camera size={18} /> ชัตเตอร์
+              <Camera size={18} /> {t.camera.shutter}
             </button>
             <button
               type="button"
               className="button outline"
               disabled={state !== "live"}
               onClick={flip}
-              aria-label="สลับกล้องหน้าหลัง"
+              aria-label={t.camera.switch}
             >
               <SwitchCamera size={18} />
             </button>
@@ -361,11 +355,11 @@ export function GhostCamera() {
                 className="button"
                 onClick={() => void save()}
               >
-                <Download size={18} /> บันทึกรูป
+                <Download size={18} /> {t.camera.save}
               </button>
             )}
             <button type="button" className="button outline" onClick={retake}>
-              <RefreshCw size={18} /> ถ่ายใหม่
+              <RefreshCw size={18} /> {t.camera.retake}
             </button>
           </>
         )}

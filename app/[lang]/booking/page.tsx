@@ -8,37 +8,40 @@ import { usePackage, usePurchaseSales } from "@/components/booking-provider";
 import { TicketArt } from "@/components/ticket-art";
 import { Progress, Summary } from "@/components/summary";
 import { canOrderPackage } from "@/lib/booking";
+import { useHref, useT } from "@/lib/i18n/client";
 export default function BookingPage() {
   const { sales } = usePurchaseSales();
   const { size } = usePackage();
+  const t = useT();
+  const href = useHref();
   return (
     <main className="booking-main">
       <Progress step={1} />
       <div className="page-heading">
-        <h1>จองบัตร</h1>
-        <p>เลือกโปร โอนเงิน แล้วแนบสลิป วันงานมารับบัตรด้วยรหัสนักศึกษา</p>
+        <h1>{t.booking.title}</h1>
+        <p>{t.booking.lead}</p>
       </div>
       <div className="booking-grid">
         <div className="booking-controls">
           <SalesNotice />
           <section className="booking-step">
-            <h2>เลือกโปร</h2>
+            <h2>{t.pkg.choose}</h2>
             <TicketArt className="booking-ticket-art" />
             <TicketAccordion selectable />
           </section>
           <PaymentInfo />
-          <Link className="text-link" href="/ticket">
-            ซื้อแล้ว? ค้นบัตรของคุณ →
+          <Link className="text-link" href={href("/ticket")}>
+            {t.booking.bought}
           </Link>
         </div>
         <Summary>
           {canOrderPackage(sales, size) ? (
-            <Link className="button" href="/checkout">
-              โอนแล้ว ไปแนบสลิป <ArrowRight size={17} />
+            <Link className="button" href={href("/checkout")}>
+              {t.booking.next} <ArrowRight size={17} />
             </Link>
           ) : (
             <button type="button" className="button" disabled>
-              ยังซื้อบัตรไม่ได้
+              {t.booking.cannotBuy}
             </button>
           )}
         </Summary>

@@ -6,6 +6,7 @@ import { drawGhost } from "@/lib/scare/ghost-shape";
 import { canShoot, planShot, type ShotPlan } from "@/lib/scare/shot-policy";
 import { useScare } from "./scare-provider";
 import { api } from "@/lib/api";
+import { useT } from "@/lib/i18n/client";
 
 const W = 600;
 const H = 800; // ครอปทุกรูปเป็น 3:4
@@ -138,6 +139,7 @@ function render(
 /** กล้องจำลอง (รูปบ้าน mock) — ใช้แทนเมื่อเปิดกล้องจริงไม่ได้ */
 export function FlashCamera({ showTitle = true }: { showTitle?: boolean }) {
   const { figure, consumeMirror, reducedMotion } = useScare();
+  const t = useT();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
   const [images, setImages] = useState<Images | null>(null);
@@ -248,7 +250,9 @@ export function FlashCamera({ showTitle = true }: { showTitle?: boolean }) {
 
   return (
     <div className="flash-camera">
-      {showTitle && <h2 className="flash-camera-title">ลองถ่ายรูปบ้านนี้ดู</h2>}
+      {showTitle && (
+        <h2 className="flash-camera-title">{t.camera.mockTitle}</h2>
+      )}
       <div className="flash-frame">
         <canvas
           ref={canvasRef}
@@ -265,7 +269,7 @@ export function FlashCamera({ showTitle = true }: { showTitle?: boolean }) {
         disabled={!images}
         onClick={shoot}
       >
-        <Camera size={18} /> ชัตเตอร์
+        <Camera size={18} /> {t.camera.shutter}
       </button>
       {polaroids.length > 0 && (
         <div className="polaroids">
@@ -276,8 +280,8 @@ export function FlashCamera({ showTitle = true }: { showTitle?: boolean }) {
               style={{ transform: `rotate(${p.tilt}deg)` }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- data URL จาก canvas */}
-              <img src={p.url} alt={`รูปที่ ${p.n} จากกล้อง`} />
-              <figcaption>รูปที่ {p.n}</figcaption>
+              <img src={p.url} alt={t.camera.shotAlt(p.n)} />
+              <figcaption>{t.camera.shotCaption(p.n)}</figcaption>
             </figure>
           ))}
         </div>

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
+import { useT } from "@/lib/i18n/client";
 
 /** QR บนหน้าบัตร เก็บแค่รหัสนักศึกษา ให้ทีมงานสแกนที่ /admin/scan */
 export function TicketQr({ studentId }: { studentId: string }) {
@@ -24,15 +25,16 @@ export function TicketQr({ studentId }: { studentId: string }) {
     };
   }, [studentId]);
   const url = src?.id === studentId ? src.url : null;
+  const t = useT();
   return (
     <figure className="ticket-qr">
       <div className="ticket-qr-box">
         {url && (
           // eslint-disable-next-line @next/next/no-img-element -- data URL ที่สร้างในเครื่อง
-          <img src={url} alt="QR สำหรับรับบัตร" width={220} height={220} />
+          <img src={url} alt={t.lookup.qrAlt} width={220} height={220} />
         )}
       </div>
-      <figcaption>ยื่น QR นี้ให้ทีมงานสแกนตอนรับบัตร</figcaption>
+      <figcaption>{t.lookup.qrCaption}</figcaption>
     </figure>
   );
 }

@@ -29,6 +29,8 @@ const {
   validStudentId,
   validPhone,
   validateSlip,
+  slipProblem,
+  salesState,
   canOrder,
   salesMessage,
   thaiTime,
@@ -86,6 +88,52 @@ assert.equal(
   "ปิดขายผ่านเว็บแล้ว ซื้อได้ที่หน้างาน",
 );
 assert.ok(thaiTime("2026-11-08T03:12:45.123Z").includes("10:12"));
+// สถานะเป็นคีย์ (หน้าเว็บเอาไปแปลตามภาษา)
+assert.equal(slipProblem(null), "missing");
+assert.equal(slipProblem({ type: "image/gif", size: 10 }), "type");
+assert.equal(slipProblem({ type: "image/png", size: 0 }), "size");
+assert.equal(slipProblem({ type: "image/png", size: 10 }), null);
+assert.equal(salesState(null), "checking");
+assert.equal(
+  salesState({
+    open: false,
+    closed_forever: true,
+    total: 1,
+    sold: 0,
+    remaining: 1,
+  }),
+  "closedForever",
+);
+assert.equal(
+  salesState({
+    open: true,
+    closed_forever: false,
+    total: 1,
+    sold: 1,
+    remaining: 0,
+  }),
+  "soldOut",
+);
+assert.equal(
+  salesState({
+    open: false,
+    closed_forever: false,
+    total: 1,
+    sold: 0,
+    remaining: 1,
+  }),
+  "notOpen",
+);
+assert.equal(
+  salesState({
+    open: true,
+    closed_forever: false,
+    total: 1,
+    sold: 0,
+    remaining: 1,
+  }),
+  "open",
+);
 console.log(
   "Buyer validation, original slip constraints, sales states, and Thai time checks passed.",
 );

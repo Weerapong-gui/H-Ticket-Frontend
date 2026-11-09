@@ -1,6 +1,8 @@
 ﻿"use client";
 import Link from "next/link";
-import { ApiError, errorMessage } from "@/lib/api";
+import { ApiError } from "@/lib/api";
+import { errorText } from "@/lib/i18n/errors";
+import { useHref, useLang, useT } from "@/lib/i18n/client";
 export function ErrorNotice({
   error,
   studentId,
@@ -8,14 +10,17 @@ export function ErrorNotice({
   error: unknown;
   studentId?: string;
 }) {
+  const lang = useLang();
+  const t = useT();
+  const href = useHref();
   if (!error) return null;
   const data = error instanceof ApiError ? error.data : null;
   return (
     <div className="error-notice" role="alert">
-      <p>{errorMessage(error)}</p>
+      <p>{errorText(error, lang)}</p>
       {data?.contact && (
         <p>
-          ติดต่อทีมงาน:{" "}
+          {t.errors.contact}{" "}
           {typeof data.contact === "string"
             ? data.contact
             : Object.entries(data.contact)
@@ -28,16 +33,18 @@ export function ErrorNotice({
           className="text-link"
           href={
             data.student_id || studentId
-              ? `/ticket/${encodeURIComponent((data.student_id || studentId)!.trim())}`
-              : "/ticket"
+              ? href(
+                  `/ticket/${encodeURIComponent((data.student_id || studentId)!.trim())}`,
+                )
+              : href("/ticket")
           }
         >
-          ดูบัตรของฉัน →
+          {t.errors.myTicket}
         </Link>
       )}
       {(data?.code === "network" || data?.code === "invalid_response") && (
-        <Link className="text-link" href="/ticket">
-          ค้นบัตรด้วยรหัสนักศึกษา →
+        <Link className="text-link" href={href("/ticket")}>
+          {t.errors.findById}
         </Link>
       )}
     </div>
