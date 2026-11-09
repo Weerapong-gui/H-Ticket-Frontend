@@ -4,7 +4,6 @@ import { TICKET_PRICE, money, packages } from "@/lib/booking";
 import { TicketArt } from "@/components/ticket-art";
 import { TicketCounter } from "@/components/ticket-counter";
 import Link from "next/link";
-import Image from "next/image";
 import {
   ArrowRight,
   ArrowDown,
@@ -19,7 +18,6 @@ import { ScareLayer } from "@/components/scare/scare-layer";
 import { FlashCamera } from "@/components/scare/flash-camera";
 import { HeroBackdrop } from "@/components/scare/hero-backdrop";
 import { ENTRY_GATE_SCRIPT } from "@/lib/scare/storage";
-import { pageImages } from "@/lib/scare/camera-config";
 export default function Home() {
   return (
     <ScareLayer>
@@ -53,9 +51,6 @@ export default function Home() {
               </div>
             </Reveal>
           </div>
-          <div className="hero-counter">
-            <TicketCounter />
-          </div>
         </section>
         <div className="info-strip">
           <span>
@@ -71,24 +66,9 @@ export default function Home() {
             <Ticket /> {money(TICKET_PRICE)} ต่อคน
           </span>
         </div>
-        <section className="section story" id="attraction">
-          <Reveal className="story-image">
-            <Image
-              src={pageImages.story.src}
-              alt={pageImages.story.alt}
-              fill
-              sizes="(max-width: 700px) 100vw, 45vw"
-            />
-          </Reveal>
-          <Reveal className="story-copy">
-            <p className="eyebrow">เกี่ยวกับงาน</p>
-            <h2>
-              บ้านหลังนี้
-              <br />
-              <em>ไม่เคยว่าง</em>
-            </h2>
-            <p>ไฟดับ ประตูเปิดค้างไว้ และมีบางอย่างรอคุณอยู่ข้างใน</p>
-            <p>เดินเข้าไป หาทางออกให้เจอ แล้วอย่าหันกลับไปมอง</p>
+        <section className="section counter-section" id="attraction">
+          <Reveal>
+            <TicketCounter />
           </Reveal>
         </section>
         <section className="section camera-section" id="camera">
