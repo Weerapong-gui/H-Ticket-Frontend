@@ -11,8 +11,8 @@
   --display: var(--f-pirata), var(--f-chant), Georgia, serif;
   /* ตัวอ่านง่ายเดิม สำหรับหน้าแอดมินและตัวเลขที่ต้องอ่านให้ชัด */
   --plain-serif: var(--f-cormorant), var(--f-serif-thai), Georgia, serif;
-  /* ตัวเลข/ราคา: ตัวเลขของ Pirata One อ่านยาก (0 คล้าย 8) ใช้ Cormorant แต่ไทยยังเป็น Srisakdi */
-  --num: var(--f-cormorant), var(--f-chant), Georgia, serif;
+  /* ตัวเลข/ราคา: Cinzel Decorative (ตัวเลขของ Pirata One อ่านยาก 0 คล้าย 8) ไทยยังเป็น Srisakdi */
+  --num: var(--f-cinzel-deco), var(--f-chant), Georgia, serif;
   --sans: var(--f-dm-sans), var(--f-sans-thai), Arial, sans-serif;
 }
 @theme inline {

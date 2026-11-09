@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import {
   Cinzel,
+  Cinzel_Decorative,
   Cormorant_Garamond,
   DM_Sans,
   Noto_Sans_Thai,
@@ -36,6 +37,12 @@ const srisakdi = Srisakdi({
   weight: ["400", "700"],
   variable: "--f-chant",
 });
+// ตัวเลข/ราคา: ตัวโรมันแกะสลักแบบป้ายหลุมศพ (ตัวเลขของ Pirata One อ่านยาก)
+const cinzelDeco = Cinzel_Decorative({
+  subsets: ["latin"],
+  weight: "700",
+  variable: "--f-cinzel-deco",
+});
 const pirata = Pirata_One({
   subsets: ["latin"],
   weight: "400",
@@ -49,6 +56,7 @@ const fontVars = [
   notoSerifThai,
   srisakdi,
   pirata,
+  cinzelDeco,
 ]
   .map((f) => f.variable)
   .join(" ");
