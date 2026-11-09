@@ -2,6 +2,7 @@ import { eventConfig } from "@/lib/event-config";
 import { TicketAccordion } from "@/components/ticket-accordion";
 import { TICKET_PRICE, money, packages } from "@/lib/booking";
 import { TicketArt } from "@/components/ticket-art";
+import { TicketCounter } from "@/components/ticket-counter";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -51,6 +52,9 @@ export default function Home() {
                 {eventConfig.date}
               </div>
             </Reveal>
+          </div>
+          <div className="hero-counter">
+            <TicketCounter />
           </div>
         </section>
         <div className="info-strip">

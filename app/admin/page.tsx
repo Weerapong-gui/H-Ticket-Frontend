@@ -6,10 +6,14 @@ import { useAdminData } from "@/components/use-admin-data";
 import { ErrorNotice } from "@/components/error-notice";
 import { ActionDialog } from "@/components/admin-dialogs";
 export default function Dashboard() {
-  const { data, loading, error, refresh } = useAdminData(api.stats);
+  const { data, loading, error, refresh, update } = useAdminData(api.stats);
   const [actionError, setActionError] = useState<unknown>(null);
   const [pending, setPending] = useState(false);
   const [closeDialog, setCloseDialog] = useState(false);
+  /** null = ยังไม่ได้แก้ ใช้ค่าจากระบบ */
+  const [totalDraft, setTotalDraft] = useState<string | null>(null);
+  const [totalError, setTotalError] = useState<unknown>(null);
+  const [totalSaved, setTotalSaved] = useState(false);
   return (
     <>
       <div className="admin-section-heading">
@@ -80,6 +84,76 @@ export default function Dashboard() {
                   ปิดขายออนไลน์ถาวร
                 </button>
               </div>
+            )}
+          </section>
+          <section className="admin-panel">
+            <h2>จำนวนบัตรทั้งหมด</h2>
+            <p>
+              แก้แล้วมีผลทันทีทั้งหน้าเว็บและการรับจอง ตั้งน้อยกว่าที่ขายไปแล้ว
+              ({data.sold} ใบ) ไม่ได้
+            </p>
+            <form
+              className="admin-filters total-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (pending) return;
+                const total = Number(totalDraft ?? data.total);
+                setTotalSaved(false);
+                if (!Number.isInteger(total) || total < 1 || total > 999) {
+                  setTotalError(new Error("จำนวนบัตรต้องเป็นตัวเลข 1–999"));
+                  return;
+                }
+                if (total < data.sold) {
+                  setTotalError(
+                    new Error(
+                      `ขายไปแล้ว ${data.sold} ใบ ตั้งจำนวนบัตรน้อยกว่านี้ไม่ได้`,
+                    ),
+                  );
+                  return;
+                }
+                setPending(true);
+                setTotalError(null);
+                try {
+                  const next = await api.setTotal(total);
+                  update(() => next);
+                  setTotalDraft(null);
+                  setTotalSaved(true);
+                } catch (err) {
+                  setTotalError(err);
+                  await refresh();
+                } finally {
+                  setPending(false);
+                }
+              }}
+            >
+              <label>
+                บัตรทั้งหมด (ใบ)
+                <input
+                  inputMode="numeric"
+                  value={totalDraft ?? String(data.total)}
+                  onChange={(e) => {
+                    setTotalSaved(false);
+                    setTotalDraft(
+                      e.target.value.replace(/\D/g, "").slice(0, 3),
+                    );
+                  }}
+                />
+              </label>
+              <button
+                className="button"
+                disabled={
+                  pending ||
+                  loading ||
+                  totalDraft === null ||
+                  totalDraft === String(data.total)
+                }
+              >
+                {pending ? "กำลังบันทึก…" : "บันทึกจำนวนบัตร"}
+              </button>
+            </form>
+            <ErrorNotice error={totalError} />
+            {totalSaved && (
+              <p role="status">บันทึกแล้ว · คงเหลือ {data.remaining} ใบ</p>
             )}
           </section>
           <section className="admin-panel">

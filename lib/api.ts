@@ -213,6 +213,14 @@ export const api = {
       isLoginResult,
     ),
   stats: () => request<AdminStats>("/api/admin/stats", {}, true, isAdminStats),
+  /** แก้จำนวนบัตรทั้งหมด (ไม่น้อยกว่าที่ขายแล้ว) ตอบสถิติชุดใหม่ */
+  setTotal: (total: number) =>
+    request<AdminStats>(
+      "/api/admin/total",
+      json("PUT", { total }),
+      true,
+      isAdminStats,
+    ),
   orders: (q = "", status = "") => {
     const params = new URLSearchParams();
     if (q.trim()) params.set("q", q.trim());

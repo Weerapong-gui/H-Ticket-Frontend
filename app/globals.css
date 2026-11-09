@@ -2148,3 +2148,123 @@ html[data-hh-entered] .entry-gate {
 .booking-controls .package-option .early-bird-name {
   grid-column: auto;
 }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* ตัวนับอยู่ฝั่งขวาของ hero (เห็นทันทีโดยไม่ต้องเลื่อน) จอเล็กย้ายไปล่างซ้าย */
+.hero-counter {
+  position: absolute;
+  right: 5.5%;
+  bottom: 16%;
+  z-index: 1;
+}
+.ticket-counter {
+  width: 340px;
+  padding: 20px 24px 22px;
+  background: #080808b3;
+  border: 1px solid #4a3028;
+  backdrop-filter: blur(6px);
+}
+.ticket-counter.pending {
+  visibility: hidden;
+}
+.ticket-counter-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #a2968d;
+}
+.ticket-counter.closed .ticket-counter-label {
+  font-size: 14px;
+  color: #c8b9aa;
+}
+.ticket-counter-warn {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border: 1px solid #b33b36;
+  color: #ff7a6b;
+  font-size: 11px;
+  animation: counter-flicker 2.4s steps(1) infinite;
+}
+.ticket-counter-value {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 6px 0 12px;
+}
+.ticket-counter-value strong {
+  font: 500 clamp(56px, 6vw, 84px)/1 var(--display);
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground);
+  text-shadow: 0 0 30px #9b111e55;
+}
+.ticket-counter-value > span:last-child {
+  font: 20px var(--serif);
+  color: #a2968d;
+}
+.ticket-counter-bar {
+  height: 3px;
+  background: #ffffff14;
+  overflow: hidden;
+}
+.ticket-counter-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #6d0f17, #d23a2f);
+  box-shadow: 0 0 12px #d23a2f;
+  transform-origin: left;
+}
+.ticket-counter.low .ticket-counter-value strong {
+  color: #ff5a4a;
+  text-shadow: 0 0 30px #ff2a1a88;
+}
+@keyframes counter-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  47% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+  53% {
+    opacity: 0.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticket-counter-warn {
+    animation: none;
+  }
+}
+@media (max-width: 1000px) {
+  .hero-counter {
+    right: auto;
+    left: 6%;
+    bottom: 28px;
+  }
+  .ticket-counter {
+    width: min(270px, calc(100vw - 110px));
+    padding: 14px 18px 16px;
+  }
+  .ticket-counter-value strong {
+    font-size: 48px;
+  }
+  .ticket-counter-value {
+    margin: 4px 0 10px;
+  }
+}
+.total-form {
+  flex-wrap: wrap;
+  max-width: 420px;
+  margin-top: 16px;
+}
