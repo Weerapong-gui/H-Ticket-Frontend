@@ -11,7 +11,7 @@ export function Summary({ children }: { children?: React.ReactNode }) {
         <EventFacts />
         <div>
           <dt>โปร</dt>
-          <dd>{pack.name} (เฉพาะในเว็บ)</dd>
+          <dd>{pack.name} (เมื่อสั่งซื้อผ่านเว็บเท่านั้น)</dd>
         </div>
         <div>
           <dt>จำนวน</dt>
