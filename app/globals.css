@@ -2048,3 +2048,134 @@ html[data-hh-entered] .entry-gate {
   font-weight: 600;
   letter-spacing: 0;
 }
+/* โปรเฉพาะในเว็บ + รูปบัตร */
+.web-only-badge {
+  margin-left: 4px;
+  padding: 3px 8px;
+  border: 1px solid #9b111e;
+  background: #9b111e33;
+  color: #f0b3a8;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.promo-lead {
+  margin-top: 14px;
+  color: #ddaf92;
+  font-size: 14px;
+}
+.early-bird-name strong {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.package-option {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.package-option:hover {
+  background: #1a1314;
+}
+.package-option.selected {
+  background: #21131499;
+  box-shadow: inset 3px 0 0 var(--bright);
+}
+.package-option input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--bright);
+}
+.package-option:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ticket-art {
+  position: relative;
+  margin: 0;
+  container-type: inline-size;
+  box-shadow: 0 14px 45px #0007;
+}
+.ticket-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.ticket-art-number {
+  position: absolute;
+  left: 82.3%;
+  top: 50.1%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  font: 700 10.5cqw/1 var(--display);
+  letter-spacing: 0.04em;
+  color: rgb(243 67 43);
+}
+.home-ticket-art {
+  max-width: 760px;
+  margin: 0 auto 34px;
+}
+.booking-ticket-art {
+  margin: 4px 0 22px;
+}
+.issued-ticket .ticket-art {
+  margin: 0 auto 28px;
+}
+.person-fields {
+  border: 0;
+  padding: 0;
+  margin: 0 0 22px;
+}
+.person-fields + .person-fields {
+  padding-top: 20px;
+  border-top: 1px solid #392020;
+}
+.person-fields legend {
+  padding: 0;
+  margin-bottom: 14px;
+  color: #ddaf92;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.group-tickets {
+  margin: 24px auto 0;
+  max-width: 420px;
+  border: 1px solid #4a3028;
+  padding: 16px 20px;
+  text-align: left;
+  font-size: 13px;
+}
+.group-tickets ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.group-tickets li {
+  display: flex;
+  gap: 16px;
+  padding: 6px 0;
+}
+.group-tickets li strong {
+  font-family: var(--display);
+  color: #f2ddc6;
+}
+.group-tickets li.self span::after {
+  content: " (คุณ)";
+  color: #aa9487;
+}
+.group-tickets p {
+  color: #aa9487;
+  font-size: 12px;
+}
+@media (max-width: 700px) {
+  .package-option {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .package-option .early-bird-name {
+    grid-column: auto;
+  }
+}
+.booking-controls .package-option {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+.booking-controls .package-option .early-bird-name {
+  grid-column: auto;
+}

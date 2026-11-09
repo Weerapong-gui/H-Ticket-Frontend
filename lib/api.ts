@@ -21,6 +21,11 @@ export type IssuedTicket = {
   name: string;
   student_id: string;
   picked_up: boolean;
+  group_size?: number;
+  /** เพื่อนที่ซื้อกลุ่มเดียวกัน (มีเฉพาะตอนค้นบัตร) */
+  group?: { ticket_label: string; name: string }[];
+  /** ทุกบัตรในออเดอร์ (มีเฉพาะตอนสร้างออเดอร์) */
+  tickets?: IssuedTicket[];
 };
 export type AdminStats = SalesStatus & {
   cancelled: number;
@@ -39,6 +44,8 @@ export type Order = {
   cancelled_at: string | null;
   cancel_reason: string | null;
   picked_up_at: string | null;
+  group_id?: string;
+  group_size?: number;
 };
 export type RejectedAttempt = {
   id: string;
@@ -53,6 +60,7 @@ export type ApiErrorData = {
   message: string;
   contact?: string | Record<string, unknown>;
   ticket_label?: string;
+  student_id?: string;
   retry_after_secs?: number;
 };
 export class ApiError extends Error {
@@ -175,15 +183,17 @@ const json = (method: string, body: unknown): RequestInit => ({
 export const api = {
   sales: (signal?: AbortSignal) =>
     request<SalesStatus>("/api/sales", { signal }, false, isSalesStatus),
+  /** people[0] คือผู้ซื้อ จำนวนคนต้องเป็นขนาดโปร (1, 2, 5) */
   createOrder: (input: {
-    name: string;
-    student_id: string;
+    people: { name: string; student_id: string }[];
     phone: string;
     slip: File;
   }) => {
     const body = new FormData();
-    body.append("name", input.name.trim());
-    body.append("student_id", input.student_id.trim());
+    for (const person of input.people) {
+      body.append("name", person.name.trim());
+      body.append("student_id", person.student_id.trim());
+    }
     body.append("phone", input.phone.trim());
     body.append("slip", input.slip);
     return request<IssuedTicket>(

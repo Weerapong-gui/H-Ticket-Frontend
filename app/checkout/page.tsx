@@ -2,30 +2,42 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, ImageUp, UserRound } from "lucide-react";
+import { ArrowRight, ImageUp, UserRound, Users } from "lucide-react";
 import { Summary, Progress } from "@/components/summary";
 import { SalesNotice } from "@/components/sales-notice";
 import { ErrorNotice } from "@/components/error-notice";
 import { PaymentInfo } from "@/components/payment-info";
-import { usePurchaseSales } from "@/components/booking-provider";
+import { usePackage, usePurchaseSales } from "@/components/booking-provider";
 import { api, ApiError } from "@/lib/api";
 import {
-  canOrder,
+  canOrderPackage,
+  duplicateIndexes,
+  money,
+  packageFor,
   validateSlip,
   validPhone,
   validStudentId,
 } from "@/lib/booking";
 
-type Form = { name: string; studentId: string; phone: string };
+type Person = { name: string; studentId: string };
+type Form = { people: Person[]; phone: string };
+type ErrorKey = `name-${number}` | `studentId-${number}` | "phone" | "slip";
 const digits = (v: string) => v.replace(/\D/g, "");
+const blank = (): Person => ({ name: "", studentId: "" });
 
 function validate(form: Form, slip: File | null) {
-  const errors: Partial<Record<keyof Form | "slip", string>> = {};
-  const name = form.name.trim();
-  if (!name) errors.name = "กรุณากรอกชื่อ-นามสกุล";
-  else if ([...name].length > 100) errors.name = "ชื่อยาวเกิน 100 ตัวอักษร";
-  if (!validStudentId(form.studentId))
-    errors.studentId = "รหัสนักศึกษาต้องเป็นตัวเลข 10 หลัก";
+  const errors: Partial<Record<ErrorKey, string>> = {};
+  const dup = duplicateIndexes(form.people.map((p) => p.studentId));
+  form.people.forEach((person, i) => {
+    const name = person.name.trim();
+    if (!name) errors[`name-${i}`] = "กรุณากรอกชื่อ-นามสกุล";
+    else if ([...name].length > 100)
+      errors[`name-${i}`] = "ชื่อยาวเกิน 100 ตัวอักษร";
+    if (!validStudentId(person.studentId))
+      errors[`studentId-${i}`] = "รหัสนักศึกษาต้องเป็นตัวเลข 10 หลัก";
+    else if (dup.has(i))
+      errors[`studentId-${i}`] = "รหัสนักศึกษาซ้ำกับคนอื่นในกลุ่ม";
+  });
   if (!validPhone(form.phone))
     errors.phone = "เบอร์โทรต้องเป็นตัวเลข 10 หลัก ขึ้นต้นด้วย 0";
   const slipError = validateSlip(slip);
@@ -36,11 +48,15 @@ function validate(form: Form, slip: File | null) {
 export default function Checkout() {
   const router = useRouter();
   const { sales, refresh } = usePurchaseSales();
-  const [form, setForm] = useState<Form>({
-    name: "",
-    studentId: "",
-    phone: "",
-  });
+  const { size } = usePackage();
+  const pack = packageFor(size);
+  const [form, setForm] = useState<Form>({ people: [blank()], phone: "" });
+  // ให้จำนวนช่องกรอกตรงกับโปรที่เลือก (เก็บข้อมูลที่กรอกไว้แล้ว)
+  if (form.people.length !== size)
+    setForm((f) => ({
+      ...f,
+      people: Array.from({ length: size }, (_, i) => f.people[i] ?? blank()),
+    }));
   const [slip, setSlip] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -49,7 +65,7 @@ export default function Checkout() {
   const guard = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
   const errors = validate(form, slip);
-  const show = (k: keyof typeof errors) => (submitted ? errors[k] : undefined);
+  const show = (k: ErrorKey) => (submitted ? errors[k] : undefined);
 
   // ล้าง blob URL ของรูปตัวอย่างตอนออกจากหน้า
   const previewRef = useRef("");
@@ -78,8 +94,10 @@ export default function Checkout() {
     setPending(true);
     try {
       const ticket = await api.createOrder({
-        name: form.name,
-        student_id: form.studentId,
+        people: form.people.map((p) => ({
+          name: p.name,
+          student_id: p.studentId,
+        })),
         phone: form.phone,
         slip: slip!, // ส่งไฟล์ต้นฉบับ ห้ามบีบอัด QR จะอ่านไม่ออก
       });
@@ -98,8 +116,10 @@ export default function Checkout() {
   }
 
   const field = (
-    key: keyof Form,
+    key: ErrorKey,
     label: string,
+    value: string,
+    onChange: (value: string) => void,
     props: React.InputHTMLAttributes<HTMLInputElement>,
     hint?: string,
   ) => {
@@ -114,15 +134,10 @@ export default function Checkout() {
           id={`f-${key}`}
           name={key}
           required
-          value={form[key]}
+          value={value}
           aria-invalid={!!err}
           aria-describedby={err ? `f-${key}-error` : undefined}
-          onChange={(e) =>
-            setForm((f) => ({
-              ...f,
-              [key]: key === "name" ? e.target.value : digits(e.target.value),
-            }))
-          }
+          onChange={(e) => onChange(e.target.value)}
           {...props}
         />
         {hint && <span className="field-hint">{hint}</span>}
@@ -134,17 +149,28 @@ export default function Checkout() {
       </label>
     );
   };
+  const setPerson = (i: number, patch: Partial<Person>) =>
+    setForm((f) => ({
+      ...f,
+      people: f.people.map((p, j) => (j === i ? { ...p, ...patch } : p)),
+    }));
 
-  const open = canOrder(sales);
+  const open = canOrderPackage(sales, size);
   return (
     <main className="booking-main">
       <Progress step={2} />
       <div className="page-heading">
-        <p className="eyebrow">1 รหัสนักศึกษา = 1 ใบ</p>
+        <p className="eyebrow">
+          โปร {pack.name} · {money(pack.price)}
+        </p>
         <h1>
           กรอกข้อมูล<em>และแนบสลิป</em>
         </h1>
-        <p>กรอกข้อมูลของคุณและแนบสลิปโอนเงิน ระบบจะออกเลขบัตรให้ทันที</p>
+        <p>
+          {size === 1
+            ? "กรอกข้อมูลของคุณและแนบสลิปโอนเงิน ระบบจะออกเลขบัตรให้ทันที"
+            : `กรอกข้อมูลทั้ง ${size} คน แนบสลิปเดียว ระบบจะออกเลขบัตรให้ทุกคนทันที`}
+        </p>
       </div>
       <form
         ref={formRef}
@@ -159,37 +185,66 @@ export default function Checkout() {
             aria-labelledby="buyer-heading"
           >
             <div className="student-form-heading">
-              <UserRound size={22} />
-              <h2 id="buyer-heading">ข้อมูลผู้ซื้อ</h2>
+              {size > 1 ? <Users size={22} /> : <UserRound size={22} />}
+              <h2 id="buyer-heading">
+                {size > 1 ? `ข้อมูลทั้ง ${size} คน` : "ข้อมูลผู้ซื้อ"}
+              </h2>
             </div>
-            <div className="form-fields">
-              {field("name", "ชื่อ-นามสกุล", {
-                type: "text",
-                autoComplete: "name",
-                maxLength: 100,
-                placeholder: "กรอกชื่อ-นามสกุล",
-                onBlur: () => setForm((f) => ({ ...f, name: f.name.trim() })),
-              })}
-              {field(
-                "studentId",
-                "รหัสนักศึกษา",
-                {
-                  type: "text",
-                  inputMode: "numeric",
-                  autoComplete: "off",
-                  maxLength: 10,
-                  placeholder: "ตัวเลข 10 หลัก",
-                },
-                "ใช้ค้นบัตรและแลกบัตรจริง",
-              )}
-              {field("phone", "เบอร์โทรศัพท์", {
-                type: "tel",
-                inputMode: "tel",
-                autoComplete: "tel-national",
-                maxLength: 10,
-                placeholder: "08XXXXXXXX",
-              })}
-            </div>
+            {form.people.map((person, i) => (
+              <fieldset className="person-fields" key={i}>
+                {size > 1 && (
+                  <legend>
+                    {i === 0 ? "คนที่ 1 (ผู้ซื้อ)" : `คนที่ ${i + 1}`}
+                  </legend>
+                )}
+                <div className="form-fields">
+                  {field(
+                    `name-${i}`,
+                    "ชื่อ-นามสกุล",
+                    person.name,
+                    (v) => setPerson(i, { name: v }),
+                    {
+                      type: "text",
+                      autoComplete: i === 0 ? "name" : "off",
+                      maxLength: 100,
+                      placeholder: "กรอกชื่อ-นามสกุล",
+                      onBlur: () => setPerson(i, { name: person.name.trim() }),
+                    },
+                  )}
+                  {field(
+                    `studentId-${i}`,
+                    "รหัสนักศึกษา",
+                    person.studentId,
+                    (v) => setPerson(i, { studentId: digits(v) }),
+                    {
+                      type: "text",
+                      inputMode: "numeric",
+                      autoComplete: "off",
+                      maxLength: 10,
+                      placeholder: "ตัวเลข 10 หลัก",
+                    },
+                    i === 0 ? "ใช้ค้นบัตรและแลกบัตรจริง" : undefined,
+                  )}
+                  {i === 0 &&
+                    field(
+                      "phone",
+                      "เบอร์โทรศัพท์",
+                      form.phone,
+                      (v) => setForm((f) => ({ ...f, phone: digits(v) })),
+                      {
+                        type: "tel",
+                        inputMode: "tel",
+                        autoComplete: "tel-national",
+                        maxLength: 10,
+                        placeholder: "08XXXXXXXX",
+                      },
+                      size > 1
+                        ? "ทีมงานจะติดต่อเบอร์นี้สำหรับทั้งกลุ่ม"
+                        : undefined,
+                    )}
+                </div>
+              </fieldset>
+            ))}
           </section>
           <section
             className="student-info student-entry"
@@ -235,11 +290,11 @@ export default function Checkout() {
           </section>
           <PaymentInfo />
           <Link className="text-link" href="/booking">
-            ← กลับไปดูรายละเอียดบัตร
+            ← กลับไปเปลี่ยนโปร
           </Link>
         </div>
         <Summary>
-          <ErrorNotice error={error} studentId={form.studentId} />
+          <ErrorNotice error={error} studentId={form.people[0].studentId} />
           <button type="submit" className="button" disabled={pending || !open}>
             {pending
               ? "กำลังตรวจสลิป…"

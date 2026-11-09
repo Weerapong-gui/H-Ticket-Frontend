@@ -1,9 +1,10 @@
 "use client";
 import { EventFacts } from "./event-facts";
 import { Ticket } from "lucide-react";
-import { eventConfig } from "@/lib/event-config";
-import { money, TICKET_PRICE } from "@/lib/booking";
+import { money, packageFor } from "@/lib/booking";
+import { usePackage } from "./booking-provider";
 export function Summary({ children }: { children?: React.ReactNode }) {
+  const pack = packageFor(usePackage().size);
   return (
     <aside className="summary">
       <div className="summary-top">
@@ -14,17 +15,17 @@ export function Summary({ children }: { children?: React.ReactNode }) {
       <dl>
         <EventFacts />
         <div>
-          <dt>บัตร</dt>
-          <dd>{eventConfig.ticket.name}</dd>
+          <dt>โปร</dt>
+          <dd>{pack.name} (เฉพาะในเว็บ)</dd>
         </div>
         <div>
           <dt>จำนวน</dt>
-          <dd>1 ใบ</dd>
+          <dd>{pack.size} ใบ</dd>
         </div>
       </dl>
       <div className="total">
         <span>ยอดโอน</span>
-        <strong>{money(TICKET_PRICE)}</strong>
+        <strong>{money(pack.price)}</strong>
       </div>
       {children}
     </aside>

@@ -31,8 +31,8 @@ export function ErrorNotice({
           <Link
             className="text-link"
             href={
-              studentId
-                ? `/ticket/${encodeURIComponent(studentId.trim())}`
+              data.student_id || studentId
+                ? `/ticket/${encodeURIComponent((data.student_id || studentId)!.trim())}`
                 : "/ticket"
             }
           >

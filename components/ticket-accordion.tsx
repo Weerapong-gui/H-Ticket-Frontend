@@ -1,14 +1,29 @@
 "use client";
 import { useId, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ChevronDown, Ticket } from "lucide-react";
-import { money, tickets, TICKET_PRICE, canOrder } from "@/lib/booking";
-import { useSales } from "./booking-provider";
-export function TicketAccordion() {
+import { ChevronDown, Ticket, Users } from "lucide-react";
+import { eventConfig } from "@/lib/event-config";
+import {
+  money,
+  packages,
+  perPerson,
+  canOrder,
+  canOrderPackage,
+} from "@/lib/booking";
+import { usePackage, useSales } from "./booking-provider";
+
+/** โปรเฉพาะในเว็บ 1/2/5 คน · selectable = ให้เลือกโปร (หน้าจองบัตร) */
+export function TicketAccordion({
+  selectable = false,
+}: {
+  selectable?: boolean;
+}) {
   const [open, setOpen] = useState(true);
   const panelId = useId();
+  const groupName = useId();
   const reduced = useReducedMotion();
   const { sales } = useSales();
+  const { size, setSize } = usePackage();
   return (
     <div className="ticket-accordion">
       <h3>
@@ -21,7 +36,8 @@ export function TicketAccordion() {
         >
           <span className="ticket-category">
             <Ticket size={22} />
-            {tickets.earlybird.category}
+            {eventConfig.ticket.category}
+            <span className="web-only-badge">โปรเฉพาะในเว็บ</span>
           </span>
           <ChevronDown
             size={18}
@@ -41,23 +57,61 @@ export function TicketAccordion() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: reduced ? 0 : 0.25 }}
           >
-            <div className="early-bird-row">
-              <div className="early-bird-name">
-                <strong>{tickets.earlybird.name}</strong>
-                <span className="ticket-available">
-                  <i aria-hidden="true" />
-                  {sales && canOrder(sales)
-                    ? `เหลือ ${sales.remaining} / ${sales.total} ใบ`
-                    : "บัตรล่วงหน้า"}
-                </span>
-              </div>
-              <div className="early-bird-price">
-                <strong>{money(TICKET_PRICE)}</strong>
-                <span>ต่อคน</span>
-              </div>
+            <div
+              role={selectable ? "radiogroup" : undefined}
+              aria-label={selectable ? "เลือกโปร" : undefined}
+            >
+              {packages.map((p) => {
+                const available = !sales || canOrderPackage(sales, p.size);
+                const body = (
+                  <>
+                    <div className="early-bird-name">
+                      <strong>
+                        {p.size > 1 && <Users size={15} aria-hidden="true" />}
+                        {p.name}
+                      </strong>
+                      <span className="ticket-available">
+                        <i aria-hidden="true" />
+                        {p.size === 1
+                          ? sales && canOrder(sales)
+                            ? `เหลือ ${sales.remaining} / ${sales.total} ใบ`
+                            : "บัตรล่วงหน้า"
+                          : available
+                            ? `เฉลี่ย ${perPerson(p)} ต่อคน`
+                            : "บัตรเหลือไม่พอ"}
+                      </span>
+                    </div>
+                    <div className="early-bird-price">
+                      <strong>{money(p.price)}</strong>
+                      <span>{p.size === 1 ? "ต่อคน" : `${p.size} ใบ`}</span>
+                    </div>
+                  </>
+                );
+                return selectable ? (
+                  <label
+                    key={p.size}
+                    className={`early-bird-row package-option${size === p.size ? " selected" : ""}`}
+                  >
+                    <input
+                      type="radio"
+                      name={groupName}
+                      value={p.size}
+                      checked={size === p.size}
+                      disabled={!available}
+                      onChange={() => setSize(p.size)}
+                    />
+                    {body}
+                  </label>
+                ) : (
+                  <div key={p.size} className="early-bird-row">
+                    {body}
+                  </div>
+                );
+              })}
             </div>
             <p className="ticket-quantity-note">
-              1 รหัสนักศึกษา = 1 ใบ · เลขบัตรบนเว็บตรงกับบัตรจริงและลำดับคิว
+              โปรนี้มีเฉพาะการจองผ่านเว็บ · โอนครั้งเดียว แนบสลิปเดียว
+              ได้เลขบัตรทุกคน · 1 รหัสนักศึกษา = 1 ใบ
             </p>
           </motion.div>
         )}

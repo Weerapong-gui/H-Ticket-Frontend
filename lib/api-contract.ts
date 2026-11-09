@@ -38,7 +38,14 @@ export function isIssuedTicket(value: unknown): value is IssuedTicket {
     !!value.name.trim() &&
     text(value.student_id) &&
     /^\d{10}$/.test(value.student_id) &&
-    typeof value.picked_up === "boolean"
+    typeof value.picked_up === "boolean" &&
+    (value.group === undefined ||
+      (Array.isArray(value.group) &&
+        value.group.every(
+          (g) => record(g) && text(g.ticket_label) && text(g.name),
+        ))) &&
+    (value.tickets === undefined ||
+      (Array.isArray(value.tickets) && value.tickets.every(isIssuedTicket)))
   );
 }
 export function isLoginResult(value: unknown): value is { token: string } {

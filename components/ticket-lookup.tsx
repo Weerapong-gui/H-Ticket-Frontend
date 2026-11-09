@@ -8,6 +8,7 @@ import { validStudentId } from "@/lib/booking";
 import { ErrorNotice } from "./error-notice";
 import { EventFacts } from "./event-facts";
 import { TicketQr } from "./ticket-qr";
+import { TicketArt } from "./ticket-art";
 export function TicketLookup({
   studentId = "",
   justIssued = false,
@@ -109,6 +110,7 @@ export function TicketLookup({
               ใช้แลกบัตรจริงหน้างาน
             </p>
           )}
+          <TicketArt label={ticket.ticket_label} priority />
           <p className="eyebrow">THE HAUNTED HOUSE · บัตรล่วงหน้า</p>
           <p>เลขบัตร / ลำดับคิว</p>
           <strong className="ticket-number">{ticket.ticket_label}</strong>
@@ -122,6 +124,25 @@ export function TicketLookup({
           >
             {ticket.picked_up ? "รับบัตรกระดาษแล้ว" : "ยังไม่รับบัตรกระดาษ"}
           </div>
+          {ticket.group && ticket.group.length > 1 && (
+            <div className="group-tickets">
+              <p>ซื้อเป็นกลุ่ม {ticket.group.length} คน</p>
+              <ul>
+                {ticket.group.map((g) => (
+                  <li
+                    key={g.ticket_label}
+                    className={
+                      g.ticket_label === ticket.ticket_label ? "self" : ""
+                    }
+                  >
+                    <strong>{g.ticket_label}</strong>
+                    <span>{g.name}</span>
+                  </li>
+                ))}
+              </ul>
+              <p>เพื่อนแต่ละคนค้นบัตรของตัวเองด้วยรหัสนักศึกษาของตัวเอง</p>
+            </div>
+          )}
           <p className="ticket-instructions">
             แสดงหน้าจอนี้กับทีมงานเพื่อแลกบัตรกระดาษ
             เลขบัตรนี้ตรงกับบัตรจริงและลำดับคิวของคุณ
