@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ImageUp, UserRound, Users } from "lucide-react";
@@ -68,6 +68,24 @@ export default function Checkout() {
   const [error, setError] = useState<unknown>(null);
   const guard = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
+  // cacheComponents เก็บหน้านี้ไว้ด้วย <Activity> ไม่ unmount: จองสำเร็จแล้วกด Back
+  // จะกลับมาเจอฟอร์มเดิมที่ปุ่มค้าง "กำลังตรวจสลิป…" · ล้างตอนหน้าถูกซ่อน (ไม่แวบฟอร์มว่างก่อนเปลี่ยนหน้า)
+  const ordered = useRef(false);
+  const [formKey, setFormKey] = useState(0);
+  useLayoutEffect(
+    () => () => {
+      if (!ordered.current) return;
+      ordered.current = false;
+      guard.current = false;
+      setForm({ people: [blank()], phone: "" });
+      pickSlip(null);
+      setSubmitted(false);
+      setPending(false);
+      setError(null);
+      setFormKey((k) => k + 1); // input file เก็บไฟล์ใน DOM ต้อง remount
+    },
+    [],
+  );
   const errors = validate(form, slip, t);
   const show = (k: ErrorKey) => (submitted ? errors[k] : undefined);
 
@@ -106,6 +124,7 @@ export default function Checkout() {
         slip: slip!, // ส่งไฟล์ต้นฉบับ ห้ามบีบอัด QR จะอ่านไม่ออก
       });
       // ปุ่มคงสถานะรอจนเปลี่ยนหน้า กันการกดส่งซ้ำ
+      ordered.current = true;
       router.push(
         href(`/ticket/${encodeURIComponent(ticket.student_id)}?new=1`),
       );
@@ -170,6 +189,7 @@ export default function Checkout() {
         <p>{size === 1 ? t.checkout.leadOne : t.checkout.leadGroup(size)}</p>
       </div>
       <form
+        key={formKey}
         ref={formRef}
         className="booking-grid student-checkout"
         noValidate
