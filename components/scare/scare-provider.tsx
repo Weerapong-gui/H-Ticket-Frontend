@@ -158,6 +158,8 @@ export function ScareProvider({ children }: { children: React.ReactNode }) {
     const store = browserStore();
     writeKey(store, KEYS.entered, "1");
     writeKey(store, KEYS.muted, withSound ? "0" : "1");
+    // ให้ CSS ซ่อนประตูทันทีเมื่อกลับมาหน้าแรกด้วย client navigation (provider mount ใหม่ entered เริ่มที่ null)
+    document.documentElement.setAttribute("data-hh-entered", "");
     live.current.entered = true;
     live.current.muted = !withSound;
     // เปลี่ยน state ก่อน เผื่อสร้าง AudioContext ไม่ได้ (เบราว์เซอร์/webview ที่ปิด Web Audio) จะได้ไม่ค้างที่หน้าประตู

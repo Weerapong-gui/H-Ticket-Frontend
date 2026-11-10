@@ -12,7 +12,6 @@ import { Reveal } from "@/components/reveal";
 import { ScareLayer } from "@/components/scare/scare-layer";
 import { GhostCamera } from "@/components/scare/ghost-camera";
 import { HeroBackdrop } from "@/components/scare/hero-backdrop";
-import { ENTRY_GATE_SCRIPT } from "@/lib/scare/storage";
 export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!isLang(lang)) notFound();
@@ -21,8 +20,6 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   const door = money(eventConfig.ticket.doorPrice);
   return (
     <ScareLayer>
-      {/* ต้องรันก่อน paint: ซ่อนหน้าประตูสำหรับคนที่เคยเข้าแล้ว */}
-      <script dangerouslySetInnerHTML={{ __html: ENTRY_GATE_SCRIPT }} />
       <main>
         <section className="hero">
           <HeroBackdrop />

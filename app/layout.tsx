@@ -13,6 +13,7 @@ import {
 import "./globals.css";
 import { PackageProvider, SalesProvider } from "@/components/booking-provider";
 import { LoadingMain } from "@/components/i18n-bits";
+import { ENTRY_GATE_SCRIPT } from "@/lib/scare/storage";
 
 // โหลดฟอนต์ผ่าน next/font เพราะ @import ใน globals.css ถูกตัดทิ้งตอน build
 const cinzel = Cinzel({ subsets: ["latin"], variable: "--f-cinzel" });
@@ -76,9 +77,14 @@ export default function RootLayout({
       lang="th"
       data-scroll-behavior="smooth"
       className={fontVars}
-      // หน้าแรกตั้ง data-hh-entered ด้วย inline script ก่อน hydrate
+      // inline script ใน <head> ตั้ง data-hh-entered ก่อน hydrate
       suppressHydrationWarning
     >
+      <head>
+        {/* อยู่ที่ root layout ไม่ใช่หน้าแรก: script ในหน้าไม่รันตอน client navigation
+            (เช่น /th/booking → /th) คนที่เคยเข้าแล้วจะเห็นหน้าประตูแวบแล้วค่อยจาง */}
+        <script dangerouslySetInnerHTML={{ __html: ENTRY_GATE_SCRIPT }} />
+      </head>
       <body>
         <SalesProvider>
           <PackageProvider>
