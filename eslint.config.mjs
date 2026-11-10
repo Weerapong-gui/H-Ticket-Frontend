@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // MediaPipe wasm ที่ sync:mediapipe คัดมาจาก node_modules (ไม่ใช่โค้ดเรา)
+    "public/mediapipe/**",
   ]),
 ]);
 
