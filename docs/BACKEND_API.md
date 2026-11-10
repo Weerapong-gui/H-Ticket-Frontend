@@ -7,10 +7,11 @@
 
 ## 1. ภาพรวม
 
-- ขายบัตร **ล่วงหน้า** ผ่านเว็บ งานเปิด **วันเดียว** บัตรมีเลข **001–600**
-- **เลขบัตรบนเว็บ = เลขบัตรกระดาษจริง = ลำดับคิว** ผู้ซื้อเอาหน้าจอที่โชว์เลขไปแลกบัตรจริงกับทีมงาน
+- ขายบัตร **ล่วงหน้า** ผ่านเว็บ งานเปิด **วันเดียว** จำนวนบัตรทั้งหมดแอดมินแก้ได้ (`PUT /api/admin/total`)
+- **เว็บไม่ออกเลขบัตร** ผู้ซื้อเอาหน้าจอบัตร (ชื่อ + รหัส + QR) ไปแลกบัตรกระดาษ ทีมงานหยิบใบถัดไปให้ที่หน้างาน
+- ซื้อเป็นกลุ่มได้ 1, 2 หรือ 5 คน โอนครั้งเดียว แนบสลิปเดียว
 - 1 รหัสนักศึกษา ซื้อได้ 1 ใบ
-- ผู้ซื้อโอนเงินเอง แล้วแนบรูปสลิป ระบบอ่าน QR บนสลิป ถ้าเป็นสลิปจริงจะ **ออกเลขบัตรทันที** ไม่ต้องรอแอดมิน
+- ผู้ซื้อโอนเงินเอง แล้วแนบรูปสลิป ระบบอ่าน QR บนสลิป ถ้าเป็นสลิปจริงจะ **ยืนยันการจองทันที** ไม่ต้องรอแอดมิน
 - ระบบ **ไม่ได้** ตรวจยอดเงิน และไม่ได้ตรวจว่าโอนเข้าบัญชีถูก แอดมินจะเปิดดูสลิปแล้วยกเลิกใบที่ผิดปกติเอง
 
 ## 2. การเชื่อมต่อ
@@ -43,7 +44,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 
 **เมื่อเปิดหน้า:** เรียก `GET /api/sales`
 ```json
-{ "open": true, "closed_forever": false, "total": 600, "sold": 42, "remaining": 558 }
+{ "open": true, "closed_forever": false, "total": 350, "sold": 42, "remaining": 308 }
 ```
 | สถานะ | สิ่งที่ต้องแสดง |
 |---|---|
@@ -57,7 +58,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 **ฟอร์ม**
 | ช่อง | กฎ (backend ตรวจซ้ำอีกรอบ) |
 |---|---|
-| ชื่อ (`name`) | ห้ามว่าง ยาวไม่เกิน 100 ตัวอักษร |
+| ชื่อ (`name`) | ห้ามว่าง ยาวไม่เกิน 100 ตัวอักษร · ซื้อกลุ่มให้ส่ง `name` + `student_id` ซ้ำเป็นคู่ ๆ ตามลำดับ คนแรกคือผู้ซื้อ (1, 2 หรือ 5 คู่ ไม่งั้น 400) |
 | รหัสนักศึกษา (`student_id`) | ตัวเลข 10 หลัก (ช่องว่างหน้า-หลังถูกตัดให้อัตโนมัติ) |
 | เบอร์โทร (`phone`) | ตัวเลข 10 หลัก ขึ้นต้นด้วย 0 |
 | รูปสลิป (`slip`) | JPG / PNG / WebP ขนาดไม่เกิน 5 MB |
@@ -68,8 +69,10 @@ NEXT_PUBLIC_API_URL=http://localhost:8080
 **ส่งคำสั่งซื้อ:** `POST /api/orders` แบบ `multipart/form-data`
 ```ts
 const fd = new FormData();
-fd.append("name", name);
-fd.append("student_id", studentId);
+for (const p of people) {           // 1, 2 หรือ 5 คน · people[0] คือผู้ซื้อ
+  fd.append("name", p.name);
+  fd.append("student_id", p.studentId);
+}
 fd.append("phone", phone);
 fd.append("slip", file); // File จาก <input type="file" accept="image/jpeg,image/png,image/webp">
 const res = await fetch(`${API}/api/orders`, { method: "POST", body: fd });
@@ -78,9 +81,13 @@ const res = await fetch(`${API}/api/orders`, { method: "POST", body: fd });
 
 **สำเร็จ** `201`:
 ```json
-{ "ticket_no": 12, "ticket_label": "012", "name": "สมชาย ใจดี", "student_id": "6831501178", "picked_up": false }
+{ "name": "สมชาย ใจดี", "student_id": "6831501178", "picked_up": false, "group_size": 2,
+  "tickets": [
+    { "name": "สมชาย ใจดี", "student_id": "6831501178", "picked_up": false, "group_size": 2 },
+    { "name": "สมหญิง ใจดี", "student_id": "6831501179", "picked_up": false, "group_size": 2 }
+  ] }
 ```
-→ พาไปหน้าแสดงบัตร (3.2) และแสดง `ticket_label` ตัวใหญ่ ๆ
+ฟิลด์ชั้นนอกคือผู้ซื้อ (= `tickets[0]`) → พาไปหน้าแสดงบัตร (3.2)
 
 **ไม่สำเร็จ**
 | HTTP | `code` | ความหมาย / สิ่งที่ควรทำ |
@@ -89,7 +96,7 @@ const res = await fetch(`${API}/api/orders`, { method: "POST", body: fd });
 | 403 | `sales_closed` | ปิดขายอยู่ แสดง `message` แล้วโหลดสถานะใหม่ |
 | 422 | `invalid_slip` | อ่านสลิปไม่ได้ แสดง `message` + **`contact`** (ช่องทางติดต่อทีมงาน) และให้ลองแนบรูปใหม่ |
 | 409 | `duplicate_slip` | สลิปนี้เคยถูกใช้แล้ว แสดง `message` + **`contact`** |
-| 409 | `already_has_ticket` | รหัสนี้มีบัตรแล้ว response มี `ticket_label` → แสดงเลขเดิม + ปุ่มไปหน้าดูบัตร |
+| 409 | `already_has_ticket` | รหัสนี้มีบัตรแล้ว response มี `student_id` → ปุ่มไปหน้าดูบัตร |
 | 409 | `sold_out` | บัตรหมด |
 | 500 | `internal` | ระบบขัดข้อง ให้ลองใหม่ |
 
@@ -99,14 +106,16 @@ const res = await fetch(`${API}/api/orders`, { method: "POST", body: fd });
 
 ผู้ใช้กรอกรหัสนักศึกษา → `GET /api/tickets/{student_id}`
 ```json
-{ "ticket_no": 12, "ticket_label": "012", "name": "สมชาย ใจดี", "student_id": "6831501178", "picked_up": false }
+{ "name": "สมชาย ใจดี", "student_id": "6831501178", "picked_up": false, "group_size": 2,
+  "group": [{ "name": "สมชาย ใจดี", "picked_up": false }, { "name": "สมหญิง ใจดี", "picked_up": true }] }
 ```
-- `404 not_found` → "ไม่พบบัตรของรหัสนี้"
+- `group` มีเฉพาะเมื่อ `group_size > 1`
+- `404 not_found` → "ไม่พบบัตรของรหัสนี้" (รวมถึงบัตรที่ถูกยกเลิกแล้ว)
 - `400 invalid_input` → รหัสไม่ใช่ตัวเลข 10 หลัก
-- หน้านี้ผู้ใช้จะเปิดโชว์ทีมงานตอนแลกบัตรจริง **เลขบัตรต้องใหญ่ อ่านง่าย** และแสดงสถานะ `picked_up` (รับบัตรแล้ว / ยังไม่รับ)
+- หน้านี้ผู้ใช้จะเปิดโชว์ทีมงานตอนแลกบัตรจริง แสดงชื่อ รหัส QR และสถานะ `picked_up` (รับบัตรแล้ว / ยังไม่รับ)
 - แนะนำให้ใส่รหัสใน URL ได้ (เช่น `/ticket/6831501178`) ผู้ใช้จะได้บุ๊กมาร์กไว้
 
-> หมายเหตุ: ใครรู้รหัสนักศึกษาก็เปิดดูชื่อกับเลขบัตรได้ ระบบตั้งใจให้เป็นแบบนี้ API นี้ไม่ส่งเบอร์โทรออกมา
+> หมายเหตุ: ใครรู้รหัสนักศึกษาก็เปิดดูชื่อกับสถานะการจองได้ ระบบตั้งใจให้เป็นแบบนี้ API นี้ไม่ส่งเบอร์โทรออกมา
 
 ---
 
@@ -123,13 +132,17 @@ const res = await fetch(`${API}/api/orders`, { method: "POST", body: fd });
 `GET /api/admin/stats`
 ```json
 {
-  "total": 600, "sold": 42, "remaining": 558, "cancelled": 3, "picked_up": 10,
+  "total": 350, "sold": 42, "remaining": 308, "cancelled": 3, "picked_up": 10,
   "open": true, "closed_forever": false,
-  "free_numbers": [7, 43, 44, 45, "..."]
+  "ghost_shots": 128
 }
 ```
 - แสดงตัวเลขสรุป
-- **`free_numbers` สำคัญมาก** ทีมขายหน้างานใช้ดูว่าเลขบัตรกระดาษไหนยังขายได้ ควรแสดงให้อ่านง่าย เช่นยุบเป็นช่วง `007, 043–600`
+- `ghost_shots` = จำนวนครั้งที่กดชัตเตอร์กล้องผีบนหน้าแรก
+- `sold - picked_up` = บัตรกระดาษที่ต้องกันไว้ให้คนจองออนไลน์ก่อนขายหน้างาน
+
+**แก้จำนวนบัตรทั้งหมด:** `PUT /api/admin/total` body `{ "total": 400 }` → สถิติชุดใหม่ (รูปแบบเดียวกับ stats)
+- `400 invalid_input` ถ้านอกช่วง 1–999 · `409 conflict` ถ้าน้อยกว่าที่ขายไปแล้ว
 
 ### 4.3 เปิด/ปิดการขาย
 - `PUT /api/admin/sales` body `{ "open": true | false }` → `{ "open": ..., "closed_forever": ... }`
@@ -139,11 +152,10 @@ const res = await fetch(`${API}/api/orders`, { method: "POST", body: fd });
 
 ### 4.4 รายชื่อผู้ซื้อ
 `GET /api/admin/orders?q=<คำค้น>&status=<active|cancelled>` (ไม่ใส่พารามิเตอร์ = ทั้งหมด)
-- `q` ค้นได้จากชื่อ รหัส เบอร์ (บางส่วนก็ได้) หรือเลขบัตร
-- ผลลัพธ์เรียงตามเลขบัตร
+- `q` ค้นได้จากชื่อ รหัส เบอร์ (บางส่วนก็ได้) · `status` ค่าอื่นได้ `[]`
 ```json
 [{
-  "id": "5b0c…uuid", "ticket_no": 12, "ticket_label": "012", "status": "active",
+  "id": "5b0c…uuid", "status": "active", "group_id": "9e1a…uuid", "group_size": 2,
   "name": "สมชาย ใจดี", "student_id": "6831501178", "phone": "0812345678",
   "slip_path": "orders/…png", "slip_ref": "015123…",
   "created_at": "2026-11-08T03:12:45.123Z",
@@ -157,7 +169,7 @@ const res = await fetch(`${API}/api/orders`, { method: "POST", body: fd });
 | ปุ่ม | API | หมายเหตุ |
 |---|---|---|
 | ดูสลิป | `GET /api/admin/orders/{id}/slip` | ต้องใส่ header token ใช้ `<img src>` ตรง ๆ **ไม่ได้** ดูวิธีด้านล่าง |
-| ยกเลิกบัตร | `POST /api/admin/orders/{id}/cancel` body `{ "reason": "สลิปปลอม" }` | ต้องใส่เหตุผล (ว่าง → 400) ควรมีหน้าต่างยืนยัน เลขบัตรใบนั้นจะกลับมาว่าง ถ้ายกเลิกซ้ำจะได้ `409 conflict` |
+| ยกเลิกบัตร | `POST /api/admin/orders/{id}/cancel` body `{ "reason": "สลิปปลอม" }` | ต้องใส่เหตุผล (ว่าง → 400) ควรมีหน้าต่างยืนยัน โควตาคืน 1 ใบ ถ้ายกเลิกซ้ำจะได้ `409 conflict` |
 | รับบัตรแล้ว / ยกเลิกการติ๊ก | `POST /api/admin/orders/{id}/pickup` body `{ "picked_up": true \| false }` | ใช้ตอนแจกบัตรจริง ถ้าบัตรถูกยกเลิกแล้วจะได้ `409` |
 
 ทั้งสองปุ่มจะได้ order ที่อัปเดตแล้วกลับมา (รูปแบบเดียวกับแถวในรายชื่อ)
@@ -171,7 +183,7 @@ const url = URL.createObjectURL(await res.blob());
 // <img src={url} />  และเรียก URL.revokeObjectURL(url) ตอนปิด
 ```
 
-**โหมดแจกบัตรหน้างาน (แนะนำ):** มีช่องค้นหาด้วยรหัสหรือเลขบัตร → แสดงชื่อ เลข และรูปสลิป → ปุ่ม "รับบัตรแล้ว" ปุ่มใหญ่ ๆ ใช้บนมือถือได้
+**โหมดแจกบัตรหน้างาน (แนะนำ):** สแกน QR บนหน้าบัตรหรือพิมพ์รหัส → แสดงชื่อและสถานะ → ปุ่ม "รับบัตรแล้ว" ปุ่มใหญ่ ๆ ใช้บนมือถือได้
 
 ### 4.5 ความพยายามที่ถูกปฏิเสธ
 `GET /api/admin/rejected` (ใหม่สุดก่อน)
@@ -180,7 +192,8 @@ const url = URL.createObjectURL(await res.blob());
    "slip_path": "rejected/…png", "slip_ref": null, "created_at": "…" }]
 ```
 - `reason` มีได้ 3 ค่า: `invalid_slip` (อ่านสลิปไม่ได้), `duplicate_slip` (ใช้สลิปซ้ำ อาจเป็นการโกง), `already_has_ticket` (รหัสนี้ซื้อซ้ำ)
-- ดูรูปได้ที่ `GET /api/admin/rejected/{id}/slip` ใช้วิธีเดียวกับข้อ 4.4
+- `name` `student_id` `phone` `slip_path` `slip_ref` เป็น `null` ได้ (schema) ต้องแสดงแทนด้วย "–" · แถวของกลุ่มรวมชื่อ/รหัสด้วย ", "
+- ดูรูปได้ที่ `GET /api/admin/rejected/{id}/slip` ใช้วิธีเดียวกับข้อ 4.4 (ไม่มีรูป → 404)
 - ใช้ตอนมีคนทักมาว่า "โอนแล้วแต่ระบบไม่รับ" แอดมินจะเปิดดูรูปที่เขาส่งมาได้
 
 ---
@@ -192,6 +205,7 @@ const url = URL.createObjectURL(await res.blob());
 | GET | `/healthz` | – | (เช็คว่า backend ทำงานอยู่) |
 | GET | `/api/sales` | – | ซื้อบัตร |
 | POST | `/api/orders` | – | ซื้อบัตร |
+| POST | `/api/ghost-shots` | – | นับชัตเตอร์กล้องผี (ไม่มี body → 204 · เกิน 30 ครั้ง/วินาทีทั้งระบบ → 429 เงียบไว้ ห้ามแสดงผู้ใช้) |
 | GET | `/api/tickets/{student_id}` | – | ค้นบัตร |
 | POST | `/api/admin/login` | – | ล็อกอินแอดมิน |
 | GET | `/api/admin/stats` | ✅ | แดชบอร์ด |
@@ -200,6 +214,7 @@ const url = URL.createObjectURL(await res.blob());
 | POST | `/api/admin/orders/{id}/cancel` | ✅ | ยกเลิกบัตร |
 | POST | `/api/admin/orders/{id}/pickup` | ✅ | แจกบัตร |
 | PUT | `/api/admin/sales` | ✅ | เปิด/ปิดขาย |
+| PUT | `/api/admin/total` | ✅ | แก้จำนวนบัตรทั้งหมด |
 | POST | `/api/admin/sales/close-forever` | ✅ | ปิดถาวร |
 | GET | `/api/admin/rejected` | ✅ | ความพยายามที่ถูกปฏิเสธ |
 | GET | `/api/admin/rejected/{id}/slip` | ✅ | ดูรูปที่ถูกปฏิเสธ |
