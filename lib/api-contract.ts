@@ -91,9 +91,10 @@ export function isRejectedAttempts(value: unknown): value is RejectedAttempt[] {
         ["invalid_slip", "duplicate_slip", "already_has_ticket"].includes(
           String(item.reason),
         ) &&
-        text(item.name) &&
-        text(item.student_id) &&
-        text(item.phone) &&
+        // schema ของ backend ให้ 3 ช่องนี้เป็น null ได้ · แถวเดียวห้ามทำทั้งหน้าพัง
+        nullableText(item.name) &&
+        nullableText(item.student_id) &&
+        nullableText(item.phone) &&
         text(item.created_at),
     )
   );

@@ -48,9 +48,9 @@ export type Order = {
 export type RejectedAttempt = {
   id: string;
   reason: "invalid_slip" | "duplicate_slip" | "already_has_ticket";
-  name: string;
-  student_id: string;
-  phone: string;
+  name: string | null;
+  student_id: string | null;
+  phone: string | null;
   created_at: string;
 };
 export type ApiErrorData = {

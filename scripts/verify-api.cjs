@@ -186,6 +186,19 @@ async function main() {
   assert.equal(search.get("status"), "active");
   await api.rejected();
   assert.equal(last().url, `${API_URL}/api/admin/rejected`);
+  // backend schema: name/student_id/phone เป็น null ได้ · ต้องไม่ทำทั้งรายการพัง
+  const nullRow = {
+    id: "r1",
+    reason: "invalid_slip",
+    name: null,
+    student_id: null,
+    phone: null,
+    slip_path: null,
+    slip_ref: null,
+    created_at: "2026-11-10T00:00:00Z",
+  };
+  response([nullRow]);
+  assert.deepEqual(await api.rejected(), [nullRow]);
   response({ open: true, closed_forever: false });
   await api.setSales(true);
   assert.equal(last().init.method, "PUT");

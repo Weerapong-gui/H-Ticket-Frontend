@@ -33,9 +33,9 @@ export default function Rejected() {
           <article className="order-card" key={item.id}>
             <div className="order-card-head">
               <div>
-                <h3>{item.name}</h3>
+                <h3>{item.name ?? "–"}</h3>
                 <p>
-                  รหัส {item.student_id} · โทร {item.phone}
+                  รหัส {item.student_id ?? "–"} · โทร {item.phone ?? "–"}
                 </p>
                 <p>{thaiTime(item.created_at)}</p>
               </div>
